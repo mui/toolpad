@@ -20,8 +20,9 @@ interface Order extends DataModel {
   status: OrderStatus;
   itemCount: number;
   fastDelivery: boolean;
-  createdAt: string;
+  maxReturnDate: string;
   deliveryTime?: string;
+  createdAt: string;
 }
 
 const INITIAL_ORDERS: Order[] = [
@@ -33,6 +34,7 @@ const INITIAL_ORDERS: Order[] = [
     priority: 1,
     itemCount: 1,
     fastDelivery: true,
+    maxReturnDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString(),
     createdAt: new Date().toISOString(),
   },
   {
@@ -43,6 +45,7 @@ const INITIAL_ORDERS: Order[] = [
     priority: 2,
     itemCount: 2,
     fastDelivery: false,
+    maxReturnDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString(),
     createdAt: new Date().toISOString(),
   },
   {
@@ -53,6 +56,7 @@ const INITIAL_ORDERS: Order[] = [
     priority: 3,
     itemCount: 3,
     fastDelivery: true,
+    maxReturnDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString(),
     createdAt: new Date().toISOString(),
   },
 ];
@@ -87,8 +91,8 @@ const ordersDataSource: DataSource<Order> = {
     { field: 'itemCount', headerName: 'No. of items', type: 'number' },
     { field: 'fastDelivery', headerName: 'Fast delivery', type: 'boolean' },
     {
-      field: 'createdAt',
-      headerName: 'Created at',
+      field: 'maxReturnDate',
+      headerName: 'Max. return date',
       type: 'date',
       valueGetter: (value: string) => value && new Date(value),
     },
@@ -97,6 +101,13 @@ const ordersDataSource: DataSource<Order> = {
       headerName: 'Delivery time',
       type: 'dateTime',
       valueGetter: (value: string) => value && new Date(value),
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Created at',
+      type: 'dateTime',
+      valueGetter: (value: string) => value && new Date(value),
+      editable: false,
     },
   ],
   getMany: ({ paginationModel }) => {
@@ -121,6 +132,7 @@ const ordersDataSource: DataSource<Order> = {
   createOne: (data) => {
     const newOrder = {
       id: ordersStore.reduce((max, order) => Math.max(max, order.id), 0) + 1,
+      createdAt: new Date().toISOString(),
       ...data,
     } as Order;
 
@@ -337,6 +349,18 @@ describe('Crud', () => {
     expect(within(dataRows[0]).getByText('Sent')).toBeInTheDocument();
     expect(within(dataRows[0]).getByText('Medium')).toBeInTheDocument();
     expect(within(dataRows[0]).getByText('no')).toBeInTheDocument();
+  });
+
+  test('does not show non-editable items in forms', async () => {
+    render(<AppWithRouter initialPath="/orders/new" />);
+
+    expect(screen.getAllByLabelText('Max. return date')).toBeTruthy();
+    expect(screen.queryByLabelText('Created at')).toBeNull();
+
+    render(<AppWithRouter initialPath="/orders/1/edit" />);
+
+    expect(screen.getAllByLabelText('Max. return date')).toBeTruthy();
+    expect(screen.queryByLabelText('Created at')).toBeNull();
   });
 
   test('deletes items from list view', async () => {

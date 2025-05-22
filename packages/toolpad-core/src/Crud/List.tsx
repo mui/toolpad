@@ -346,7 +346,10 @@ function List<D extends DataModel>(props: ListProps<D>) {
 
   const columns = React.useMemo<GridColDef[]>(() => {
     return [
-      ...fields,
+      ...fields.map((field) => ({
+        ...field,
+        editable: false,
+      })),
       {
         field: 'actions',
         type: 'actions',

@@ -314,6 +314,14 @@ To disable the data source cache, pass `null` to the `dataSourceCache` prop.
 
 {{"demo": "CrudNoCache.js", "height": 600, "iframe": true}}
 
+## Non-editable fields
+
+By default, all fields in a data source except `id` are editable in the CRUD form pages for creating or editing items.
+
+To exclude a field from these forms, set its `editable` property to `false`.
+
+{{"demo": "CrudNonEditableFields.js", "height": 600, "iframe": true}}
+
 ## Custom form fields
 
 You can customize form fields by using the `renderFormField` property in the data source fields definition.

@@ -20,8 +20,9 @@ export interface Order extends DataModel {
   itemCount: number;
   fastDelivery: boolean;
   tags: OrderTag[];
-  createdAt: string;
+  maxReturnDate: string;
   deliveryTime?: string;
+  createdAt: string;
 }
 
 const getOrdersStore = (): Order[] => {
@@ -105,8 +106,8 @@ export const ordersDataSource: DataSource<Order> = {
       ),
     },
     {
-      field: 'createdAt',
-      headerName: 'Created at',
+      field: 'maxReturnDate',
+      headerName: 'Max. return date',
       type: 'date',
       valueGetter: (value) => value && new Date(value),
     },
@@ -115,6 +116,13 @@ export const ordersDataSource: DataSource<Order> = {
       headerName: 'Delivery time',
       type: 'dateTime',
       valueGetter: (value) => value && new Date(value),
+    },
+    {
+      field: 'createdAt',
+      headerName: 'Created at',
+      type: 'dateTime',
+      valueGetter: (value: string) => value && new Date(value),
+      editable: false,
     },
   ],
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
@@ -259,9 +267,9 @@ export const ordersDataSource: DataSource<Order> = {
       .number({ required_error: 'Item count is required' })
       .min(1, 'Item count must be at least 1'),
     fastDelivery: z.boolean({ required_error: 'Fast delivery is required' }),
-    createdAt: z
-      .string({ required_error: 'Creation date is required' })
-      .nonempty('Creation date is required'),
+    maxReturnDate: z
+      .string({ required_error: 'Max. return date is required' })
+      .nonempty('Max. return date is required'),
     deliveryTime: z.string().optional(),
   })['~standard'].validate,
 };

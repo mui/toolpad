@@ -195,7 +195,7 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
         fieldElement = renderFormField({
           value: (fieldValue ?? null) as DataFieldFormValue,
           onChange: (value) => onFieldChange(field, value),
-          error: fieldError,
+          error: fieldError ?? null,
         });
       } else if (!type || type === 'string') {
         const TextFieldComponent = slots?.textField ?? TextField;

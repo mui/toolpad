@@ -40,8 +40,8 @@ function TagsFormField({
   error,
 }: {
   value: OrderTag[];
-  onChange: (value: OrderTag | OrderTag[]) => void | Promise<void>;
-  error?: string;
+  onChange: (value: OrderTag[]) => void | Promise<void>;
+  error: string | null;
 }) {
   const labelId = 'tags-label';
   const label = 'Tags';

@@ -69,8 +69,8 @@ function TagsFormField({
   error,
 }: {
   value: NoteTag[];
-  onChange: (value: NoteTag | NoteTag[]) => void | Promise<void>;
-  error?: string;
+  onChange: (value: NoteTag[]) => void | Promise<void>;
+  error: string | null;
 }) {
   const labelId = 'tags-label';
   const label = 'Tags';

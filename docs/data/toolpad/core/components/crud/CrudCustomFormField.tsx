@@ -1,14 +1,20 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { createTheme } from '@mui/material/styles';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
-import { AppProvider } from '@toolpad/core/AppProvider';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { Crud, DataSourceCache } from '@toolpad/core/Crud';
+import { Crud, DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
 import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
-const NAVIGATION = [
+const NAVIGATION: Navigation = [
   {
     segment: 'notes',
     title: 'Notes',
@@ -33,36 +39,99 @@ const demoTheme = createTheme({
   },
 });
 
-let notesStore = [
+type NoteTag = 'urgent' | 'todo';
+
+export interface Note extends DataModel {
+  id: number;
+  title: string;
+  text: string;
+  tags: NoteTag[];
+}
+
+let notesStore: Note[] = [
   {
     id: 1,
     title: 'Grocery List Item',
     text: 'Buy more coffee.',
-    createdAt: new Date().toISOString(),
+    tags: ['urgent', 'todo'],
   },
   {
     id: 2,
     title: 'Personal Goal',
     text: 'Finish reading the book.',
-    createdAt: new Date().toISOString(),
+    tags: ['todo'],
   },
 ];
 
+function TagsFormField({
+  value,
+  onChange,
+  error,
+}: {
+  value: NoteTag[];
+  onChange: (value: NoteTag[]) => void | Promise<void>;
+  error: string | null;
+}) {
+  const labelId = 'tags-label';
+  const label = 'Tags';
+
+  const handleChange = (event: SelectChangeEvent<string | string[]>) => {
+    const updatedTags = event.target.value;
+    onChange(
+      (typeof updatedTags === 'string' ? [updatedTags] : updatedTags) as NoteTag[],
+    );
+  };
+
+  return (
+    <FormControl error={!!error} fullWidth>
+      <InputLabel id={labelId}>{label}</InputLabel>
+      <Select
+        multiple
+        value={value ?? []}
+        onChange={handleChange}
+        labelId={labelId}
+        name="tags"
+        label={label}
+        renderValue={(selected) => (
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+            {selected.map((selectedValue) => (
+              <Chip key={selectedValue} label={selectedValue} />
+            ))}
+          </Box>
+        )}
+        fullWidth
+      >
+        <MenuItem value="urgent">Urgent</MenuItem>
+        <MenuItem value="todo">Todo</MenuItem>
+      </Select>
+      <FormHelperText>{error ?? ' '}</FormHelperText>
+    </FormControl>
+  );
+}
+
 // preview-start
-export const notesDataSource = {
+export const notesDataSource: DataSource<Note> = {
   fields: [
     { field: 'id', headerName: 'ID' },
     { field: 'title', headerName: 'Title', flex: 1 },
     { field: 'text', headerName: 'Text', flex: 1 },
     {
-      field: 'createdAt',
-      headerName: 'Created at',
-      type: 'dateTime',
-      valueGetter: (value) => value && new Date(value),
-      editable: false,
+      field: 'tags',
+      headerName: 'Tags',
+      valueFormatter: (value) => {
+        return value && (value as string[]).join(', ');
+      },
+      renderFormField: ({ value, onChange, error }) => (
+        <TagsFormField
+          value={value as NoteTag[]}
+          onChange={onChange}
+          error={error}
+        />
+      ),
     },
   ],
   // preview-end
+
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
     // Simulate loading delay
     await new Promise((resolve) => {
@@ -97,9 +166,9 @@ export const notesDataSource = {
                 .toLowerCase()
                 .endsWith(String(value).toLowerCase());
             case '>':
-              return noteValue > value;
+              return (noteValue as number) > value;
             case '<':
-              return noteValue < value;
+              return (noteValue as number) < value;
             default:
               return true;
           }
@@ -111,10 +180,10 @@ export const notesDataSource = {
     if (sortModel?.length) {
       processedNotes.sort((a, b) => {
         for (const { field, sort } of sortModel) {
-          if (a[field] < b[field]) {
+          if ((a[field] as number) < (b[field] as number)) {
             return sort === 'asc' ? -1 : 1;
           }
-          if (a[field] > b[field]) {
+          if ((a[field] as number) > (b[field] as number)) {
             return sort === 'asc' ? 1 : -1;
           }
         }
@@ -132,6 +201,7 @@ export const notesDataSource = {
       itemCount: processedNotes.length,
     };
   },
+
   getOne: async (noteId) => {
     // Simulate loading delay
     await new Promise((resolve) => {
@@ -145,6 +215,7 @@ export const notesDataSource = {
     }
     return noteToShow;
   },
+
   createOne: async (data) => {
     // Simulate loading delay
     await new Promise((resolve) => {
@@ -154,20 +225,20 @@ export const notesDataSource = {
     const newNote = {
       id: notesStore.reduce((max, note) => Math.max(max, note.id), 0) + 1,
       ...data,
-      createdAt: new Date().toISOString(),
-    };
+    } as Note;
 
     notesStore = [...notesStore, newNote];
 
     return newNote;
   },
+
   updateOne: async (noteId, data) => {
     // Simulate loading delay
     await new Promise((resolve) => {
       setTimeout(resolve, 750);
     });
 
-    let updatedNote = null;
+    let updatedNote: Note | null = null;
 
     notesStore = notesStore.map((note) => {
       if (note.id === Number(noteId)) {
@@ -182,6 +253,7 @@ export const notesDataSource = {
     }
     return updatedNote;
   },
+
   deleteOne: async (noteId) => {
     // Simulate loading delay
     await new Promise((resolve) => {
@@ -190,8 +262,9 @@ export const notesDataSource = {
 
     notesStore = notesStore.filter((note) => note.id !== Number(noteId));
   },
+
   validate: (formValues) => {
-    let issues = [];
+    let issues: { message: string; path: [keyof Note] }[] = [];
 
     if (!formValues.title) {
       issues = [...issues, { message: 'Title is required', path: ['title'] }];
@@ -217,13 +290,21 @@ export const notesDataSource = {
 
 const notesCache = new DataSourceCache();
 
-function matchPath(pattern, pathname) {
+function matchPath(pattern: string, pathname: string): string | null {
   const regex = new RegExp(`^${pattern.replace(/:[^/]+/g, '([^/]+)')}$`);
   const match = pathname.match(regex);
   return match ? match[1] : null;
 }
 
-function CrudNonEditableFields(props) {
+interface DemoProps {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window?: () => Window;
+}
+
+export default function CrudCustomFormField(props: DemoProps) {
   const { window } = props;
 
   const router = useDemoRouter('/notes');
@@ -258,28 +339,16 @@ function CrudNonEditableFields(props) {
       >
         <DashboardLayout defaultSidebarCollapsed>
           <PageContainer title={title}>
-            {/* preview-start */}
-            <Crud
+            <Crud<Note>
               dataSource={notesDataSource}
               dataSourceCache={notesCache}
               rootPath="/notes"
               initialPageSize={10}
               defaultValues={{ title: 'New note' }}
             />
-            {/* preview-end */}
           </PageContainer>
         </DashboardLayout>
       </AppProvider>
     </DemoProvider>
   );
 }
-
-CrudNonEditableFields.propTypes = {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * Remove this when copying and pasting into your project.
-   */
-  window: PropTypes.func,
-};
-
-export default CrudNonEditableFields;

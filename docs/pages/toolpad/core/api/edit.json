@@ -8,7 +8,22 @@
       }
     },
     "localeText": { "type": { "name": "object" } },
-    "onSubmitSuccess": { "type": { "name": "func" } }
+    "onSubmitSuccess": { "type": { "name": "func" } },
+    "slotProps": {
+      "type": {
+        "name": "shape",
+        "description": "{ form?: { checkbox?: object, datePicker?: object, dateTimePicker?: object, select?: object, textField?: object } }"
+      },
+      "default": "{}"
+    },
+    "slots": {
+      "type": {
+        "name": "shape",
+        "description": "{ form?: { checkbox?: elementType, datePicker?: elementType, dateTimePicker?: elementType, select?: elementType, textField?: elementType } }"
+      },
+      "default": "{}",
+      "additionalInfo": { "slotsApi": true }
+    }
   },
   "name": "Edit",
   "imports": ["import { Edit } from '@toolpad/core/Crud';"],

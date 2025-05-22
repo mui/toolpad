@@ -2,6 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { createTheme } from '@mui/material/styles';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
+import { DataGridPro } from '@mui/x-data-grid-pro';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
@@ -34,35 +35,16 @@ const demoTheme = createTheme({
 });
 
 let notesStore = [
-  {
-    id: 1,
-    title: 'Grocery List Item',
-    text: 'Buy more coffee.',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    title: 'Personal Goal',
-    text: 'Finish reading the book.',
-    createdAt: new Date().toISOString(),
-  },
+  { id: 1, title: 'Grocery List Item', text: 'Buy more coffee.' },
+  { id: 2, title: 'Personal Goal', text: 'Finish reading the book.' },
 ];
 
-// preview-start
 export const notesDataSource = {
   fields: [
     { field: 'id', headerName: 'ID' },
     { field: 'title', headerName: 'Title', flex: 1 },
     { field: 'text', headerName: 'Text', flex: 1 },
-    {
-      field: 'createdAt',
-      headerName: 'Created at',
-      type: 'dateTime',
-      valueGetter: (value) => value && new Date(value),
-      editable: false,
-    },
   ],
-  // preview-end
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
     // Simulate loading delay
     await new Promise((resolve) => {
@@ -154,7 +136,6 @@ export const notesDataSource = {
     const newNote = {
       id: notesStore.reduce((max, note) => Math.max(max, note.id), 0) + 1,
       ...data,
-      createdAt: new Date().toISOString(),
     };
 
     notesStore = [...notesStore, newNote];
@@ -223,7 +204,7 @@ function matchPath(pattern, pathname) {
   return match ? match[1] : null;
 }
 
-function CrudNonEditableFields(props) {
+function CrudDataGridSlots(props) {
   const { window } = props;
 
   const router = useDemoRouter('/notes');
@@ -265,6 +246,14 @@ function CrudNonEditableFields(props) {
               rootPath="/notes"
               initialPageSize={10}
               defaultValues={{ title: 'New note' }}
+              slots={{ list: { dataGrid: DataGridPro } }}
+              slotProps={{
+                list: {
+                  dataGrid: {
+                    initialState: { pinnedColumns: { right: ['actions'] } },
+                  },
+                },
+              }}
             />
             {/* preview-end */}
           </PageContainer>
@@ -274,7 +263,7 @@ function CrudNonEditableFields(props) {
   );
 }
 
-CrudNonEditableFields.propTypes = {
+CrudDataGridSlots.propTypes = {
   /**
    * Injected by the documentation to work in an iframe.
    * Remove this when copying and pasting into your project.
@@ -282,4 +271,4 @@ CrudNonEditableFields.propTypes = {
   window: PropTypes.func,
 };
 
-export default CrudNonEditableFields;
+export default CrudDataGridSlots;

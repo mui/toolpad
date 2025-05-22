@@ -12,7 +12,9 @@
     "onSubmitSuccess": { "description": "Callback fired when the form is successfully submitted." },
     "resetOnSubmit": {
       "description": "Whether the form fields should reset after the form is submitted."
-    }
+    },
+    "slotProps": { "description": "The props used for each slot inside." },
+    "slots": { "description": "The components used for each slot inside." }
   },
   "classDescriptions": {}
 }

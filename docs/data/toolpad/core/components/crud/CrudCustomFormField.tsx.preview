@@ -1,0 +1,20 @@
+export const notesDataSource: DataSource<Note> = {
+  fields: [
+    { field: 'id', headerName: 'ID' },
+    { field: 'title', headerName: 'Title', flex: 1 },
+    { field: 'text', headerName: 'Text', flex: 1 },
+    {
+      field: 'tags',
+      headerName: 'Tags',
+      valueFormatter: (value) => {
+        return value && (value as string[]).join(', ');
+      },
+      renderFormField: ({ value, onChange, error }) => (
+        <TagsFormField
+          value={value as NoteTag[]}
+          onChange={onChange}
+          error={error}
+        />
+      ),
+    },
+  ],

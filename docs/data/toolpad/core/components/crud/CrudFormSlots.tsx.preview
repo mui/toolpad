@@ -1,0 +1,23 @@
+<Crud<Thing>
+  dataSource={thingsDataSource}
+  dataSourceCache={thingsCache}
+  rootPath="/things"
+  initialPageSize={10}
+  defaultValues={{ title: 'New thing' }}
+  slotProps={{
+    form: {
+      textField: {
+        variant: 'filled',
+      },
+      checkbox: {
+        color: 'secondary',
+      },
+      datePicker: {
+        views: ['year', 'month'],
+      },
+      select: {
+        variant: 'standard',
+      },
+    },
+  }}
+/>

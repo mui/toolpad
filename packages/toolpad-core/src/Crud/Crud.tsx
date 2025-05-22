@@ -11,6 +11,7 @@ import { Create } from './Create';
 import { Edit } from './Edit';
 import { DataSourceCache } from './cache';
 import type { DataModel, DataModelId, DataSource, OmitId } from './types';
+import { CrudFormSlotProps, CrudFormSlots } from './CrudForm';
 
 export interface CrudProps<D extends DataModel> {
   /**
@@ -40,14 +41,16 @@ export interface CrudProps<D extends DataModel> {
    * @default {}
    */
   slots?: {
-    list: ListSlots;
+    list?: ListSlots;
+    form?: CrudFormSlots;
   };
   /**
    * The props used for each slot inside.
    * @default {}
    */
   slotProps?: {
-    list: ListSlotProps;
+    list?: ListSlotProps;
+    form?: CrudFormSlotProps;
   };
 }
 /**
@@ -129,6 +132,16 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
           initialValues={defaultValues}
           onSubmitSuccess={handleCreate}
           resetOnSubmit={false}
+          slots={
+            slots?.form && {
+              form: slots?.form,
+            }
+          }
+          slotProps={
+            slotProps?.form && {
+              form: slotProps?.form,
+            }
+          }
         />
       );
     }
@@ -142,7 +155,22 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
     if (editMatch) {
       const resourceId = editMatch.params.id;
       invariant(resourceId, 'No resource ID present in URL.');
-      return <Edit<D> id={resourceId} onSubmitSuccess={handleEdit} />;
+      return (
+        <Edit<D>
+          id={resourceId}
+          onSubmitSuccess={handleEdit}
+          slots={
+            slots?.form && {
+              form: slots?.form,
+            }
+          }
+          slotProps={
+            slotProps?.form && {
+              form: slotProps?.form,
+            }
+          }
+        />
+      );
     }
     return null;
   }, [
@@ -208,18 +236,32 @@ Crud.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slotProps: PropTypes.shape({
+    form: PropTypes.shape({
+      checkbox: PropTypes.object,
+      datePicker: PropTypes.object,
+      dateTimePicker: PropTypes.object,
+      select: PropTypes.object,
+      textField: PropTypes.object,
+    }),
     list: PropTypes.shape({
       dataGrid: PropTypes.object,
-    }).isRequired,
+    }),
   }),
   /**
    * The components used for each slot inside.
    * @default {}
    */
   slots: PropTypes.shape({
+    form: PropTypes.shape({
+      checkbox: PropTypes.elementType,
+      datePicker: PropTypes.elementType,
+      dateTimePicker: PropTypes.elementType,
+      select: PropTypes.elementType,
+      textField: PropTypes.elementType,
+    }),
     list: PropTypes.shape({
       dataGrid: PropTypes.func,
-    }).isRequired,
+    }),
   }),
 } as any;
 

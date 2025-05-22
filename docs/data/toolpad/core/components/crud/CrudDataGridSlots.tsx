@@ -1,14 +1,14 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { createTheme } from '@mui/material/styles';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
-import { AppProvider } from '@toolpad/core/AppProvider';
+import { DataGridPro } from '@mui/x-data-grid-pro';
+import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { Crud, DataSourceCache } from '@toolpad/core/Crud';
+import { Crud, DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
 import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
-const NAVIGATION = [
+const NAVIGATION: Navigation = [
   {
     segment: 'notes',
     title: 'Notes',
@@ -33,36 +33,24 @@ const demoTheme = createTheme({
   },
 });
 
-let notesStore = [
-  {
-    id: 1,
-    title: 'Grocery List Item',
-    text: 'Buy more coffee.',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    title: 'Personal Goal',
-    text: 'Finish reading the book.',
-    createdAt: new Date().toISOString(),
-  },
+export interface Note extends DataModel {
+  id: number;
+  title: string;
+  text: string;
+}
+
+let notesStore: Note[] = [
+  { id: 1, title: 'Grocery List Item', text: 'Buy more coffee.' },
+  { id: 2, title: 'Personal Goal', text: 'Finish reading the book.' },
 ];
 
-// preview-start
-export const notesDataSource = {
+export const notesDataSource: DataSource<Note> = {
   fields: [
     { field: 'id', headerName: 'ID' },
     { field: 'title', headerName: 'Title', flex: 1 },
     { field: 'text', headerName: 'Text', flex: 1 },
-    {
-      field: 'createdAt',
-      headerName: 'Created at',
-      type: 'dateTime',
-      valueGetter: (value) => value && new Date(value),
-      editable: false,
-    },
   ],
-  // preview-end
+
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
     // Simulate loading delay
     await new Promise((resolve) => {
@@ -97,9 +85,9 @@ export const notesDataSource = {
                 .toLowerCase()
                 .endsWith(String(value).toLowerCase());
             case '>':
-              return noteValue > value;
+              return (noteValue as number) > value;
             case '<':
-              return noteValue < value;
+              return (noteValue as number) < value;
             default:
               return true;
           }
@@ -111,10 +99,10 @@ export const notesDataSource = {
     if (sortModel?.length) {
       processedNotes.sort((a, b) => {
         for (const { field, sort } of sortModel) {
-          if (a[field] < b[field]) {
+          if ((a[field] as number) < (b[field] as number)) {
             return sort === 'asc' ? -1 : 1;
           }
-          if (a[field] > b[field]) {
+          if ((a[field] as number) > (b[field] as number)) {
             return sort === 'asc' ? 1 : -1;
           }
         }
@@ -132,6 +120,7 @@ export const notesDataSource = {
       itemCount: processedNotes.length,
     };
   },
+
   getOne: async (noteId) => {
     // Simulate loading delay
     await new Promise((resolve) => {
@@ -145,6 +134,7 @@ export const notesDataSource = {
     }
     return noteToShow;
   },
+
   createOne: async (data) => {
     // Simulate loading delay
     await new Promise((resolve) => {
@@ -154,20 +144,20 @@ export const notesDataSource = {
     const newNote = {
       id: notesStore.reduce((max, note) => Math.max(max, note.id), 0) + 1,
       ...data,
-      createdAt: new Date().toISOString(),
-    };
+    } as Note;
 
     notesStore = [...notesStore, newNote];
 
     return newNote;
   },
+
   updateOne: async (noteId, data) => {
     // Simulate loading delay
     await new Promise((resolve) => {
       setTimeout(resolve, 750);
     });
 
-    let updatedNote = null;
+    let updatedNote: Note | null = null;
 
     notesStore = notesStore.map((note) => {
       if (note.id === Number(noteId)) {
@@ -182,6 +172,7 @@ export const notesDataSource = {
     }
     return updatedNote;
   },
+
   deleteOne: async (noteId) => {
     // Simulate loading delay
     await new Promise((resolve) => {
@@ -190,8 +181,9 @@ export const notesDataSource = {
 
     notesStore = notesStore.filter((note) => note.id !== Number(noteId));
   },
+
   validate: (formValues) => {
-    let issues = [];
+    let issues: { message: string; path: [keyof Note] }[] = [];
 
     if (!formValues.title) {
       issues = [...issues, { message: 'Title is required', path: ['title'] }];
@@ -217,13 +209,21 @@ export const notesDataSource = {
 
 const notesCache = new DataSourceCache();
 
-function matchPath(pattern, pathname) {
+function matchPath(pattern: string, pathname: string): string | null {
   const regex = new RegExp(`^${pattern.replace(/:[^/]+/g, '([^/]+)')}$`);
   const match = pathname.match(regex);
   return match ? match[1] : null;
 }
 
-function CrudNonEditableFields(props) {
+interface DemoProps {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window?: () => Window;
+}
+
+export default function CrudDataGridSlots(props: DemoProps) {
   const { window } = props;
 
   const router = useDemoRouter('/notes');
@@ -259,12 +259,20 @@ function CrudNonEditableFields(props) {
         <DashboardLayout defaultSidebarCollapsed>
           <PageContainer title={title}>
             {/* preview-start */}
-            <Crud
+            <Crud<Note>
               dataSource={notesDataSource}
               dataSourceCache={notesCache}
               rootPath="/notes"
               initialPageSize={10}
               defaultValues={{ title: 'New note' }}
+              slots={{ list: { dataGrid: DataGridPro } }}
+              slotProps={{
+                list: {
+                  dataGrid: {
+                    initialState: { pinnedColumns: { right: ['actions'] } },
+                  },
+                },
+              }}
             />
             {/* preview-end */}
           </PageContainer>
@@ -273,13 +281,3 @@ function CrudNonEditableFields(props) {
     </DemoProvider>
   );
 }
-
-CrudNonEditableFields.propTypes = {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * Remove this when copying and pasting into your project.
-   */
-  window: PropTypes.func,
-};
-
-export default CrudNonEditableFields;

@@ -41,16 +41,16 @@ export interface CrudProps<D extends DataModel> {
    * @default {}
    */
   slots?: {
-    list: ListSlots;
-    form: CrudFormSlots;
+    list?: ListSlots;
+    form?: CrudFormSlots;
   };
   /**
    * The props used for each slot inside.
    * @default {}
    */
   slotProps?: {
-    list: ListSlotProps;
-    form: CrudFormSlotProps;
+    list?: ListSlotProps;
+    form?: CrudFormSlotProps;
   };
 }
 /**
@@ -242,10 +242,10 @@ Crud.propTypes /* remove-proptypes */ = {
       dateTimePicker: PropTypes.object,
       select: PropTypes.object,
       textField: PropTypes.object,
-    }).isRequired,
+    }),
     list: PropTypes.shape({
       dataGrid: PropTypes.object,
-    }).isRequired,
+    }),
   }),
   /**
    * The components used for each slot inside.
@@ -258,10 +258,10 @@ Crud.propTypes /* remove-proptypes */ = {
       dateTimePicker: PropTypes.elementType,
       select: PropTypes.elementType,
       textField: PropTypes.elementType,
-    }).isRequired,
+    }),
     list: PropTypes.shape({
       dataGrid: PropTypes.func,
-    }).isRequired,
+    }),
   }),
 } as any;
 

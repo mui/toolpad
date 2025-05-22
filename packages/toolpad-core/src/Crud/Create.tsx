@@ -43,14 +43,14 @@ export interface CreateProps<D extends DataModel> {
    * @default {}
    */
   slots?: {
-    form: CrudFormSlots;
+    form?: CrudFormSlots;
   };
   /**
    * The props used for each slot inside.
    * @default {}
    */
   slotProps?: {
-    form: CrudFormSlotProps;
+    form?: CrudFormSlotProps;
   };
 }
 
@@ -261,7 +261,7 @@ Create.propTypes /* remove-proptypes */ = {
       dateTimePicker: PropTypes.object,
       select: PropTypes.object,
       textField: PropTypes.object,
-    }).isRequired,
+    }),
   }),
   /**
    * The components used for each slot inside.
@@ -274,7 +274,7 @@ Create.propTypes /* remove-proptypes */ = {
       dateTimePicker: PropTypes.elementType,
       select: PropTypes.elementType,
       textField: PropTypes.elementType,
-    }).isRequired,
+    }),
   }),
 } as any;
 

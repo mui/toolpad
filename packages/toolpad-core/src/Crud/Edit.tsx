@@ -21,10 +21,10 @@ interface EditFormProps<D extends DataModel> {
   onSubmitSuccess?: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
   localeText: CRUDLocaleText;
   slots?: {
-    form: CrudFormSlots;
+    form?: CrudFormSlots;
   };
   slotProps?: {
-    form: CrudFormSlotProps;
+    form?: CrudFormSlotProps;
   };
 }
 
@@ -162,7 +162,7 @@ EditForm.propTypes /* remove-proptypes */ = {
       dateTimePicker: PropTypes.object,
       select: PropTypes.object,
       textField: PropTypes.object,
-    }).isRequired,
+    }),
   }),
   slots: PropTypes.shape({
     form: PropTypes.shape({
@@ -171,7 +171,7 @@ EditForm.propTypes /* remove-proptypes */ = {
       dateTimePicker: PropTypes.elementType,
       select: PropTypes.elementType,
       textField: PropTypes.elementType,
-    }).isRequired,
+    }),
   }),
 } as any;
 
@@ -198,14 +198,14 @@ export interface EditProps<D extends DataModel> {
    * @default {}
    */
   slots?: {
-    form: CrudFormSlots;
+    form?: CrudFormSlots;
   };
   /**
    * The props used for each slot inside.
    * @default {}
    */
   slotProps?: {
-    form: CrudFormSlotProps;
+    form?: CrudFormSlotProps;
   };
 }
 
@@ -374,7 +374,7 @@ Edit.propTypes /* remove-proptypes */ = {
       dateTimePicker: PropTypes.object,
       select: PropTypes.object,
       textField: PropTypes.object,
-    }).isRequired,
+    }),
   }),
   /**
    * The components used for each slot inside.
@@ -387,7 +387,7 @@ Edit.propTypes /* remove-proptypes */ = {
       dateTimePicker: PropTypes.elementType,
       select: PropTypes.elementType,
       textField: PropTypes.elementType,
-    }).isRequired,
+    }),
   }),
 } as any;
 

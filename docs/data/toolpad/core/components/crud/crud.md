@@ -322,13 +322,31 @@ To exclude a field from these forms, set its `editable` property to `false`.
 
 {{"demo": "CrudNonEditableFields.js", "height": 600, "iframe": true}}
 
-## Custom form fields
+## Customization
+
+### Custom form fields
 
 You can customize form fields by using the `renderFormField` property in the data source fields definition.
 
 This function receives `value`, `onChange` and `error` as arguments for the respective field, allowing you to create your own custom logic inside the form.
 
 {{"demo": "CrudCustomFormField.js", "height": 600, "iframe": true}}
+
+### Slots
+
+Certain parts of the CRUD UIs can be customized or replaced with custom components by using the `slots` and `slotProps` props.
+
+#### Integration with Data Grid
+
+The `list` and then `dataGrid` slot and slot props can be used to replace the standard Data Grid with any of its [commercially licensed versions](https://mui.com/x/react-data-grid/#commercial-licenses).
+
+{{"demo": "CrudDataGridSlots.js", "height": 600, "iframe": true}}
+
+#### Customizing forms
+
+The `form` slots and slot props can be used, for example, to customize components inside CRUD forms:
+
+{{"demo": "CrudFormSlots.js", "height": 600, "iframe": true}}
 
 ## Advanced configuration
 
@@ -348,12 +366,6 @@ If props are passed for `onCreateClick` or `onEditClick`, buttons are shown for 
 If the data source includes `deleteOne`, it is possible to delete items directly from their respective rows.
 
 {{"demo": "CrudList.js", "height": 600, "iframe": true}}
-
-#### Integration with Data Grid
-
-The `dataGrid` slot and slot props can be used to replace the standard Data Grid with any of its [commercially licensed versions](https://mui.com/x/react-data-grid/#commercial-licenses).
-
-{{"demo": "CrudListDataGrid.js", "height": 600, "iframe": true}}
 
 ### `Show` component
 

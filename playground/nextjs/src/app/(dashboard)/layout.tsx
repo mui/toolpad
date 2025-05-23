@@ -166,7 +166,7 @@ export default function DashboardPagesLayout(props: { children: React.ReactNode 
     if (pathname.endsWith('/orders/new')) {
       return 'New Order';
     }
-    if (orderId && pathname.endsWith('/orders/edit')) {
+    if (orderId && pathname.endsWith('/edit')) {
       return `Order ${orderId} - Edit`;
     }
     if (orderId) {

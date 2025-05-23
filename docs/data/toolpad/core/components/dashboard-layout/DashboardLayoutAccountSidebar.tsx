@@ -12,7 +12,11 @@ import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { DashboardLayout, SidebarFooterProps } from '@toolpad/core/DashboardLayout';
+import {
+  DashboardLayout,
+  SidebarFooterProps,
+  ThemeSwitcher,
+} from '@toolpad/core/DashboardLayout';
 import {
   Account,
   AccountPreview,
@@ -55,6 +59,14 @@ const demoTheme = createTheme({
     },
   },
 });
+
+function CustomToolbarActions() {
+  return (
+    <Stack direction="row" alignItems="center">
+      <ThemeSwitcher />
+    </Stack>
+  );
+}
 
 function DemoPageContent({ pathname }: { pathname: string }) {
   return (
@@ -267,7 +279,10 @@ export default function DashboardLayoutAccountSidebar(props: DemoProps) {
       >
         {/* preview-start */}
         <DashboardLayout
-          slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
+          slots={{
+            toolbarActions: CustomToolbarActions,
+            sidebarFooter: SidebarFooterAccount,
+          }}
         >
           <DemoPageContent pathname={pathname} />
         </DashboardLayout>

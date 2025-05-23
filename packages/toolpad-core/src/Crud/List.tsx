@@ -352,7 +352,10 @@ function List<D extends DataModel>(props: ListProps<D>) {
       pinnedColumnsOverride?.right?.includes('actions');
 
     return [
-      ...fields,
+      ...fields.map((field) => ({
+        ...field,
+        editable: false,
+      })),
       {
         field: 'actions',
         type: 'actions',

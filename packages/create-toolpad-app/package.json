@@ -1,6 +1,6 @@
 {
   "name": "create-toolpad-app",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "author": "MUI Team",
   "description": "Create Toolpad apps with one command",
   "keywords": [
@@ -41,7 +41,7 @@
     "yargs": "17.7.2"
   },
   "devDependencies": {
-    "@types/inquirer": "9.0.7",
+    "@types/inquirer": "9.0.8",
     "@types/invariant": "2.2.37",
     "@types/node": "^20.17.32",
     "@types/semver": "7.7.0",

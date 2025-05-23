@@ -54,10 +54,12 @@ function DefaultLayout({ page }: { page: React.ReactElement<any> }) {
   const [orderId] = segments;
 
   const title = React.useMemo(() => {
-    if (router.asPath.split('?')[0] === '/orders/new') {
+    const pathname = router.asPath.split('?')[0];
+
+    if (pathname.endsWith('/orders/new')) {
       return 'New Order';
     }
-    if (orderId && router.asPath.includes('/edit')) {
+    if (orderId && pathname.endsWith('/edit')) {
       return `Order ${orderId} - Edit`;
     }
     if (orderId) {

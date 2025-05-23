@@ -345,6 +345,12 @@ function List<D extends DataModel>(props: ListProps<D>) {
   );
 
   const columns = React.useMemo<GridColDef[]>(() => {
+    const pinnedColumnsOverride = (slotProps?.dataGrid as DataGridProProps | DataGridPremiumProps)
+      ?.initialState?.pinnedColumns;
+    const isActionsColumnPinned =
+      pinnedColumnsOverride?.left?.includes('actions') ||
+      pinnedColumnsOverride?.right?.includes('actions');
+
     return [
       ...fields.map((field) => ({
         ...field,
@@ -353,7 +359,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
       {
         field: 'actions',
         type: 'actions',
-        flex: 1,
+        flex: isActionsColumnPinned ? undefined : 1,
         align: 'right',
         getActions: ({ id }) => [
           ...(onEditClick
@@ -387,6 +393,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
     localeText.deleteLabel,
     localeText.editLabel,
     onEditClick,
+    slotProps?.dataGrid,
   ]);
 
   return (

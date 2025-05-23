@@ -1,24 +1,24 @@
 import * as React from 'react';
-import { Outlet, useLocation, useParams, matchPath } from 'react-router';
+import { Outlet, useLocation, useParams } from 'react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 
 export default function Layout() {
-  const location = useLocation();
+  const { pathname } = useLocation();
   const { employeeId } = useParams();
 
   const title = React.useMemo(() => {
-    if (location.pathname === '/employees/new') {
+    if (pathname.endsWith('/employees/new')) {
       return 'New Employee';
     }
-    if (matchPath('/employees/:employeeId/edit', location.pathname)) {
+    if (employeeId && pathname.endsWith('/edit')) {
       return `Employee ${employeeId} - Edit`;
     }
     if (employeeId) {
       return `Employee ${employeeId}`;
     }
     return undefined;
-  }, [location.pathname, employeeId]);
+  }, [employeeId, pathname]);
 
   return (
     <DashboardLayout>

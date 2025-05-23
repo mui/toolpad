@@ -97,10 +97,12 @@ function DefaultLayout({ page }: { page: React.ReactElement<any> }) {
   const [employeeId] = segments;
 
   const title = React.useMemo(() => {
-    if (router.asPath.split('?')[0] === '/employees/new') {
+    const pathname = router.asPath.split('?')[0];
+
+    if (pathname.endsWith('/employees/new')) {
       return 'New Employee';
     }
-    if (employeeId && router.asPath.includes('/edit')) {
+    if (employeeId && pathname.endsWith('/edit')) {
       return \`Employee \${employeeId} - Edit\`;
     }
     if (employeeId) {

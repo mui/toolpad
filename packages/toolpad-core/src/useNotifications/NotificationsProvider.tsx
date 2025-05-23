@@ -22,13 +22,6 @@ import type {
 } from './useNotifications';
 import { useLocaleText, type LocaleText } from '../AppProvider/LocalizationProvider';
 
-export interface RemoveClosedNotifications {
-  /**
-   * Remove all closed snackbars from the NotificationsState queue.
-   */
-  (): void;
-}
-
 export interface NotificationsProviderSlotProps {
   snackbar: SnackbarProps;
 }
@@ -62,8 +55,7 @@ interface NotificationProps {
 function Notification({ notificationKey, open, message, options, badge }: NotificationProps) {
   const globalLocaleText = useLocaleText();
   const localeText = { ...defaultLocaleText, ...globalLocaleText };
-  const { close, removeClosed } = useNonNullableContext(NotificationsContext);
-
+  const { close, remove } = useNonNullableContext(NotificationsContext);
   const { severity, actionText, onAction, autoHideDuration } = options;
 
   const handleClose = React.useCallback(
@@ -77,8 +69,8 @@ function Notification({ notificationKey, open, message, options, badge }: Notifi
   );
 
   const handleExited = React.useCallback(() => {
-    removeClosed();
-  }, [removeClosed]);
+    remove(notificationKey);
+  }, [notificationKey, remove]);
 
   const action = (
     <React.Fragment>
@@ -101,22 +93,30 @@ function Notification({ notificationKey, open, message, options, badge }: Notifi
 
   const props = React.useContext(RootPropsContext);
   const SnackbarComponent = props?.slots?.snackbar ?? Snackbar;
-  const externalTransitionProps = props?.slotProps?.snackbar?.slotProps?.transition;
+
+  // Passing `onExited` through `externalSlotProps` here.
+  // Passing it through `additionalProps` causes it to be overwritten when
+  // transition slotProps are specified in RootPropsContext.
+  const externalSnackbarSlotProps = props?.slotProps?.snackbar?.slotProps;
+  const externalTransitionProps = externalSnackbarSlotProps?.transition;
   const snackbarSlotProps = useSlotProps({
     elementType: SnackbarComponent,
     ownerState: props,
-    externalSlotProps: props?.slotProps?.snackbar,
-    additionalProps: {
-      open,
-      autoHideDuration,
-      onClose: handleClose,
-      action,
+    externalSlotProps: {
+      ...props?.slotProps?.snackbar,
       slotProps: {
+        ...externalSnackbarSlotProps,
         transition: {
           ...externalTransitionProps,
           onExited: handleExited,
         },
       },
+    },
+    additionalProps: {
+      open,
+      autoHideDuration,
+      onClose: handleClose,
+      action,
     },
   });
 
@@ -176,6 +176,15 @@ const generateId = () => {
   return id;
 };
 
+export interface RemoveNotification {
+  /**
+   * Remove a snackbar from the application state (after it has been closed).
+   *
+   * @param key The key of the notification to remove.
+   */
+  (key: string): void;
+}
+
 /**
  * Provider for Notifications. The subtree of this component can use the `useNotifications` hook to
  * access the notifications API. The notifications are shown in the same order they are requested.
@@ -215,17 +224,14 @@ function NotificationsProvider(props: NotificationsProviderProps) {
     }));
   }, []);
 
-  const removeClosed = React.useCallback<RemoveClosedNotifications>(() => {
+  const remove = React.useCallback<RemoveNotification>((key) => {
     setState((prev) => ({
       ...prev,
-      queue: prev.queue.filter((n) => n.open),
+      queue: prev.queue.filter((n) => key !== n.notificationKey),
     }));
   }, []);
 
-  const contextValue = React.useMemo(
-    () => ({ show, close, removeClosed }),
-    [show, close, removeClosed],
-  );
+  const contextValue = React.useMemo(() => ({ show, close, remove }), [show, close, remove]);
 
   return (
     <RootPropsContext.Provider value={props}>

@@ -12,9 +12,8 @@ function Layout() {
     if (pathname.endsWith('/orders/new')) {
       return 'New Order';
     }
-
     const orderId = _splat?.split('/')[0];
-    if (orderId && pathname.startsWith('/orders') && pathname.endsWith('/edit')) {
+    if (orderId && pathname.endsWith('/edit')) {
       return `Order ${orderId} - Edit`;
     }
     if (orderId) {

@@ -22,6 +22,13 @@ import type {
 } from './useNotifications';
 import { useLocaleText, type LocaleText } from '../AppProvider/LocalizationProvider';
 
+export interface RemoveClosedNotifications {
+  /**
+   * Remove all closed snackbars from the NotificationsState queue.
+   */
+  (): void;
+}
+
 export interface NotificationsProviderSlotProps {
   snackbar: SnackbarProps;
 }
@@ -55,7 +62,7 @@ interface NotificationProps {
 function Notification({ notificationKey, open, message, options, badge }: NotificationProps) {
   const globalLocaleText = useLocaleText();
   const localeText = { ...defaultLocaleText, ...globalLocaleText };
-  const { close } = useNonNullableContext(NotificationsContext);
+  const { close, removeClosed } = useNonNullableContext(NotificationsContext);
 
   const { severity, actionText, onAction, autoHideDuration } = options;
 
@@ -68,6 +75,10 @@ function Notification({ notificationKey, open, message, options, badge }: Notifi
     },
     [notificationKey, close],
   );
+
+  const handleExited = React.useCallback(() => {
+    removeClosed();
+  }, [removeClosed]);
 
   const action = (
     <React.Fragment>
@@ -90,6 +101,7 @@ function Notification({ notificationKey, open, message, options, badge }: Notifi
 
   const props = React.useContext(RootPropsContext);
   const SnackbarComponent = props?.slots?.snackbar ?? Snackbar;
+  const externalTransitionProps = props?.slotProps?.snackbar?.slotProps?.transition;
   const snackbarSlotProps = useSlotProps({
     elementType: SnackbarComponent,
     ownerState: props,
@@ -99,6 +111,12 @@ function Notification({ notificationKey, open, message, options, badge }: Notifi
       autoHideDuration,
       onClose: handleClose,
       action,
+      slotProps: {
+        transition: {
+          ...externalTransitionProps,
+          onExited: handleExited,
+        },
+      },
     },
   });
 
@@ -195,16 +213,19 @@ function NotificationsProvider(props: NotificationsProviderProps) {
       ...prev,
       queue: prev.queue.map((n) => (n.notificationKey === key ? { ...n, open: false } : n)),
     }));
-
-    setTimeout(() => {
-      setState((prev) => ({
-        ...prev,
-        queue: prev.queue.filter((n) => n.open),
-      }));
-    }, 100);
   }, []);
 
-  const contextValue = React.useMemo(() => ({ show, close }), [show, close]);
+  const removeClosed = React.useCallback<RemoveClosedNotifications>(() => {
+    setState((prev) => ({
+      ...prev,
+      queue: prev.queue.filter((n) => n.open),
+    }));
+  }, []);
+
+  const contextValue = React.useMemo(
+    () => ({ show, close, removeClosed }),
+    [show, close, removeClosed],
+  );
 
   return (
     <RootPropsContext.Provider value={props}>

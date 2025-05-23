@@ -393,6 +393,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
     localeText.deleteLabel,
     localeText.editLabel,
     onEditClick,
+    slotProps?.dataGrid,
   ]);
 
   return (

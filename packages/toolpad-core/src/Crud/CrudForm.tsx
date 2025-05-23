@@ -106,14 +106,21 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
 
   const { fields } = dataSource;
 
-  const [, submitAction, isSubmitting] = React.useActionState<null | Error, FormData>(async () => {
-    try {
-      await onSubmit(formValues);
-    } catch (error) {
-      return error as Error;
-    }
-    return null;
-  }, null);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const handleSubmit = React.useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+
+      setIsSubmitting(true);
+      try {
+        await onSubmit(formValues);
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [formValues, onSubmit],
+  );
 
   const handleTextFieldChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -317,7 +324,7 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
   return (
     <Box
       component="form"
-      action={submitAction}
+      onSubmit={handleSubmit}
       noValidate
       autoComplete="off"
       onReset={handleReset}
@@ -325,7 +332,9 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
     >
       <FormGroup>
         <Grid container spacing={2} sx={{ mb: 2, width: '100%' }}>
-          {fields.filter(({ field }) => field !== 'id').map(renderField)}
+          {fields
+            .filter(({ field, editable }) => field !== 'id' && editable !== false)
+            .map(renderField)}
         </Grid>
       </FormGroup>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>

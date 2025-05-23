@@ -1,0 +1,57 @@
+{
+  "props": {
+    "menuOpen": { "type": { "name": "bool" }, "required": true },
+    "onToggleMenu": { "type": { "name": "func" }, "required": true },
+    "branding": {
+      "type": {
+        "name": "shape",
+        "description": "{ homeUrl?: string, logo?: node, title?: string }"
+      },
+      "default": "null"
+    },
+    "hideMenuButton": { "type": { "name": "bool" }, "default": "false" },
+    "slotProps": {
+      "type": {
+        "name": "shape",
+        "description": "{ appTitle?: { branding?: { homeUrl?: string, logo?: node, title?: string } }, toolbarAccount?: { localeText?: object, slotProps?: { popover?: object, popoverContent?: object, preview?: object, signInButton?: object, signOutButton?: object }, slots?: { popover?: elementType, popoverContent?: elementType, preview?: elementType, signInButton?: elementType, signOutButton?: elementType } }, toolbarActions?: object }"
+      },
+      "default": "{}"
+    },
+    "slots": {
+      "type": {
+        "name": "shape",
+        "description": "{ appTitle?: elementType, toolbarAccount?: elementType, toolbarActions?: elementType }"
+      },
+      "default": "{}",
+      "additionalInfo": { "slotsApi": true }
+    }
+  },
+  "name": "DashboardHeader",
+  "imports": ["import { DashboardHeader } from '@toolpad/core/DashboardLayout';"],
+  "slots": [
+    {
+      "name": "appTitle",
+      "description": "The component used for the app title section.",
+      "default": "Link",
+      "class": null
+    },
+    {
+      "name": "toolbarActions",
+      "description": "The toolbar actions component to be used.",
+      "default": "ToolbarActions",
+      "class": null
+    },
+    {
+      "name": "toolbarAccount",
+      "description": "The toolbar account component to be used.",
+      "default": "Account",
+      "class": null
+    }
+  ],
+  "classes": [],
+  "muiName": "DashboardHeader",
+  "filename": "/packages/toolpad-core/src/DashboardLayout/DashboardHeader.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-dashboard-layout/\">Dashboard Layout</a></li></ul>",
+  "cssComponent": false
+}

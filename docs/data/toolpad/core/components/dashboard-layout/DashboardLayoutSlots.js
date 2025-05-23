@@ -15,6 +15,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import SearchIcon from '@mui/icons-material/Search';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout, ThemeSwitcher } from '@toolpad/core/DashboardLayout';
+import { Account } from '@toolpad/core/Account';
 import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
@@ -103,6 +104,7 @@ function ToolbarActionsSearch() {
         sx={{ display: { xs: 'none', md: 'inline-block' }, mr: 1 }}
       />
       <ThemeSwitcher />
+      <Account />
     </Stack>
   );
 }

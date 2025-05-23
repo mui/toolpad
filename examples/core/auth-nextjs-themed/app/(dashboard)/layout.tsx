@@ -1,10 +1,20 @@
 'use client';
 import * as React from 'react';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import Stack from '@mui/material/Stack';
+import { DashboardLayout, ThemeSwitcher } from '@toolpad/core/DashboardLayout';
 import { usePathname, useParams } from 'next/navigation';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import Copyright from '../components/Copyright';
 import SidebarFooterAccount, { ToolbarAccountOverride } from './SidebarFooterAccount';
+
+function CustomActions() {
+  return (
+    <Stack direction="row" alignItems="center">
+      <ThemeSwitcher />
+      <ToolbarAccountOverride />
+    </Stack>
+  );
+}
 
 export default function Layout(props: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -27,7 +37,7 @@ export default function Layout(props: { children: React.ReactNode }) {
   return (
     <DashboardLayout
       slots={{
-        toolbarAccount: ToolbarAccountOverride,
+        toolbarActions: CustomActions,
         sidebarFooter: SidebarFooterAccount,
       }}
     >

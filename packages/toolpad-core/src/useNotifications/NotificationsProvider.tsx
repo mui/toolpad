@@ -19,6 +19,7 @@ import type {
   CloseNotification,
   ShowNotification,
   ShowNotificationOptions,
+  RemoveNotification,
 } from './useNotifications';
 import { useLocaleText, type LocaleText } from '../AppProvider/LocalizationProvider';
 
@@ -175,15 +176,6 @@ const generateId = () => {
   nextId += 1;
   return id;
 };
-
-export interface RemoveNotification {
-  /**
-   * Remove a snackbar from the application state (after it has been closed).
-   *
-   * @param key The key of the notification to remove.
-   */
-  (key: string): void;
-}
 
 /**
  * Provider for Notifications. The subtree of this component can use the `useNotifications` hook to

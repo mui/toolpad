@@ -82,7 +82,10 @@ function DialogsProvider(props: DialogProviderProps) {
     result: R,
   ) {
     const entryToClose = stack.find((entry) => entry.promise === dialog);
-    invariant(entryToClose, 'dialog not found');
+    if (!entryToClose) {
+      // Dialog already closed or not found - this is safe to ignore
+      return dialog;
+    }
     await entryToClose.onClose(result);
     entryToClose.resolve(result);
     closeDialogUi(dialog);

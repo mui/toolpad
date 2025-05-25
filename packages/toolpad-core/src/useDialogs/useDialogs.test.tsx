@@ -280,17 +280,24 @@ describe('useDialogs', () => {
         }, [dialogs]);
 
         React.useEffect(() => {
-          setTimeout(() => {
+          const timeout = setTimeout(() => {
             if (dialogRef.current) {
               dialogs.close(dialogRef.current, undefined);
+              dialogRef.current = null;
             }
           }, 50);
+          return () => clearTimeout(timeout);
         });
 
         return <div>Test Component</div>;
       }
 
-      render(<TestComponent />, { wrapper: TestWrapper });
+      render(
+        <DialogsProvider>
+          <TestComponent />
+        </DialogsProvider>,
+        { reactStrictMode: true },
+      );
 
       await waitFor(
         async () => {

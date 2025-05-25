@@ -84,14 +84,14 @@ function DialogsProvider(props: DialogProviderProps) {
     setStack((currentStack) => {
       const entryToClose = currentStack.find((entry) => entry.promise === dialog);
       invariant(entryToClose, 'dialog not found');
-      
+
       // Execute async operations outside of setState
       Promise.resolve().then(async () => {
         await entryToClose.onClose(result);
         entryToClose.resolve(result);
         closeDialogUi(dialog);
       });
-      
+
       return currentStack;
     });
     return dialog;

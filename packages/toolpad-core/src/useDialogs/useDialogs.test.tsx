@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { describe, test, expect } from 'vitest';
-import { renderHook, within, screen, waitFor } from '@testing-library/react';
+import { renderHook, within, screen, waitFor, render } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { DialogProps, useDialogs } from './useDialogs';
 import { DialogsProvider } from './DialogsProvider';
@@ -257,6 +257,48 @@ describe('useDialogs', () => {
       await result.current.close(theDialog, null);
 
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeFalsy());
+    });
+  });
+
+  describe('React Strict Mode behavior', () => {
+    test('should not leave dialogs open when effect runs twice', async () => {
+      function CustomDialog({ open }: DialogProps) {
+        return open ? <div role="dialog">Custom Dialog Content</div> : null;
+      }
+
+      function TestComponent() {
+        const dialogs = useDialogs();
+        const dialogRef = React.useRef<Promise<void> | null>(null);
+
+        React.useEffect(() => {
+          const dialog = dialogs.open(CustomDialog);
+          dialogRef.current = dialog;
+
+          return () => {
+            dialogs.close(dialog, undefined);
+          };
+        }, [dialogs]);
+
+        React.useEffect(() => {
+          setTimeout(() => {
+            if (dialogRef.current) {
+              dialogs.close(dialogRef.current, undefined);
+            }
+          }, 50);
+        });
+
+        return <div>Test Component</div>;
+      }
+
+      render(<TestComponent />, { wrapper: TestWrapper });
+
+      await waitFor(
+        async () => {
+          const dialogs = screen.queryAllByRole('dialog');
+          expect(dialogs.length).toBeLessThanOrEqual(0);
+        },
+        { timeout: 100 },
+      );
     });
   });
 });

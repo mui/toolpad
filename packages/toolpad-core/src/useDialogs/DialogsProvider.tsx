@@ -81,11 +81,19 @@ function DialogsProvider(props: DialogProviderProps) {
     dialog: Promise<R>,
     result: R,
   ) {
-    const entryToClose = stack.find((entry) => entry.promise === dialog);
-    invariant(entryToClose, 'dialog not found');
-    await entryToClose.onClose(result);
-    entryToClose.resolve(result);
-    closeDialogUi(dialog);
+    setStack((currentStack) => {
+      const entryToClose = currentStack.find((entry) => entry.promise === dialog);
+      invariant(entryToClose, 'dialog not found');
+      
+      // Execute async operations outside of setState
+      Promise.resolve().then(async () => {
+        await entryToClose.onClose(result);
+        entryToClose.resolve(result);
+        closeDialogUi(dialog);
+      });
+      
+      return currentStack;
+    });
     return dialog;
   });
 

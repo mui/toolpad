@@ -276,6 +276,7 @@ describe('useDialogs', () => {
 
           return () => {
             dialogs.close(dialog, undefined);
+            dialogRef.current = null;
           };
         }, [dialogs]);
 

@@ -9,7 +9,6 @@
 ```bash
 # Run commands in specific workspace
 pnpm -F @toolpad/core <command>
-pnpm -F create-toolpad-app <command>
 
 # Examples:
 pnpm -F @toolpad/core test
@@ -21,7 +20,6 @@ pnpm -F @toolpad/core lint
 
 ```bash
 # DON'T do this
-cd packages/toolpad-core && npm test
 cd packages/toolpad-core && pnpm test
 ```
 
@@ -34,5 +32,5 @@ cd packages/toolpad-core && pnpm test
 ## Testing
 
 - Always run tests using `pnpm -F <workspace> test`
-- For linting: `pnpm -F <workspace> lint`
-- For type checking: `pnpm -F <workspace> typecheck`
+- For linting: `pnpm eslint`
+- For type checking: `pnpm -F <workspace> typescript`

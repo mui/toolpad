@@ -87,9 +87,12 @@ function DialogsProvider(props: DialogProviderProps) {
 
       // Execute async operations outside of setState
       Promise.resolve().then(async () => {
-        await entryToClose.onClose(result);
-        entryToClose.resolve(result);
-        closeDialogUi(dialog);
+        try {
+          await entryToClose.onClose(result);
+        } finally {
+          entryToClose.resolve(result);
+          closeDialogUi(dialog);
+        }
       });
 
       return currentStack;

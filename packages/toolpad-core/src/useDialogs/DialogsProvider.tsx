@@ -37,6 +37,7 @@ function DialogsProvider(props: DialogProviderProps) {
   const [stack, setStack] = React.useState<DialogStackEntry<any, any>[]>([]);
   const keyPrefix = React.useId();
   const nextId = React.useRef(0);
+  const dialogMetadata = React.useRef(new Map<Promise<any>, DialogStackEntry<any, any>>());
 
   const requestDialog = useEventCallback<OpenDialog>(function open<P, R>(
     Component: DialogComponent<P, R>,
@@ -63,6 +64,9 @@ function DialogsProvider(props: DialogProviderProps) {
       resolve,
     };
 
+    // Store metadata for reliable access during close
+    dialogMetadata.current.set(promise, newEntry);
+
     setStack((prevStack) => [...prevStack, newEntry]);
     return promise;
   });
@@ -74,6 +78,8 @@ function DialogsProvider(props: DialogProviderProps) {
     setTimeout(() => {
       // wait for closing animation
       setStack((prevStack) => prevStack.filter((entry) => entry.promise !== dialog));
+      // Clean up metadata after dialog is fully removed
+      dialogMetadata.current.delete(dialog);
     }, unmountAfter);
   });
 
@@ -81,22 +87,12 @@ function DialogsProvider(props: DialogProviderProps) {
     dialog: Promise<R>,
     result: R,
   ) {
-    setStack((currentStack) => {
-      const entryToClose = currentStack.find((entry) => entry.promise === dialog);
-      invariant(entryToClose, 'dialog not found');
-
-      // Execute async operations outside of setState
-      Promise.resolve().then(async () => {
-        try {
-          await entryToClose.onClose(result);
-        } finally {
-          entryToClose.resolve(result);
-          closeDialogUi(dialog);
-        }
-      });
-
-      return currentStack;
-    });
+    const entryToClose = dialogMetadata.current.get(dialog);
+    invariant(entryToClose, 'dialog not found');
+    
+    await entryToClose.onClose(result);
+    entryToClose.resolve(result);
+    closeDialogUi(dialog);
     return dialog;
   });
 

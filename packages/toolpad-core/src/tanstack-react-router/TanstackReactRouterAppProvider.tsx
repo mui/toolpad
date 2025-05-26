@@ -10,8 +10,16 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => {
 });
 
 function TanstackReactRouterAppProvider(props: AppProviderProps) {
-  const { pathname, search } = useLocation();
+  const location = useLocation();
+  const { search } = location;
+
   const navigate = useNavigate();
+
+  // Updates pathname even when the current path changes inside a splat route.
+  const splatAwarePathname = React.useMemo(() => {
+    const { pathname } = location;
+    return window.location.pathname !== pathname ? window.location.pathname : pathname;
+  }, [location]);
 
   const navigateImpl = React.useCallback<Navigate>(
     (url, { history = 'auto' } = {}) => {
@@ -28,12 +36,12 @@ function TanstackReactRouterAppProvider(props: AppProviderProps) {
 
   const routerImpl = React.useMemo<Router>(
     () => ({
-      pathname,
+      pathname: splatAwarePathname,
       searchParams: new URLSearchParams(search),
       navigate: navigateImpl,
       Link,
     }),
-    [pathname, search, navigateImpl],
+    [splatAwarePathname, search, navigateImpl],
   );
 
   return <AppProvider router={routerImpl} {...props} />;

@@ -88,10 +88,13 @@ function DialogsProvider(props: DialogProviderProps) {
   ) {
     const entryToClose = dialogMetadata.current.get(dialog);
     invariant(entryToClose, 'dialog not found');
-    
-    await entryToClose.onClose(result);
-    entryToClose.resolve(result);
-    closeDialogUi(dialog);
+
+    try {
+      await entryToClose.onClose(result);
+    } finally {
+      entryToClose.resolve(result);
+      closeDialogUi(dialog);
+    }
     return dialog;
   });
 

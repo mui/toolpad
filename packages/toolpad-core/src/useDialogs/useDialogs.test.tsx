@@ -3,7 +3,7 @@
  */
 
 import * as React from 'react';
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, vi } from 'vitest';
 import { renderHook, within, screen, waitFor, render } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { DialogProps, useDialogs } from './useDialogs';
@@ -335,6 +335,23 @@ describe('useDialogs', () => {
       const fakeDialog = Promise.resolve(undefined);
 
       await expect(result.current.close(fakeDialog, undefined)).rejects.toThrow('dialog not found');
+    });
+
+    test('dialog still closes when onClose callback throws', async () => {
+      const onCloseError = new Error('onClose failed');
+      const onCloseMock = vi.fn().mockRejectedValue(onCloseError);
+      const { result } = renderHook(() => useDialogs(), { wrapper: TestWrapper });
+
+      const theDialog = result.current.alert('Hello', { onClose: onCloseMock });
+
+      await screen.findByRole('dialog');
+
+      // Close should throw the onClose error
+      await expect(result.current.close(theDialog, undefined)).rejects.toThrow('onClose failed');
+
+      // But dialog should still be closed in UI and promise should be resolved
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeFalsy());
+      await expect(theDialog).resolves.toBeUndefined();
     });
   });
 });

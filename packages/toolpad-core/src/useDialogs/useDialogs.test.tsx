@@ -309,4 +309,32 @@ describe('useDialogs', () => {
       );
     });
   });
+
+  describe('stale closure', () => {
+    test('can close dialog after multiple re-renders', async () => {
+      const { result, rerender } = renderHook(() => useDialogs(), { wrapper: TestWrapper });
+
+      const theDialog = result.current.alert('Hello');
+
+      // Force multiple re-renders to create stale closures
+      rerender();
+      rerender();
+      rerender();
+
+      await screen.findByRole('dialog');
+
+      // This should work even with stale closures
+      await result.current.close(theDialog, undefined);
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeFalsy());
+    });
+
+    test('throws when closing unknown dialog', async () => {
+      const { result } = renderHook(() => useDialogs(), { wrapper: TestWrapper });
+
+      const fakeDialog = Promise.resolve(undefined);
+
+      await expect(result.current.close(fakeDialog, undefined)).rejects.toThrow('dialog not found');
+    });
+  });
 });

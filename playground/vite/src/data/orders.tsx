@@ -1,8 +1,16 @@
-'use client';
+import * as React from 'react';
 import { DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
 import { z } from 'zod';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 
-type OrderStatus = 'Pending' | 'Sent';
+type OrderStatus = 'pending' | 'sent';
+type OrderTag = 'gift' | 'fragile' | 'wholesale';
 
 export interface Order extends DataModel {
   id: number;
@@ -11,6 +19,7 @@ export interface Order extends DataModel {
   status: OrderStatus;
   itemCount: number;
   fastDelivery: boolean;
+  tags: OrderTag[];
   maxReturnDate: string;
   deliveryTime?: string;
   createdAt: string;
@@ -25,6 +34,51 @@ const setOrdersStore = (value: Order[]) => {
   return localStorage.setItem('orders-store', JSON.stringify(value));
 };
 
+function TagsFormField({
+  value,
+  onChange,
+  error,
+}: {
+  value: OrderTag[];
+  onChange: (value: OrderTag[]) => void | Promise<void>;
+  error: string | null;
+}) {
+  const labelId = 'tags-label';
+  const label = 'Tags';
+
+  const handleChange = (event: SelectChangeEvent<string | string[]>) => {
+    const updatedTags = event.target.value;
+    onChange((typeof updatedTags === 'string' ? [updatedTags] : updatedTags) as OrderTag[]);
+  };
+
+  return (
+    <FormControl error={!!error} fullWidth>
+      <InputLabel id={labelId}>{label}</InputLabel>
+      <Select
+        multiple
+        value={value ?? []}
+        onChange={handleChange}
+        labelId={labelId}
+        name="tags"
+        label={label}
+        renderValue={(selected) => (
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+            {selected.map((selectedValue) => (
+              <Chip key={selectedValue} label={selectedValue} />
+            ))}
+          </Box>
+        )}
+        fullWidth
+      >
+        <MenuItem value="gift">Gift</MenuItem>
+        <MenuItem value="fragile">Fragile</MenuItem>
+        <MenuItem value="wholesale">Wholesale</MenuItem>
+      </Select>
+      <FormHelperText>{error ?? ' '}</FormHelperText>
+    </FormControl>
+  );
+}
+
 export const ordersDataSource: DataSource<Order> = {
   fields: [
     { field: 'id', headerName: 'ID' },
@@ -34,21 +88,34 @@ export const ordersDataSource: DataSource<Order> = {
       field: 'status',
       headerName: 'Status',
       type: 'singleSelect',
-      valueOptions: ['Pending', 'Sent'],
+      valueOptions: [
+        { value: 'pending', label: 'Pending' },
+        { value: 'sent', label: 'Sent' },
+      ],
     },
     { field: 'itemCount', headerName: 'No. of items', type: 'number' },
     { field: 'fastDelivery', headerName: 'Fast delivery', type: 'boolean' },
     {
+      field: 'tags',
+      headerName: 'Tags',
+      valueFormatter: (value) => {
+        return value && (value as string[]).join(', ');
+      },
+      renderFormField: ({ value, onChange, error }) => (
+        <TagsFormField value={value as OrderTag[]} onChange={onChange} error={error} />
+      ),
+    },
+    {
       field: 'maxReturnDate',
       headerName: 'Max. return date',
       type: 'date',
-      valueGetter: (value: string) => value && new Date(value),
+      valueGetter: (value) => value && new Date(value),
     },
     {
       field: 'deliveryTime',
       headerName: 'Delivery time',
       type: 'dateTime',
-      valueGetter: (value: string) => value && new Date(value),
+      valueGetter: (value) => value && new Date(value),
     },
     {
       field: 'createdAt',
@@ -149,6 +216,7 @@ export const ordersDataSource: DataSource<Order> = {
     const newOrder = {
       id: ordersStore.reduce((max, order) => Math.max(max, order.id), 0) + 1,
       ...data,
+      createdAt: new Date().toISOString(),
     } as Order;
 
     setOrdersStore([...ordersStore, newOrder]);
@@ -193,7 +261,7 @@ export const ordersDataSource: DataSource<Order> = {
   validate: z.object({
     title: z.string({ required_error: 'Title is required' }).nonempty('Title is required'),
     description: z.string().optional(),
-    status: z.enum(['Pending', 'Sent'], {
+    status: z.enum(['pending', 'sent'], {
       errorMap: () => ({ message: 'Status must be "Pending" or "Sent"' }),
     }),
     itemCount: z

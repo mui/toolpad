@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { createTheme } from '@mui/material/styles';
-import StickyNote2Icon from '@mui/icons-material/StickyNote2';
+import LocalActivityIcon from '@mui/icons-material/LocalActivity';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
@@ -10,10 +10,10 @@ import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
   {
-    segment: 'notes',
-    title: 'Notes',
-    icon: <StickyNote2Icon />,
-    pattern: 'notes{/:noteId}*',
+    segment: 'things',
+    title: 'Things',
+    icon: <LocalActivityIcon />,
+    pattern: 'things{/:thingId}*',
   },
 ];
 
@@ -33,43 +33,52 @@ const demoTheme = createTheme({
   },
 });
 
-let notesStore = [
+let thingsStore = [
   {
     id: 1,
-    title: 'Grocery List Item',
-    text: 'Buy more coffee.',
-    createdAt: new Date().toISOString(),
+    text: 'I am the first thing.',
+    boolean: true,
+    date: new Date('2024-06-01'),
+    option: 'option1',
   },
   {
     id: 2,
-    title: 'Personal Goal',
-    text: 'Finish reading the book.',
-    createdAt: new Date().toISOString(),
+    text: 'I am the second thing.',
+    boolean: false,
+    date: new Date('2024-06-02'),
+    option: 'option2',
   },
 ];
 
-// preview-start
-export const notesDataSource = {
+export const thingsDataSource = {
   fields: [
     { field: 'id', headerName: 'ID' },
-    { field: 'title', headerName: 'Title', flex: 1 },
     { field: 'text', headerName: 'Text', flex: 1 },
+    { field: 'boolean', headerName: 'Boolean', type: 'boolean', flex: 1 },
     {
-      field: 'createdAt',
-      headerName: 'Created at',
-      type: 'dateTime',
+      field: 'date',
+      headerName: 'Date',
+      type: 'date',
       valueGetter: (value) => value && new Date(value),
-      editable: false,
+    },
+    {
+      field: 'option',
+      headerName: 'Option',
+      type: 'singleSelect',
+      valueOptions: [
+        { value: 'option1', label: 'Option 1' },
+        { value: 'option2', label: 'Option 2' },
+      ],
+      flex: 1,
     },
   ],
-  // preview-end
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
     // Simulate loading delay
     await new Promise((resolve) => {
       setTimeout(resolve, 750);
     });
 
-    let processedNotes = [...notesStore];
+    let processedThings = [...thingsStore];
 
     // Apply filters (demo only)
     if (filterModel?.items?.length) {
@@ -78,28 +87,28 @@ export const notesDataSource = {
           return;
         }
 
-        processedNotes = processedNotes.filter((note) => {
-          const noteValue = note[field];
+        processedThings = processedThings.filter((thing) => {
+          const thingValue = thing[field];
 
           switch (operator) {
             case 'contains':
-              return String(noteValue)
+              return String(thingValue)
                 .toLowerCase()
                 .includes(String(value).toLowerCase());
             case 'equals':
-              return noteValue === value;
+              return thingValue === value;
             case 'startsWith':
-              return String(noteValue)
+              return String(thingValue)
                 .toLowerCase()
                 .startsWith(String(value).toLowerCase());
             case 'endsWith':
-              return String(noteValue)
+              return String(thingValue)
                 .toLowerCase()
                 .endsWith(String(value).toLowerCase());
             case '>':
-              return noteValue > value;
+              return thingValue > value;
             case '<':
-              return noteValue < value;
+              return thingValue < value;
             default:
               return true;
           }
@@ -109,7 +118,7 @@ export const notesDataSource = {
 
     // Apply sorting
     if (sortModel?.length) {
-      processedNotes.sort((a, b) => {
+      processedThings.sort((a, b) => {
         for (const { field, sort } of sortModel) {
           if (a[field] < b[field]) {
             return sort === 'asc' ? -1 : 1;
@@ -125,25 +134,25 @@ export const notesDataSource = {
     // Apply pagination
     const start = paginationModel.page * paginationModel.pageSize;
     const end = start + paginationModel.pageSize;
-    const paginatedNotes = processedNotes.slice(start, end);
+    const paginatedThings = processedThings.slice(start, end);
 
     return {
-      items: paginatedNotes,
-      itemCount: processedNotes.length,
+      items: paginatedThings,
+      itemCount: processedThings.length,
     };
   },
-  getOne: async (noteId) => {
+  getOne: async (thingId) => {
     // Simulate loading delay
     await new Promise((resolve) => {
       setTimeout(resolve, 750);
     });
 
-    const noteToShow = notesStore.find((note) => note.id === Number(noteId));
+    const thingToShow = thingsStore.find((thing) => thing.id === Number(thingId));
 
-    if (!noteToShow) {
-      throw new Error('Note not found');
+    if (!thingToShow) {
+      throw new Error('Thing not found');
     }
-    return noteToShow;
+    return thingToShow;
   },
   createOne: async (data) => {
     // Simulate loading delay
@@ -151,71 +160,47 @@ export const notesDataSource = {
       setTimeout(resolve, 750);
     });
 
-    const newNote = {
-      id: notesStore.reduce((max, note) => Math.max(max, note.id), 0) + 1,
+    const newThing = {
+      id: thingsStore.reduce((max, thing) => Math.max(max, thing.id), 0) + 1,
       ...data,
-      createdAt: new Date().toISOString(),
     };
 
-    notesStore = [...notesStore, newNote];
+    thingsStore = [...thingsStore, newThing];
 
-    return newNote;
+    return newThing;
   },
-  updateOne: async (noteId, data) => {
+  updateOne: async (thingId, data) => {
     // Simulate loading delay
     await new Promise((resolve) => {
       setTimeout(resolve, 750);
     });
 
-    let updatedNote = null;
+    let updatedThing = null;
 
-    notesStore = notesStore.map((note) => {
-      if (note.id === Number(noteId)) {
-        updatedNote = { ...note, ...data };
-        return updatedNote;
+    thingsStore = thingsStore.map((thing) => {
+      if (thing.id === Number(thingId)) {
+        updatedThing = { ...thing, ...data };
+        return updatedThing;
       }
-      return note;
+      return thing;
     });
 
-    if (!updatedNote) {
-      throw new Error('Note not found');
+    if (!updatedThing) {
+      throw new Error('Thing not found');
     }
-    return updatedNote;
+    return updatedThing;
   },
-  deleteOne: async (noteId) => {
+  deleteOne: async (thingId) => {
     // Simulate loading delay
     await new Promise((resolve) => {
       setTimeout(resolve, 750);
     });
 
-    notesStore = notesStore.filter((note) => note.id !== Number(noteId));
-  },
-  validate: (formValues) => {
-    let issues = [];
-
-    if (!formValues.title) {
-      issues = [...issues, { message: 'Title is required', path: ['title'] }];
-    }
-
-    if (formValues.title && formValues.title.length < 3) {
-      issues = [
-        ...issues,
-        {
-          message: 'Title must be at least 3 characters long',
-          path: ['title'],
-        },
-      ];
-    }
-
-    if (!formValues.text) {
-      issues = [...issues, { message: 'Text is required', path: ['text'] }];
-    }
-
-    return { issues };
+    thingsStore = thingsStore.filter((thing) => thing.id !== Number(thingId));
   },
 };
 
-const notesCache = new DataSourceCache();
+const thingsCache = new DataSourceCache();
 
 function matchPath(pattern, pathname) {
   const regex = new RegExp(`^${pattern.replace(/:[^/]+/g, '([^/]+)')}$`);
@@ -223,25 +208,25 @@ function matchPath(pattern, pathname) {
   return match ? match[1] : null;
 }
 
-function CrudNonEditableFields(props) {
+function CrudFormSlots(props) {
   const { window } = props;
 
-  const router = useDemoRouter('/notes');
+  const router = useDemoRouter('/things/new');
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
   const title = React.useMemo(() => {
-    if (router.pathname === '/notes/new') {
-      return 'New Note';
+    if (router.pathname === '/things/new') {
+      return 'New Thing';
     }
-    const editNoteId = matchPath('/notes/:noteId/edit', router.pathname);
-    if (editNoteId) {
-      return `Note ${editNoteId} - Edit`;
+    const editThingId = matchPath('/things/:thingId/edit', router.pathname);
+    if (editThingId) {
+      return `Thing ${editThingId} - Edit`;
     }
-    const showNoteId = matchPath('/notes/:noteId', router.pathname);
-    if (showNoteId) {
-      return `Note ${showNoteId}`;
+    const showThingId = matchPath('/things/:thingId', router.pathname);
+    if (showThingId) {
+      return `Thing ${showThingId}`;
     }
 
     return undefined;
@@ -260,11 +245,27 @@ function CrudNonEditableFields(props) {
           <PageContainer title={title}>
             {/* preview-start */}
             <Crud
-              dataSource={notesDataSource}
-              dataSourceCache={notesCache}
-              rootPath="/notes"
+              dataSource={thingsDataSource}
+              dataSourceCache={thingsCache}
+              rootPath="/things"
               initialPageSize={10}
-              defaultValues={{ title: 'New note' }}
+              defaultValues={{ title: 'New thing' }}
+              slotProps={{
+                form: {
+                  textField: {
+                    variant: 'filled',
+                  },
+                  checkbox: {
+                    color: 'secondary',
+                  },
+                  datePicker: {
+                    views: ['year', 'month'],
+                  },
+                  select: {
+                    variant: 'standard',
+                  },
+                },
+              }}
             />
             {/* preview-end */}
           </PageContainer>
@@ -274,7 +275,7 @@ function CrudNonEditableFields(props) {
   );
 }
 
-CrudNonEditableFields.propTypes = {
+CrudFormSlots.propTypes = {
   /**
    * Injected by the documentation to work in an iframe.
    * Remove this when copying and pasting into your project.
@@ -282,4 +283,4 @@ CrudNonEditableFields.propTypes = {
   window: PropTypes.func,
 };
 
-export default CrudNonEditableFields;
+export default CrudFormSlots;

@@ -13,5 +13,11 @@
     "submitButtonLabel": { "description": "Text for form submit button." }
   },
   "classDescriptions": {},
-  "slotDescriptions": { "textField": "The text field component used in the form." }
+  "slotDescriptions": {
+    "checkbox": "The checkbox component used in the form.",
+    "datePicker": "The date picker component used in the form.",
+    "dateTimePicker": "The date and time picker component used in the form.",
+    "select": "The select component used in the form.",
+    "textField": "The text field component used in the form."
+  }
 }

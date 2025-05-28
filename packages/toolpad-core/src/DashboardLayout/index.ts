@@ -1,4 +1,5 @@
 export * from './DashboardLayout';
-export * from './ToolbarActions';
-export * from './ThemeSwitcher';
+export * from './DashboardHeader';
 export * from './DashboardSidebarPageItem';
+export * from './ThemeSwitcher';
+export * from './ToolbarActions';

@@ -23,7 +23,7 @@ export const employeesDataSource: DataSource<Employee> = {
       field: 'joinDate',
       headerName: 'Join date',
       type: 'date',
-      valueGetter: (value: string) => value && new Date(value),
+      valueGetter: (value) => value && new Date(value),
       width: 140,
     },
     {

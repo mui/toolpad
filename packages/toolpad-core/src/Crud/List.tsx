@@ -158,9 +158,6 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const { getMany, deleteOne } = methods;
 
   const routerContext = React.useContext(RouterContext);
-  const appWindowContext = React.useContext(WindowContext);
-
-  const appWindow = appWindowContext ?? (typeof window !== 'undefined' ? window : null);
 
   const dialogs = useDialogs();
   const notifications = useNotifications();
@@ -196,7 +193,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
     (model: GridPaginationModel) => {
       setPaginationModel(model);
 
-      if (appWindow && routerContext) {
+      if (routerContext) {
         const { pathname, searchParams, navigate } = routerContext;
 
         // Needed because searchParams from Next.js are read-only
@@ -210,14 +207,14 @@ function List<D extends DataModel>(props: ListProps<D>) {
         navigate(`${pathname}${newSearchParamsString ? '?' : ''}${newSearchParamsString}`);
       }
     },
-    [appWindow, paginationModel.page, paginationModel.pageSize, routerContext],
+    [paginationModel.page, paginationModel.pageSize, routerContext],
   );
 
   const handleFilterModelChange = React.useCallback(
     (model: GridFilterModel) => {
       setFilterModel(model);
 
-      if (appWindow && routerContext) {
+      if (routerContext) {
         const { pathname, searchParams, navigate } = routerContext;
 
         // Needed because searchParams from Next.js are read-only
@@ -237,14 +234,14 @@ function List<D extends DataModel>(props: ListProps<D>) {
         navigate(`${pathname}${newSearchParamsString ? '?' : ''}${newSearchParamsString}`);
       }
     },
-    [appWindow, filterModel, routerContext],
+    [filterModel, routerContext],
   );
 
   const handleSortModelChange = React.useCallback(
     (model: GridSortModel) => {
       setSortModel(model);
 
-      if (appWindow && routerContext) {
+      if (routerContext) {
         const { pathname, searchParams, navigate } = routerContext;
 
         // Needed because searchParams from Next.js are read-only
@@ -261,7 +258,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
         navigate(`${pathname}${newSearchParamsString ? '?' : ''}${newSearchParamsString}`);
       }
     },
-    [appWindow, routerContext, sortModel],
+    [routerContext, sortModel],
   );
 
   const loadData = React.useCallback(async () => {

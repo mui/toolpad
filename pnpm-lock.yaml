@@ -628,9 +628,6 @@ importers:
       '@toolpad/utils':
         specifier: workspace:*
         version: link:../toolpad-utils/build
-      '@vitejs/plugin-react':
-        specifier: 4.4.1
-        version: 4.4.1(vite@5.4.19(@types/node@20.17.32)(terser@5.39.0))
       client-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -686,6 +683,9 @@ importers:
       '@types/sinon':
         specifier: ^17.0.4
         version: 17.0.4
+      '@vitejs/plugin-react':
+        specifier: 4.4.1
+        version: 4.4.1(vite@5.4.19(@types/node@20.17.32)(terser@5.39.0))
       '@vitest/browser':
         specifier: 2.1.9
         version: 2.1.9(@types/node@20.17.32)(playwright@1.52.0)(typescript@5.8.3)(vite@5.4.19(@types/node@20.17.32)(terser@5.39.0))(vitest@2.1.9)

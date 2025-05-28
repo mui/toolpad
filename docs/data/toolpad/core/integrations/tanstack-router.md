@@ -6,9 +6,9 @@ title: TanStack Router - Integration
 
 <p class="description">To integrate Toolpad Core into a project that uses TanStack Router, follow these steps.</p>
 
-## Wrap all your pages in a `TanStackRouterAppProvider`
+## Wrap all routes in a `TanStackRouterAppProvider`
 
-In your root route (for example `src/routes/__root.tsx`), wrap all the route page content in the `TanStackRouterAppProvider` from `@toolpad/core/tanstack-router`.
+In the root route (for example `src/routes/__root.tsx`), wrap all the route page content in the `TanStackRouterAppProvider` from `@toolpad/core/tanstack-router`.
 
 ```tsx title="src/routes/__root.tsx"
 import * as React from 'react';

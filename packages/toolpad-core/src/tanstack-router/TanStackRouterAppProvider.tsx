@@ -14,7 +14,7 @@ function TanStackRouterAppProvider(props: AppProviderProps) {
   const { pathname, search } = useLocation();
 
   // TansStack Router's search automatically parses stringified objects, which is incompatible with our standard implementation.
-  const searchParamsImpl = React.useMemo(
+  const searchParams = React.useMemo(
     () =>
       new URLSearchParams(
         mapProperties(search, ([key, value]: [key: string, value: unknown]) => [
@@ -43,11 +43,11 @@ function TanStackRouterAppProvider(props: AppProviderProps) {
   const routerImpl = React.useMemo<Router>(
     () => ({
       pathname,
-      searchParams: searchParamsImpl,
+      searchParams,
       navigate: navigateImpl,
       Link,
     }),
-    [navigateImpl, pathname, searchParamsImpl],
+    [navigateImpl, pathname, searchParams],
   );
 
   return <AppProvider router={routerImpl} {...props} />;

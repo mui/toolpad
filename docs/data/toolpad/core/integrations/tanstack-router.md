@@ -4,7 +4,7 @@ title: TanStack Router - Integration
 
 # TanStack Router
 
-<p class="description">To integrate Toolpad Core into a single-page app (with Vite, for example) using TanStack Router, follow these steps.</p>
+<p class="description">To integrate Toolpad Core into a project that uses TanStack Router, follow these steps.</p>
 
 ## Wrap all your pages in a `TanStackRouterAppProvider`
 
@@ -110,7 +110,7 @@ export const Route = createFileRoute('/_layout/orders')({
 });
 ```
 
-That's it! You now have Toolpad Core integrated into your single-page app with TanStack Router!
+That's it! You now have Toolpad Core integrated into your project with TanStack Router!
 
 <!-- :::info
 @TODO: Uncomment when example is live

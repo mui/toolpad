@@ -1,0 +1,50 @@
+'use client';
+import * as React from 'react';
+import { useLocation, useNavigate, Link as TanStackRouterLink } from '@tanstack/react-router';
+import { AppProvider, type AppProviderProps, Navigate, Router } from '../AppProvider/AppProvider';
+import { LinkProps } from '../shared/Link';
+
+const Link = React.forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => {
+  const { href, history, ...rest } = props;
+  return <TanStackRouterLink ref={ref} to={href} replace={history === 'replace'} {...rest} />;
+});
+
+function TanStackRouterAppProvider(props: AppProviderProps) {
+  const location = useLocation();
+  const { search } = location;
+
+  const navigate = useNavigate();
+
+  // Updates pathname even when the current path changes inside a splat route.
+  const splatAwarePathname = React.useMemo(() => {
+    const { pathname } = location;
+    return window.location.pathname !== pathname ? window.location.pathname : pathname;
+  }, [location]);
+
+  const navigateImpl = React.useCallback<Navigate>(
+    (url, { history = 'auto' } = {}) => {
+      if (history === 'auto' || history === 'push') {
+        return navigate({ to: url as string });
+      }
+      if (history === 'replace') {
+        return navigate({ to: url as string, replace: true });
+      }
+      throw new Error(`Invalid history option: ${history}`);
+    },
+    [navigate],
+  );
+
+  const routerImpl = React.useMemo<Router>(
+    () => ({
+      pathname: splatAwarePathname,
+      searchParams: new URLSearchParams(search),
+      navigate: navigateImpl,
+      Link,
+    }),
+    [splatAwarePathname, search, navigateImpl],
+  );
+
+  return <AppProvider router={routerImpl} {...props} />;
+}
+
+export { TanStackRouterAppProvider };

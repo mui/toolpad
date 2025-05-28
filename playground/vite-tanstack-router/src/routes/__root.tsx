@@ -3,7 +3,7 @@ import { Outlet, createRootRoute } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { TanstackReactRouterAppProvider } from '@toolpad/core/tanstack-react-router';
+import { TanStackRouterAppProvider } from '@toolpad/core/tanstack-router';
 import type { Navigation } from '@toolpad/core/AppProvider';
 
 const NAVIGATION: Navigation = [
@@ -29,10 +29,10 @@ const BRANDING = {
 
 function App() {
   return (
-    <TanstackReactRouterAppProvider navigation={NAVIGATION} branding={BRANDING}>
+    <TanStackRouterAppProvider navigation={NAVIGATION} branding={BRANDING}>
       <Outlet />
       <TanStackRouterDevtools />
-    </TanstackReactRouterAppProvider>
+    </TanStackRouterAppProvider>
   );
 }
 

@@ -6,11 +6,11 @@ import * as React from 'react';
 import { describe, test, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { createRootRoute, createRouter, RouterProvider } from '@tanstack/react-router';
-import { TanstackReactRouterAppProvider } from './TanstackReactRouterAppProvider';
+import { TanStackRouterAppProvider } from './TanStackRouterAppProvider';
 
 describe('Tanstack React Router AppProvider', () => {
   const rootRoute = createRootRoute({
-    component: () => <TanstackReactRouterAppProvider>Hello</TanstackReactRouterAppProvider>,
+    component: () => <TanStackRouterAppProvider>Hello</TanStackRouterAppProvider>,
   });
 
   const router = createRouter({ routeTree: rootRoute });

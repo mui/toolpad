@@ -28,7 +28,7 @@ In the following example, an `AppProvider` component wrapping the page provides 
 
 For more details on how to define a `navigation` to be used by the `DashboardLayout` component, please see the [Navigation](/toolpad/core/react-dashboard-layout/#navigation) section for that component.
 
-## Next.js
+## Next.js Integration
 
 The `NextAppProvider` includes some Next.js integrations out-of-the-box.
 
@@ -80,7 +80,7 @@ export default function App(props) {
 }
 ```
 
-## Client-side routing
+## React Router Integration
 
 The `ReactRouterAppProvider` includes routing out-of-the-box for projects using [react-router](https://www.npmjs.com/package/react-router).
 
@@ -88,6 +88,16 @@ This specific `ReactRouterAppProvider` is recommended when building single-page 
 
 ```tsx
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
+```
+
+## Other Integrations
+
+We also provide the following integrations for the app provider:
+
+### TanStack Router
+
+```tsx
+import { TanStackRouterAppProvider } from '@toolpad/core/tanstack-router';
 ```
 
 ## Theming

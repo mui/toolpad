@@ -1,15 +1,15 @@
 'use client';
 import * as React from 'react';
-import { useLocation, useNavigate, Link as TanstackReactRouterLink } from '@tanstack/react-router';
+import { useLocation, useNavigate, Link as TanStackRouterLink } from '@tanstack/react-router';
 import { AppProvider, type AppProviderProps, Navigate, Router } from '../AppProvider/AppProvider';
 import { LinkProps } from '../shared/Link';
 
 const Link = React.forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => {
   const { href, history, ...rest } = props;
-  return <TanstackReactRouterLink ref={ref} to={href} replace={history === 'replace'} {...rest} />;
+  return <TanStackRouterLink ref={ref} to={href} replace={history === 'replace'} {...rest} />;
 });
 
-function TanstackReactRouterAppProvider(props: AppProviderProps) {
+function TanStackRouterAppProvider(props: AppProviderProps) {
   const location = useLocation();
   const { search } = location;
 
@@ -47,4 +47,4 @@ function TanstackReactRouterAppProvider(props: AppProviderProps) {
   return <AppProvider router={routerImpl} {...props} />;
 }
 
-export { TanstackReactRouterAppProvider };
+export { TanStackRouterAppProvider };

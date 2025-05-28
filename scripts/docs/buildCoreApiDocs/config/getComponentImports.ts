@@ -47,7 +47,7 @@ export function getComponentImports(name: string, filename: string) {
           : ''
       }${
         tanStackRouterFileName
-          ? `\nimport { ${tanStackRouterFileName} } from '@toolpad/core/tanstack-router'; // Tanstack Router`
+          ? `\nimport { ${tanStackRouterFileName} } from '@toolpad/core/tanstack-router'; // TanStack Router`
           : ''
       }`,
     ];

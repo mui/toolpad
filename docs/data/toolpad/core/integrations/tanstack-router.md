@@ -4,7 +4,7 @@ title: TanStack Router - Integration
 
 # TanStack Router
 
-<p class="description">To integrate Toolpad Core into a single-page app (with Vite, for example) using Tanstack Router, follow these steps.</p>
+<p class="description">To integrate Toolpad Core into a single-page app (with Vite, for example) using TanStack Router, follow these steps.</p>
 
 ## Wrap all your pages in a `TanStackRouterAppProvider`
 
@@ -114,5 +114,5 @@ That's it! You now have Toolpad Core integrated into your single-page app with T
 
 <!-- :::info
 @TODO: Uncomment when example is live
-For a full working example, see the [Toolpad Core Vite app with Tanstack Router example](https://github.com/mui/toolpad/tree/master/examples/core/vite-tanstack-router/)
+For a full working example, see the [Toolpad Core Vite app with TanStack Router example](https://github.com/mui/toolpad/tree/master/examples/core/vite-tanstack-router/)
 ::: -->

@@ -193,52 +193,46 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const [error, setError] = React.useState<Error | null>(null);
 
   React.useEffect(() => {
-    if (appWindow) {
-      const url = new URL(appWindow.location.href);
+    if (appWindow && routerContext) {
+      const { pathname, searchParams, navigate } = routerContext;
 
-      url.searchParams.set('page', String(paginationModel.page));
-      url.searchParams.set('pageSize', String(paginationModel.pageSize));
+      searchParams.set('page', String(paginationModel.page));
+      searchParams.set('pageSize', String(paginationModel.pageSize));
 
-      if (!appWindow.frameElement) {
-        appWindow.history.pushState({}, '', url);
-      }
+      navigate(`${pathname}?${searchParams.toString()}`);
     }
-  }, [appWindow, paginationModel.page, paginationModel.pageSize]);
+  }, [appWindow, paginationModel.page, paginationModel.pageSize, routerContext]);
 
   React.useEffect(() => {
-    if (appWindow) {
-      const url = new URL(appWindow.location.href);
+    if (appWindow && routerContext) {
+      const { pathname, searchParams, navigate } = routerContext;
 
       if (
         filterModel.items.length > 0 ||
         (filterModel.quickFilterValues && filterModel.quickFilterValues.length > 0)
       ) {
-        url.searchParams.set('filter', JSON.stringify(filterModel));
+        searchParams.set('filter', JSON.stringify(filterModel));
       } else {
-        url.searchParams.delete('filter');
+        searchParams.delete('filter');
       }
 
-      if (!appWindow.frameElement) {
-        appWindow.history.pushState({}, '', url);
-      }
+      navigate(`${pathname}?${searchParams.toString()}`);
     }
-  }, [appWindow, filterModel]);
+  }, [appWindow, filterModel, routerContext]);
 
   React.useEffect(() => {
-    if (appWindow) {
-      const url = new URL(appWindow.location.href);
+    if (appWindow && routerContext) {
+      const { pathname, searchParams, navigate } = routerContext;
 
       if (sortModel.length > 0) {
-        url.searchParams.set('sort', JSON.stringify(sortModel));
+        searchParams.set('sort', JSON.stringify(sortModel));
       } else {
-        url.searchParams.delete('sort');
+        searchParams.delete('sort');
       }
 
-      if (!appWindow.frameElement) {
-        appWindow.history.pushState({}, '', url);
-      }
+      navigate(`${pathname}?${searchParams.toString()}`);
     }
-  }, [appWindow, sortModel]);
+  }, [appWindow, routerContext, sortModel]);
 
   const loadData = React.useCallback(async () => {
     setError(null);

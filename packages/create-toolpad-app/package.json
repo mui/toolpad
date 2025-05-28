@@ -34,7 +34,7 @@
     "@toolpad/core": "workspace:*",
     "@toolpad/utils": "workspace:*",
     "chalk": "5.4.1",
-    "execa": "9.5.2",
+    "execa": "9.6.0",
     "invariant": "2.2.4",
     "semver": "7.6.3",
     "tar": "7.4.3",

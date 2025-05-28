@@ -100,7 +100,7 @@
     "dayjs": "1.11.13",
     "dotenv": "16.5.0",
     "esbuild": "0.25.5",
-    "execa": "9.5.2",
+    "execa": "9.6.0",
     "express": "4.21.2",
     "find-up": "7.0.0",
     "fractional-indexing": "3.2.0",

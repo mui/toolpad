@@ -1,6 +1,7 @@
 'use client';
 import * as React from 'react';
 import { useLocation, useNavigate, Link as TanStackRouterLink } from '@tanstack/react-router';
+import { mapProperties } from '@toolpad/utils/collections';
 import { AppProvider, type AppProviderProps, Navigate, Router } from '../AppProvider/AppProvider';
 import { LinkProps } from '../shared/Link';
 
@@ -10,7 +11,19 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => {
 });
 
 function TanStackRouterAppProvider(props: AppProviderProps) {
-  const { search, pathname } = useLocation();
+  const { pathname, search } = useLocation();
+
+  // TansStack Router's automatically parses stringified objects, which is incompatible with our standard implementation.
+  const searchParamsImpl = React.useMemo(
+    () =>
+      new URLSearchParams(
+        mapProperties(search, ([key, value]: [key: string, value: unknown]) => [
+          key,
+          JSON.stringify(value),
+        ]),
+      ),
+    [search],
+  );
 
   const navigate = useNavigate();
 
@@ -30,11 +43,11 @@ function TanStackRouterAppProvider(props: AppProviderProps) {
   const routerImpl = React.useMemo<Router>(
     () => ({
       pathname,
-      searchParams: new URLSearchParams(search),
+      searchParams: searchParamsImpl,
       navigate: navigateImpl,
       Link,
     }),
-    [navigateImpl, pathname, search],
+    [navigateImpl, pathname, searchParamsImpl],
   );
 
   return <AppProvider router={routerImpl} {...props} />;

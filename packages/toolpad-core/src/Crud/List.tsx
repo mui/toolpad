@@ -30,7 +30,7 @@ import invariant from 'invariant';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
 import { NoSsr } from '../shared/NoSsr';
-import { CrudContext, RouterContext } from '../shared/context';
+import { CrudContext, RouterContext, WindowContext } from '../shared/context';
 import { useLocaleText } from '../AppProvider/LocalizationProvider';
 import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
@@ -158,6 +158,9 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const { getMany, deleteOne } = methods;
 
   const routerContext = React.useContext(RouterContext);
+  const appWindowContext = React.useContext(WindowContext);
+
+  const appWindow = appWindowContext ?? (typeof window !== 'undefined' ? window : null);
 
   const dialogs = useDialogs();
   const notifications = useNotifications();
@@ -189,47 +192,77 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
 
-  React.useEffect(() => {
-    if (routerContext) {
-      const { pathname, searchParams, navigate } = routerContext;
+  const handlePaginationModelChange = React.useCallback(
+    (model: GridPaginationModel) => {
+      setPaginationModel(model);
 
-      searchParams.set('page', String(paginationModel.page));
-      searchParams.set('pageSize', String(paginationModel.pageSize));
+      if (appWindow && routerContext) {
+        const { pathname, searchParams, navigate } = routerContext;
 
-      navigate(`${pathname}?${searchParams.toString()}`);
-    }
-  }, [paginationModel.page, paginationModel.pageSize, routerContext]);
+        // Needed because searchParams from Next.js are read-only
+        const writeableSearchParams = new URLSearchParams(searchParams);
 
-  React.useEffect(() => {
-    if (routerContext) {
-      const { pathname, searchParams, navigate } = routerContext;
+        writeableSearchParams.set('page', String(paginationModel.page));
+        writeableSearchParams.set('pageSize', String(paginationModel.pageSize));
 
-      if (
-        filterModel.items.length > 0 ||
-        (filterModel.quickFilterValues && filterModel.quickFilterValues.length > 0)
-      ) {
-        searchParams.set('filter', JSON.stringify(filterModel));
-      } else {
-        searchParams.delete('filter');
+        const newSearchParamsString = writeableSearchParams.toString();
+
+        navigate(`${pathname}${newSearchParamsString ? '?' : ''}${newSearchParamsString}`);
       }
+    },
+    [appWindow, paginationModel.page, paginationModel.pageSize, routerContext],
+  );
 
-      navigate(`${pathname}?${searchParams.toString()}`);
-    }
-  }, [filterModel, routerContext]);
+  const handleFilterModelChange = React.useCallback(
+    (model: GridFilterModel) => {
+      setFilterModel(model);
 
-  React.useEffect(() => {
-    if (routerContext) {
-      const { pathname, searchParams, navigate } = routerContext;
+      if (appWindow && routerContext) {
+        const { pathname, searchParams, navigate } = routerContext;
 
-      if (sortModel.length > 0) {
-        searchParams.set('sort', JSON.stringify(sortModel));
-      } else {
-        searchParams.delete('sort');
+        // Needed because searchParams from Next.js are read-only
+        const writeableSearchParams = new URLSearchParams(searchParams);
+
+        if (
+          filterModel.items.length > 0 ||
+          (filterModel.quickFilterValues && filterModel.quickFilterValues.length > 0)
+        ) {
+          writeableSearchParams.set('filter', JSON.stringify(filterModel));
+        } else {
+          writeableSearchParams.delete('filter');
+        }
+
+        const newSearchParamsString = writeableSearchParams.toString();
+
+        navigate(`${pathname}${newSearchParamsString ? '?' : ''}${newSearchParamsString}`);
       }
+    },
+    [appWindow, filterModel, routerContext],
+  );
 
-      navigate(`${pathname}?${searchParams.toString()}`);
-    }
-  }, [routerContext, sortModel]);
+  const handleSortModelChange = React.useCallback(
+    (model: GridSortModel) => {
+      setSortModel(model);
+
+      if (appWindow && routerContext) {
+        const { pathname, searchParams, navigate } = routerContext;
+
+        // Needed because searchParams from Next.js are read-only
+        const writeableSearchParams = new URLSearchParams(searchParams);
+
+        if (sortModel.length > 0) {
+          writeableSearchParams.set('sort', JSON.stringify(sortModel));
+        } else {
+          writeableSearchParams.delete('sort');
+        }
+
+        const newSearchParamsString = writeableSearchParams.toString();
+
+        navigate(`${pathname}${newSearchParamsString ? '?' : ''}${newSearchParamsString}`);
+      }
+    },
+    [appWindow, routerContext, sortModel],
+  );
 
   const loadData = React.useCallback(async () => {
     setError(null);
@@ -408,11 +441,11 @@ function List<D extends DataModel>(props: ListProps<D>) {
             filterMode="server"
             paginationMode="server"
             paginationModel={paginationModel}
-            onPaginationModelChange={setPaginationModel}
+            onPaginationModelChange={handlePaginationModelChange}
             sortModel={sortModel}
-            onSortModelChange={setSortModel}
+            onSortModelChange={handleSortModelChange}
             filterModel={filterModel}
-            onFilterModelChange={setFilterModel}
+            onFilterModelChange={handleFilterModelChange}
             onRowClick={handleRowClick}
             loading={isLoading}
             initialState={initialState}

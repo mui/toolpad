@@ -8,7 +8,9 @@
       "description": "<a href=\"https://mui.com/toolpad/core/react-crud/#data-caching\">Cache</a> for the data source."
     },
     "localeText": { "description": "Locale text for the component." },
-    "onSubmitSuccess": { "description": "Callback fired when the form is successfully submitted." }
+    "onSubmitSuccess": { "description": "Callback fired when the form is successfully submitted." },
+    "slotProps": { "description": "The props used for each slot inside." },
+    "slots": { "description": "The components used for each slot inside." }
   },
   "classDescriptions": {}
 }

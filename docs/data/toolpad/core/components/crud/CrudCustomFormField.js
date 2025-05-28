@@ -2,6 +2,13 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { createTheme } from '@mui/material/styles';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
@@ -38,31 +45,79 @@ let notesStore = [
     id: 1,
     title: 'Grocery List Item',
     text: 'Buy more coffee.',
-    createdAt: new Date().toISOString(),
+    tags: ['urgent', 'todo'],
   },
   {
     id: 2,
     title: 'Personal Goal',
     text: 'Finish reading the book.',
-    createdAt: new Date().toISOString(),
+    tags: ['todo'],
   },
 ];
 
+function TagsFormField({ value, onChange, error }) {
+  const labelId = 'tags-label';
+  const label = 'Tags';
+
+  const handleChange = (event) => {
+    const updatedTags = event.target.value;
+    onChange(typeof updatedTags === 'string' ? [updatedTags] : updatedTags);
+  };
+
+  return (
+    <FormControl error={!!error} fullWidth>
+      <InputLabel id={labelId}>{label}</InputLabel>
+      <Select
+        multiple
+        value={value ?? []}
+        onChange={handleChange}
+        labelId={labelId}
+        name="tags"
+        label={label}
+        renderValue={(selected) => (
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+            {selected.map((selectedValue) => (
+              <Chip key={selectedValue} label={selectedValue} />
+            ))}
+          </Box>
+        )}
+        fullWidth
+      >
+        <MenuItem value="urgent">Urgent</MenuItem>
+        <MenuItem value="todo">Todo</MenuItem>
+      </Select>
+      <FormHelperText>{error ?? ' '}</FormHelperText>
+    </FormControl>
+  );
+}
+
 // preview-start
+
+TagsFormField.propTypes = {
+  error: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.arrayOf(PropTypes.oneOf(['todo', 'urgent']).isRequired)
+    .isRequired,
+};
+
 export const notesDataSource = {
   fields: [
     { field: 'id', headerName: 'ID' },
     { field: 'title', headerName: 'Title', flex: 1 },
     { field: 'text', headerName: 'Text', flex: 1 },
     {
-      field: 'createdAt',
-      headerName: 'Created at',
-      type: 'dateTime',
-      valueGetter: (value) => value && new Date(value),
-      editable: false,
+      field: 'tags',
+      headerName: 'Tags',
+      valueFormatter: (value) => {
+        return value && value.join(', ');
+      },
+      renderFormField: ({ value, onChange, error }) => (
+        <TagsFormField value={value} onChange={onChange} error={error} />
+      ),
     },
   ],
   // preview-end
+
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
     // Simulate loading delay
     await new Promise((resolve) => {
@@ -154,7 +209,6 @@ export const notesDataSource = {
     const newNote = {
       id: notesStore.reduce((max, note) => Math.max(max, note.id), 0) + 1,
       ...data,
-      createdAt: new Date().toISOString(),
     };
 
     notesStore = [...notesStore, newNote];
@@ -223,7 +277,7 @@ function matchPath(pattern, pathname) {
   return match ? match[1] : null;
 }
 
-function CrudNonEditableFields(props) {
+function CrudCustomFormField(props) {
   const { window } = props;
 
   const router = useDemoRouter('/notes');
@@ -258,7 +312,6 @@ function CrudNonEditableFields(props) {
       >
         <DashboardLayout defaultSidebarCollapsed>
           <PageContainer title={title}>
-            {/* preview-start */}
             <Crud
               dataSource={notesDataSource}
               dataSourceCache={notesCache}
@@ -266,7 +319,6 @@ function CrudNonEditableFields(props) {
               initialPageSize={10}
               defaultValues={{ title: 'New note' }}
             />
-            {/* preview-end */}
           </PageContainer>
         </DashboardLayout>
       </AppProvider>
@@ -274,7 +326,7 @@ function CrudNonEditableFields(props) {
   );
 }
 
-CrudNonEditableFields.propTypes = {
+CrudCustomFormField.propTypes = {
   /**
    * Injected by the documentation to work in an iframe.
    * Remove this when copying and pasting into your project.
@@ -282,4 +334,4 @@ CrudNonEditableFields.propTypes = {
   window: PropTypes.func,
 };
 
-export default CrudNonEditableFields;
+export default CrudCustomFormField;

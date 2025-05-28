@@ -7,11 +7,19 @@ import { expect, describe, test, afterEach } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import FormControl from '@mui/material/FormControl';
+import FormHelperText from '@mui/material/FormHelperText';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { AppProvider, Router } from '../AppProvider';
 import { Crud } from './Crud';
 import type { DataModel, DataSource } from './types';
 
-type OrderStatus = 'Pending' | 'Sent';
+type OrderStatus = 'pending' | 'sent';
+type OrderTag = 'gift' | 'fragile' | 'wholesale';
 
 interface Order extends DataModel {
   id: number;
@@ -20,6 +28,7 @@ interface Order extends DataModel {
   status: OrderStatus;
   itemCount: number;
   fastDelivery: boolean;
+  tags: OrderTag[];
   maxReturnDate: string;
   deliveryTime?: string;
   createdAt: string;
@@ -30,10 +39,11 @@ const INITIAL_ORDERS: Order[] = [
     id: 1,
     title: 'Order 1',
     description: 'I am the first order',
-    status: 'Pending',
+    status: 'pending',
     priority: 1,
     itemCount: 1,
     fastDelivery: true,
+    tags: [],
     maxReturnDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString(),
     createdAt: new Date().toISOString(),
   },
@@ -41,10 +51,11 @@ const INITIAL_ORDERS: Order[] = [
     id: 2,
     title: 'Order 2',
     description: 'I am the second order',
-    status: 'Pending',
+    status: 'pending',
     priority: 2,
     itemCount: 2,
     fastDelivery: false,
+    tags: ['gift'],
     maxReturnDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString(),
     createdAt: new Date().toISOString(),
   },
@@ -52,10 +63,11 @@ const INITIAL_ORDERS: Order[] = [
     id: 3,
     title: 'Order 3',
     description: 'I am the third order',
-    status: 'Sent',
+    status: 'sent',
     priority: 3,
     itemCount: 3,
     fastDelivery: true,
+    tags: ['gift', 'fragile'],
     maxReturnDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString(),
     createdAt: new Date().toISOString(),
   },
@@ -67,6 +79,51 @@ function resetOrdersStore() {
   ordersStore = INITIAL_ORDERS;
 }
 
+function TagsFormField({
+  value,
+  onChange,
+  error,
+}: {
+  value: OrderTag[];
+  onChange: (value: OrderTag[]) => void | Promise<void>;
+  error: string | null;
+}) {
+  const labelId = 'tags-label';
+  const label = 'Tags';
+
+  const handleChange = (event: SelectChangeEvent<string | string[]>) => {
+    const updatedTags = event.target.value;
+    onChange((typeof updatedTags === 'string' ? [updatedTags] : updatedTags) as OrderTag[]);
+  };
+
+  return (
+    <FormControl error={!!error} fullWidth>
+      <InputLabel id={labelId}>{label}</InputLabel>
+      <Select
+        multiple
+        value={value ?? []}
+        onChange={handleChange}
+        labelId={labelId}
+        name="tags"
+        label={label}
+        renderValue={(selected) => (
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+            {selected.map((selectedValue) => (
+              <Chip key={selectedValue} label={selectedValue} />
+            ))}
+          </Box>
+        )}
+        fullWidth
+      >
+        <MenuItem value="gift">Gift</MenuItem>
+        <MenuItem value="fragile">Fragile</MenuItem>
+        <MenuItem value="wholesale">Wholesale</MenuItem>
+      </Select>
+      <FormHelperText>{error ?? ' '}</FormHelperText>
+    </FormControl>
+  );
+}
+
 const ordersDataSource: DataSource<Order> = {
   fields: [
     { field: 'id', headerName: 'ID' },
@@ -76,7 +133,10 @@ const ordersDataSource: DataSource<Order> = {
       field: 'status',
       headerName: 'Status',
       type: 'singleSelect',
-      valueOptions: ['Pending', 'Sent'],
+      valueOptions: [
+        { value: 'pending', label: 'Pending' },
+        { value: 'sent', label: 'Sent' },
+      ],
     },
     {
       field: 'priority',
@@ -91,16 +151,26 @@ const ordersDataSource: DataSource<Order> = {
     { field: 'itemCount', headerName: 'No. of items', type: 'number' },
     { field: 'fastDelivery', headerName: 'Fast delivery', type: 'boolean' },
     {
+      field: 'tags',
+      headerName: 'Tags',
+      valueFormatter: (value) => {
+        return value && (value as string[]).join(', ');
+      },
+      renderFormField: ({ value, onChange, error }) => (
+        <TagsFormField value={value as OrderTag[]} onChange={onChange} error={error} />
+      ),
+    },
+    {
       field: 'maxReturnDate',
       headerName: 'Max. return date',
       type: 'date',
-      valueGetter: (value: string) => value && new Date(value),
+      valueGetter: (value) => value && new Date(value),
     },
     {
       field: 'deliveryTime',
       headerName: 'Delivery time',
       type: 'dateTime',
-      valueGetter: (value: string) => value && new Date(value),
+      valueGetter: (value) => value && new Date(value),
     },
     {
       field: 'createdAt',
@@ -132,8 +202,8 @@ const ordersDataSource: DataSource<Order> = {
   createOne: (data) => {
     const newOrder = {
       id: ordersStore.reduce((max, order) => Math.max(max, order.id), 0) + 1,
-      createdAt: new Date().toISOString(),
       ...data,
+      createdAt: new Date().toISOString(),
     } as Order;
 
     ordersStore = [...ordersStore, newOrder];
@@ -239,12 +309,14 @@ describe('Crud', () => {
     expect(within(dataRows[1]).getByText('Pending')).toBeInTheDocument();
     expect(within(dataRows[1]).getByText('Medium')).toBeInTheDocument();
     expect(within(dataRows[1]).getByText('no')).toBeInTheDocument();
+    expect(within(dataRows[1]).getByText('gift')).toBeInTheDocument();
 
     expect(within(dataRows[2]).getByText('Order 3')).toBeInTheDocument();
     expect(within(dataRows[2]).getByText('I am the third order')).toBeInTheDocument();
     expect(within(dataRows[2]).getByText('Sent')).toBeInTheDocument();
     expect(within(dataRows[2]).getByText('High')).toBeInTheDocument();
     expect(within(dataRows[2]).getByText('yes')).toBeInTheDocument();
+    expect(within(dataRows[2]).getByText('gift, fragile')).toBeInTheDocument();
   });
 
   test('shows item details correctly', async () => {
@@ -272,6 +344,7 @@ describe('Crud', () => {
     expect(screen.getByText('Pending')).toBeInTheDocument();
     expect(screen.getByText('Medium')).toBeInTheDocument();
     expect(screen.getByText('No')).toBeInTheDocument();
+    expect(screen.getByText('gift')).toBeInTheDocument();
 
     expect(screen.queryByText('Order 1')).not.toBeInTheDocument();
   });
@@ -289,6 +362,11 @@ describe('Crud', () => {
 
     await userEvent.click(screen.getByLabelText('Fast delivery'));
 
+    await userEvent.click(screen.getByLabelText('Tags'));
+    await userEvent.click(await screen.findByRole('option', { name: 'Gift' }));
+    await userEvent.click(await screen.findByRole('option', { name: 'Wholesale' }));
+    await userEvent.keyboard('{Escape}');
+
     await userEvent.click(screen.getByRole('button', { name: 'Create' }));
 
     await waitFor(() => {
@@ -304,6 +382,7 @@ describe('Crud', () => {
     expect(within(dataRows[3]).getByText('Sent')).toBeInTheDocument();
     expect(within(dataRows[3]).getByText('High')).toBeInTheDocument();
     expect(within(dataRows[3]).getByText('yes')).toBeInTheDocument();
+    expect(within(dataRows[3]).getByText('gift, wholesale')).toBeInTheDocument();
   });
 
   test('edits existing items', async () => {
@@ -332,6 +411,10 @@ describe('Crud', () => {
 
     await userEvent.click(screen.getByLabelText('Fast delivery'));
 
+    await userEvent.click(screen.getByLabelText('Tags'));
+    await userEvent.click(await screen.findByRole('option', { name: 'Fragile' }));
+    await userEvent.keyboard('{Escape}');
+
     await userEvent.click(screen.getByRole('button', { name: 'Edit' }));
 
     await waitFor(() => {
@@ -349,7 +432,8 @@ describe('Crud', () => {
     expect(within(dataRows[0]).getByText('Sent')).toBeInTheDocument();
     expect(within(dataRows[0]).getByText('Medium')).toBeInTheDocument();
     expect(within(dataRows[0]).getByText('no')).toBeInTheDocument();
-  });
+    expect(within(dataRows[0]).getByText('fragile')).toBeInTheDocument();
+  }, 10000);
 
   test('does not show non-editable items in forms', async () => {
     render(<AppWithRouter initialPath="/orders/new" />);

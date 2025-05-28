@@ -37,7 +37,7 @@ function CrudProvider<D extends DataModel>(props: CrudProviderProps<D>) {
   return (
     <CrudContext
       value={{
-        dataSource: dataSource as CrudProviderProps<DataModel>['dataSource'],
+        dataSource: dataSource as DataSource<DataModel>,
         dataSourceCache: cache,
       }}
     >

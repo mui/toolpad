@@ -18,7 +18,25 @@ type RemappedOmit<T, K extends PropertyKey> = { [P in keyof T as P extends K ? n
 
 export type OmitId<D extends DataModel> = RemappedOmit<D, 'id'>;
 
-export type DataField = RemappedOmit<GridColDef, 'type'> & { type?: GridColType };
+export type DataFieldFormValue = string | string[] | number | boolean | File | null;
+
+export type DataFieldRenderFormField<F extends DataFieldFormValue = DataFieldFormValue> = ({
+  value,
+  onChange,
+  error,
+}: {
+  value: F;
+  onChange: (value: F) => void | Promise<void>;
+  error: string | null;
+}) => React.ReactNode;
+
+export type DataField<F extends DataFieldFormValue = DataFieldFormValue> = RemappedOmit<
+  GridColDef,
+  'type'
+> & {
+  type?: GridColType;
+  renderFormField?: DataFieldRenderFormField<F>;
+};
 
 export interface DataSource<D extends DataModel> {
   fields: DataField[];

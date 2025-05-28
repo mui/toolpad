@@ -10,11 +10,17 @@
     "dataSource": { "type": { "name": "object" } },
     "onReset": { "type": { "name": "func" } },
     "slotProps": {
-      "type": { "name": "shape", "description": "{ textField?: object }" },
+      "type": {
+        "name": "shape",
+        "description": "{ checkbox?: object, datePicker?: object, dateTimePicker?: object, select?: object, textField?: object }"
+      },
       "default": "{}"
     },
     "slots": {
-      "type": { "name": "shape", "description": "{ textField?: elementType }" },
+      "type": {
+        "name": "shape",
+        "description": "{ checkbox?: elementType, datePicker?: elementType, dateTimePicker?: elementType, select?: elementType, textField?: elementType }"
+      },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }
     }
@@ -26,6 +32,30 @@
       "name": "textField",
       "description": "The text field component used in the form.",
       "default": "TextField",
+      "class": null
+    },
+    {
+      "name": "checkbox",
+      "description": "The checkbox component used in the form.",
+      "default": "TextField",
+      "class": null
+    },
+    {
+      "name": "datePicker",
+      "description": "The date picker component used in the form.",
+      "default": "DatePicker",
+      "class": null
+    },
+    {
+      "name": "dateTimePicker",
+      "description": "The date and time picker component used in the form.",
+      "default": "DatePicker",
+      "class": null
+    },
+    {
+      "name": "select",
+      "description": "The select component used in the form.",
+      "default": "Select",
       "class": null
     }
   ],

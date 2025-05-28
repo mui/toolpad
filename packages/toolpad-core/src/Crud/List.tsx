@@ -30,7 +30,7 @@ import invariant from 'invariant';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
 import { NoSsr } from '../shared/NoSsr';
-import { CrudContext, RouterContext, WindowContext } from '../shared/context';
+import { CrudContext, RouterContext } from '../shared/context';
 import { useLocaleText } from '../AppProvider/LocalizationProvider';
 import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
@@ -158,9 +158,6 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const { getMany, deleteOne } = methods;
 
   const routerContext = React.useContext(RouterContext);
-  const appWindowContext = React.useContext(WindowContext);
-
-  const appWindow = appWindowContext ?? (typeof window !== 'undefined' ? window : null);
 
   const dialogs = useDialogs();
   const notifications = useNotifications();
@@ -193,7 +190,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const [error, setError] = React.useState<Error | null>(null);
 
   React.useEffect(() => {
-    if (appWindow && routerContext) {
+    if (routerContext) {
       const { pathname, searchParams, navigate } = routerContext;
 
       searchParams.set('page', String(paginationModel.page));
@@ -201,10 +198,10 @@ function List<D extends DataModel>(props: ListProps<D>) {
 
       navigate(`${pathname}?${searchParams.toString()}`);
     }
-  }, [appWindow, paginationModel.page, paginationModel.pageSize, routerContext]);
+  }, [paginationModel.page, paginationModel.pageSize, routerContext]);
 
   React.useEffect(() => {
-    if (appWindow && routerContext) {
+    if (routerContext) {
       const { pathname, searchParams, navigate } = routerContext;
 
       if (
@@ -218,10 +215,10 @@ function List<D extends DataModel>(props: ListProps<D>) {
 
       navigate(`${pathname}?${searchParams.toString()}`);
     }
-  }, [appWindow, filterModel, routerContext]);
+  }, [filterModel, routerContext]);
 
   React.useEffect(() => {
-    if (appWindow && routerContext) {
+    if (routerContext) {
       const { pathname, searchParams, navigate } = routerContext;
 
       if (sortModel.length > 0) {
@@ -232,7 +229,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
 
       navigate(`${pathname}?${searchParams.toString()}`);
     }
-  }, [appWindow, routerContext, sortModel]);
+  }, [routerContext, sortModel]);
 
   const loadData = React.useCallback(async () => {
     setError(null);

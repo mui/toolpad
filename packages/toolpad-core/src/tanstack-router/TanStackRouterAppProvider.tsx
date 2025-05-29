@@ -13,7 +13,7 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => {
 function TanStackRouterAppProvider(props: AppProviderProps) {
   const { pathname, search } = useLocation();
 
-  // TansStack Router's search automatically parses stringified objects, which is incompatible with our standard implementation.
+  // TansStack Router's search automatically parses stringified values, which is incompatible with our standard implementation.
   const searchParams = React.useMemo(
     () =>
       new URLSearchParams(

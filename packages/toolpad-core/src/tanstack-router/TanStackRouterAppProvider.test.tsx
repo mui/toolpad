@@ -30,7 +30,7 @@ describe('Tanstack React Router AppProvider', () => {
   });
 
   const routeTree = rootRoute.addChildren([indexRoute]);
-  const router = createRouter({ routeTree });
+  const router = createRouter({ routeTree, defaultPendingMinMs: 0 });
 
   test('renders content correctly', async () => {
     await act(() =>

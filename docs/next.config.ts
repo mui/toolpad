@@ -34,9 +34,6 @@ export default withDocsInfra({
   transpilePackages: [
     // TODO, those shouldn't be needed in the first place
     '@mui/monorepo', // Migrate everything to @mui/docs until the @mui/monorepo dependency becomes obsolete
-    '@mui/x-data-grid', // Fix CSS imports https://github.com/mui/mui-x/issues/17427
-    '@mui/x-data-grid-pro', // Fix CSS imports https://github.com/mui/mui-x/issues/17427
-    '@mui/x-data-grid-premium', // Fix CSS imports https://github.com/mui/mui-x/issues/17427
     '@mui/x-charts', // Fix ESM module support https://github.com/mui/mui-x/issues/9826#issuecomment-1658333978
     // Fix trailingSlash support https://github.com/mui/toolpad/pull/3301#issuecomment-2054213837
     // Migrate everything from @mui/monorepo to @mui/docs

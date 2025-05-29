@@ -33,11 +33,11 @@
     "@mui/material-nextjs": "^7.0.2",
     "@mui/system": "^7.0.2",
     "@mui/utils": "^7.0.2",
-    "@mui/x-data-grid": "^8.4.0",
-    "@mui/x-data-grid-pro": "^8.4.0",
-    "@mui/x-date-pickers": "^8.4.0",
-    "@mui/x-date-pickers-pro": "^8.4.0",
-    "@mui/x-license": "^8.4.0",
+    "@mui/x-data-grid": "^8.5.0",
+    "@mui/x-data-grid-pro": "^8.5.0",
+    "@mui/x-date-pickers": "^8.5.0",
+    "@mui/x-date-pickers-pro": "^8.5.0",
+    "@mui/x-license": "^8.5.0",
     "@toolpad/core": "workspace:*",
     "@toolpad/studio-components": "^0.13.0",
     "@toolpad/studio-runtime": "^0.13.0",
@@ -89,7 +89,7 @@
     "stylis-plugin-rtl": "npm:stylis-plugin-rtl@^2.1.1",
     "stylis-plugin-rtl-sc": "npm:stylis-plugin-rtl@^2.1.1",
     "webpack-bundle-analyzer": "4.10.2",
-    "zod": "3.24.3"
+    "zod": "3.25.36"
   },
   "devDependencies": {
     "@babel/core": "7.27.1",

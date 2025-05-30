@@ -443,6 +443,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
             onSortModelChange={handleSortModelChange}
             filterModel={filterModel}
             onFilterModelChange={handleFilterModelChange}
+            disableRowSelectionOnClick
             onRowClick={handleRowClick}
             loading={isLoading}
             initialState={initialState}

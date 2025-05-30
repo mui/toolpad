@@ -25,7 +25,6 @@ function loadPkg(pkgPath: string): { version: string } {
 }
 
 const toolpadCorePkg = loadPkg('./packages/toolpad-core');
-const toolpadStudioPkg = loadPkg('./packages/toolpad-studio');
 
 export default withDocsInfra({
   experimental: {
@@ -41,8 +40,6 @@ export default withDocsInfra({
     // Fix trailingSlash support https://github.com/mui/toolpad/pull/3301#issuecomment-2054213837
     // Migrate everything from @mui/monorepo to @mui/docs
     '@mui/docs',
-    '@toolpad/studio-runtime',
-    '@toolpad/studio-components',
   ],
   // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
   assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
@@ -55,7 +52,7 @@ export default withDocsInfra({
     // Toolpad related
     // …
     TOOLPAD_CORE_VERSION: toolpadCorePkg.version,
-    TOOLPAD_STUDIO_VERSION: toolpadStudioPkg.version,
+    TOOLPAD_STUDIO_VERSION: '0.13.0',
   },
   webpack: (config, options) => {
     return {

@@ -8,7 +8,7 @@ pnpm-lock.yaml
 build
 dist
 
-/examples/*/toolpad.yml
+/examples/*
 
 /test/integration/*/fixture*/
 /test/visual/*/fixture*/
@@ -24,3 +24,6 @@ test
 /packages/toolpad-studio/
 /packages/toolpad-studio-runtime/
 /packages/toolpad-studio-components/
+
+# generated TanStack Router files
+routeTree.gen.ts

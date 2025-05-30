@@ -177,9 +177,16 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
         return '…';
       }
 
-      const { field, type } = showField;
+      const { field, type, valueFormatter } = showField;
       const fieldValue = data[field];
 
+      if (valueFormatter) {
+        return (valueFormatter as (value: unknown, row: D, column: DataField) => string)(
+          fieldValue,
+          data,
+          showField,
+        );
+      }
       if (type === 'boolean') {
         return fieldValue ? 'Yes' : 'No';
       }
@@ -263,12 +270,16 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
             .map((showField) => {
               const { field, headerName } = showField;
 
+              const renderedField = renderField(showField);
+
               return (
                 <Grid key={field} size={{ xs: 12, sm: 6 }}>
                   <Paper sx={{ px: 2, py: 1 }}>
                     <Typography variant="overline">{headerName}</Typography>
                     <Typography variant="body1" sx={{ mb: 1 }}>
-                      {renderField(showField)}
+                      {renderedField && (!Array.isArray(renderedField) || renderedField.length > 0)
+                        ? renderedField
+                        : '-'}
                     </Typography>
                   </Paper>
                 </Grid>

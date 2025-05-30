@@ -9,6 +9,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import { useNonNullableContext } from '@toolpad/utils/react';
 import invariant from 'invariant';
 import * as React from 'react';
+import useEventCallback from '@mui/utils/useEventCallback';
 import { DialogsContext } from './DialogsContext';
 import { WindowContext } from '../shared/context';
 import { useLocaleText, type LocaleText } from '../AppProvider/LocalizationProvider';
@@ -337,19 +338,16 @@ export function PromptDialog({ open, payload, onClose }: PromptDialogProps) {
 export function useDialogs(): DialogHook {
   const { open, close } = useNonNullableContext(DialogsContext);
 
-  const alert = React.useCallback<OpenAlertDialog>(
-    (msg, { onClose, ...options } = {}) => open(AlertDialog, { ...options, msg }, { onClose }),
-    [open],
+  const alert = useEventCallback<OpenAlertDialog>((msg, { onClose, ...options } = {}) =>
+    open(AlertDialog, { ...options, msg }, { onClose }),
   );
 
-  const confirm = React.useCallback<OpenConfirmDialog>(
-    (msg, { onClose, ...options } = {}) => open(ConfirmDialog, { ...options, msg }, { onClose }),
-    [open],
+  const confirm = useEventCallback<OpenConfirmDialog>((msg, { onClose, ...options } = {}) =>
+    open(ConfirmDialog, { ...options, msg }, { onClose }),
   );
 
-  const prompt = React.useCallback<OpenPromptDialog>(
-    (msg, { onClose, ...options } = {}) => open(PromptDialog, { ...options, msg }, { onClose }),
-    [open],
+  const prompt = useEventCallback<OpenPromptDialog>((msg, { onClose, ...options } = {}) =>
+    open(PromptDialog, { ...options, msg }, { onClose }),
   );
 
   return React.useMemo(

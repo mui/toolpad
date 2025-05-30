@@ -3,8 +3,8 @@
  */
 
 import * as React from 'react';
-import { describe, test, expect } from 'vitest';
-import { renderHook, within, screen, waitFor } from '@testing-library/react';
+import { describe, test, expect, vi } from 'vitest';
+import { renderHook, within, screen, waitFor, render } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { DialogProps, useDialogs } from './useDialogs';
 import { DialogsProvider } from './DialogsProvider';
@@ -257,6 +257,101 @@ describe('useDialogs', () => {
       await result.current.close(theDialog, null);
 
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeFalsy());
+    });
+  });
+
+  describe('React Strict Mode behavior', () => {
+    test('should not leave dialogs open when effect runs twice', async () => {
+      function CustomDialog({ open }: DialogProps) {
+        return open ? <div role="dialog">Custom Dialog Content</div> : null;
+      }
+
+      function TestComponent() {
+        const dialogs = useDialogs();
+        const dialogRef = React.useRef<Promise<void> | null>(null);
+
+        React.useEffect(() => {
+          const dialog = dialogs.open(CustomDialog);
+          dialogRef.current = dialog;
+
+          return () => {
+            dialogs.close(dialog, undefined);
+            dialogRef.current = null;
+          };
+        }, [dialogs]);
+
+        React.useEffect(() => {
+          const timeout = setTimeout(() => {
+            if (dialogRef.current) {
+              dialogs.close(dialogRef.current, undefined);
+              dialogRef.current = null;
+            }
+          }, 50);
+          return () => clearTimeout(timeout);
+        });
+
+        return <div>Test Component</div>;
+      }
+
+      render(
+        <DialogsProvider>
+          <TestComponent />
+        </DialogsProvider>,
+        { reactStrictMode: true },
+      );
+
+      await waitFor(
+        async () => {
+          const dialogs = screen.queryAllByRole('dialog');
+          expect(dialogs.length).toBeLessThanOrEqual(0);
+        },
+        { timeout: 100 },
+      );
+    });
+  });
+
+  describe('stale closure', () => {
+    test('can close dialog after multiple re-renders', async () => {
+      const { result, rerender } = renderHook(() => useDialogs(), { wrapper: TestWrapper });
+
+      const theDialog = result.current.alert('Hello');
+
+      // Force multiple re-renders to create stale closures
+      rerender();
+      rerender();
+      rerender();
+
+      await screen.findByRole('dialog');
+
+      // This should work even with stale closures
+      await result.current.close(theDialog, undefined);
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeFalsy());
+    });
+
+    test('throws when closing unknown dialog', async () => {
+      const { result } = renderHook(() => useDialogs(), { wrapper: TestWrapper });
+
+      const fakeDialog = Promise.resolve(undefined);
+
+      await expect(result.current.close(fakeDialog, undefined)).rejects.toThrow('dialog not found');
+    });
+
+    test('dialog still closes when onClose callback throws', async () => {
+      const onCloseError = new Error('onClose failed');
+      const onCloseMock = vi.fn().mockRejectedValue(onCloseError);
+      const { result } = renderHook(() => useDialogs(), { wrapper: TestWrapper });
+
+      const theDialog = result.current.alert('Hello', { onClose: onCloseMock });
+
+      await screen.findByRole('dialog');
+
+      // Close should throw the onClose error
+      await expect(result.current.close(theDialog, undefined)).rejects.toThrow('onClose failed');
+
+      // But dialog should still be closed in UI and promise should be resolved
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeFalsy());
+      await expect(theDialog).resolves.toBeUndefined();
     });
   });
 });

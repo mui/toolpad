@@ -55,6 +55,10 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/core/integrations/react-router',
         title: 'Vite with React Router',
       },
+      {
+        pathname: '/toolpad/core/integrations/tanstack-router',
+        title: 'TanStack Router',
+      },
     ],
   },
   {
@@ -128,6 +132,10 @@ const pages: MuiPage[] = [
             title: 'useSession',
           },
           {
+            pathname: '/toolpad/core/react-use-navigation',
+            title: 'useNavigation',
+          },
+          {
             pathname: '/toolpad/core/react-persistent-state',
             title: 'Persisted state',
           },
@@ -163,6 +171,10 @@ const pages: MuiPage[] = [
           {
             pathname: '/toolpad/core/react-use-session/api',
             title: 'useSession',
+          },
+          {
+            pathname: '/toolpad/core/react-use-navigation/api',
+            title: 'useNavigation',
           },
           {
             pathname: '/toolpad/core/react-persistent-state/use-session-storage-state-api',

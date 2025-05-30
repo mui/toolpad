@@ -8,11 +8,11 @@ import invariant from 'invariant';
 import { useNotifications } from '../useNotifications';
 import { CrudContext } from '../shared/context';
 import { useLocaleText } from '../AppProvider/LocalizationProvider';
-import { CrudForm } from './CrudForm';
+import { CrudForm, CrudFormSlotProps, CrudFormSlots } from './CrudForm';
 import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
-import type { DataModel, DataModelId, DataSource, OmitId } from './types';
+import type { DataFieldFormValue, DataModel, DataModelId, DataSource, OmitId } from './types';
 
 interface EditFormProps<D extends DataModel> {
   dataSource: DataSource<D> & Required<Pick<DataSource<D>, 'getOne' | 'updateOne'>>;
@@ -20,10 +20,17 @@ interface EditFormProps<D extends DataModel> {
   onSubmit: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
   onSubmitSuccess?: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
   localeText: CRUDLocaleText;
+  slots?: {
+    form?: CrudFormSlots;
+  };
+  slotProps?: {
+    form?: CrudFormSlotProps;
+  };
 }
 
 function EditForm<D extends DataModel>(props: EditFormProps<D>) {
-  const { dataSource, initialValues, onSubmit, onSubmitSuccess, localeText } = props;
+  const { dataSource, initialValues, onSubmit, onSubmitSuccess, localeText, slots, slotProps } =
+    props;
   const { fields, validate } = dataSource;
 
   const notifications = useNotifications();
@@ -35,7 +42,7 @@ function EditForm<D extends DataModel>(props: EditFormProps<D>) {
     values: {
       ...Object.fromEntries(
         fields
-          .filter(({ field }) => field !== 'id')
+          .filter(({ field, editable }) => field !== 'id' && editable !== false)
           .map(({ field, type }) => [
             field,
             type === 'boolean' ? (initialValues[field] ?? false) : initialValues[field],
@@ -63,7 +70,7 @@ function EditForm<D extends DataModel>(props: EditFormProps<D>) {
   }, []);
 
   const handleFormFieldChange = React.useCallback(
-    (name: keyof D, value: string | number | boolean | File | null) => {
+    (name: keyof D, value: DataFieldFormValue) => {
       const validateField = async (values: Partial<OmitId<D>>) => {
         if (validate) {
           const { issues } = await validate(values);
@@ -132,6 +139,8 @@ function EditForm<D extends DataModel>(props: EditFormProps<D>) {
       onSubmit={handleFormSubmit}
       onReset={handleFormReset}
       submitButtonLabel={localeText.editLabel}
+      slots={slots?.form}
+      slotProps={slotProps?.form}
     />
   );
 }
@@ -146,6 +155,24 @@ EditForm.propTypes /* remove-proptypes */ = {
   localeText: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onSubmitSuccess: PropTypes.func,
+  slotProps: PropTypes.shape({
+    form: PropTypes.shape({
+      checkbox: PropTypes.object,
+      datePicker: PropTypes.object,
+      dateTimePicker: PropTypes.object,
+      select: PropTypes.object,
+      textField: PropTypes.object,
+    }),
+  }),
+  slots: PropTypes.shape({
+    form: PropTypes.shape({
+      checkbox: PropTypes.elementType,
+      datePicker: PropTypes.elementType,
+      dateTimePicker: PropTypes.elementType,
+      select: PropTypes.elementType,
+      textField: PropTypes.elementType,
+    }),
+  }),
 } as any;
 
 export interface EditProps<D extends DataModel> {
@@ -166,6 +193,20 @@ export interface EditProps<D extends DataModel> {
    * Locale text for the component.
    */
   localeText?: CRUDLocaleText;
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots?: {
+    form?: CrudFormSlots;
+  };
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps?: {
+    form?: CrudFormSlotProps;
+  };
 }
 
 /**
@@ -179,7 +220,14 @@ export interface EditProps<D extends DataModel> {
  * - [Edit API](https://mui.com/toolpad/core/api/edit)
  */
 function Edit<D extends DataModel>(props: EditProps<D>) {
-  const { id, onSubmitSuccess, dataSourceCache, localeText: propsLocaleText } = props;
+  const {
+    id,
+    onSubmitSuccess,
+    dataSourceCache,
+    localeText: propsLocaleText,
+    slots,
+    slotProps,
+  } = props;
 
   const globalLocaleText = useLocaleText();
 
@@ -277,6 +325,8 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
         onSubmit={handleSubmit}
         onSubmitSuccess={onSubmitSuccess}
         localeText={localeText}
+        slots={slots}
+        slotProps={slotProps}
       />
     ) : null;
   }, [
@@ -288,6 +338,8 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
     isLoading,
     onSubmitSuccess,
     propsLocaleText,
+    slotProps,
+    slots,
   ]);
 
   return <Box sx={{ display: 'flex', flex: 1 }}>{renderEdit}</Box>;
@@ -324,6 +376,32 @@ Edit.propTypes /* remove-proptypes */ = {
    * Callback fired when the form is successfully submitted.
    */
   onSubmitSuccess: PropTypes.func,
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps: PropTypes.shape({
+    form: PropTypes.shape({
+      checkbox: PropTypes.object,
+      datePicker: PropTypes.object,
+      dateTimePicker: PropTypes.object,
+      select: PropTypes.object,
+      textField: PropTypes.object,
+    }),
+  }),
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots: PropTypes.shape({
+    form: PropTypes.shape({
+      checkbox: PropTypes.elementType,
+      datePicker: PropTypes.elementType,
+      dateTimePicker: PropTypes.elementType,
+      select: PropTypes.elementType,
+      textField: PropTypes.elementType,
+    }),
+  }),
 } as any;
 
 export { Edit };

@@ -1,64 +1,64 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, useTheme, SxProps } from '@mui/material';
-import MuiAppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import IconButton from '@mui/material/IconButton';
-import Stack from '@mui/material/Stack';
-import Toolbar from '@mui/material/Toolbar';
-import Tooltip from '@mui/material/Tooltip';
+import { useTheme, SxProps } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import MenuIcon from '@mui/icons-material/Menu';
-import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
+import Toolbar from '@mui/material/Toolbar';
 import warnOnce from '@toolpad/utils/warnOnce';
-import { BrandingContext, NavigationContext, WindowContext } from '../shared/context';
-import { Account, type AccountProps } from '../Account';
+import { NavigationContext, WindowContext } from '../shared/context';
+import type { Branding, Navigation, NavigationPageItem } from '../AppProvider';
+import type { AccountProps } from '../Account';
+import {
+  DashboardHeader,
+  type DashboardHeaderProps,
+  type DashboardHeaderSlotProps,
+} from './DashboardHeader';
 import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
-import { ToolbarActions } from './ToolbarActions';
-import { AppTitle, AppTitleProps } from './AppTitle';
 import { getDrawerSxTransitionMixin, getDrawerWidthTransitionMixin } from './utils';
 import { MINI_DRAWER_WIDTH } from './shared';
-import type { Branding, Navigation, NavigationPageItem } from '../AppProvider';
-
-const AppBar = styled(MuiAppBar)(({ theme }) => ({
-  borderWidth: 0,
-  borderBottomWidth: 1,
-  borderStyle: 'solid',
-  borderColor: (theme.vars ?? theme).palette.divider,
-  boxShadow: 'none',
-  zIndex: theme.zIndex.drawer + 1,
-}));
 
 export interface SidebarFooterProps {
   mini: boolean;
 }
 
 export interface DashboardLayoutSlotProps {
-  appTitle?: AppTitleProps;
-  toolbarActions?: {};
-  toolbarAccount?: AccountProps;
+  appTitle?: DashboardHeaderSlotProps['appTitle'];
+  toolbarActions?: DashboardHeaderSlotProps['toolbarActions'];
+  toolbarAccount?: DashboardHeaderSlotProps['toolbarAccount'];
   sidebarFooter?: SidebarFooterProps;
+  header?: DashboardHeaderProps;
 }
+
+// @TODO: Deprecate `appTitle` and `toolbarActions` slots so that they must be used in DashboardHeader component only. Update docs accordingly.
 
 export interface DashboardLayoutSlots {
   /**
    * The component used for the app title section in the layout header.
    * @default Link
+   * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
   appTitle?: React.ElementType;
   /**
    * The toolbar actions component used in the layout header.
    * @default ToolbarActions
+   * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
   toolbarActions?: React.JSXElementConstructor<{}>;
   /**
    * The toolbar account component used in the layout header.
    * @default Account
+   * @deprecated Place your custom component on the right in the `toolbarActions` slot instead.
+   * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
   toolbarAccount?: React.JSXElementConstructor<AccountProps>;
+  /**
+   * The component used for the layout header.
+   * @default DashboardHeader
+   */
+  header?: React.JSXElementConstructor<DashboardHeaderProps>;
   /**
    * Optional footer component used in the layout sidebar.
    * @default null
@@ -140,7 +140,7 @@ export interface DashboardLayoutProps {
 function DashboardLayout(props: DashboardLayoutProps) {
   const {
     children,
-    branding: brandingProp,
+    branding,
     navigation: navigationProp,
     defaultSidebarCollapsed = false,
     disableCollapsibleSidebar = false,
@@ -160,11 +160,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const theme = useTheme();
 
-  const brandingContext = React.useContext(BrandingContext);
   const navigationContext = React.useContext(NavigationContext);
   const appWindowContext = React.useContext(WindowContext);
 
-  const branding = { ...brandingContext, ...brandingProp };
   const navigation = navigationProp ?? navigationContext;
 
   const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] =
@@ -239,9 +237,12 @@ function DashboardLayout(props: DashboardLayoutProps) {
     [setIsNavigationExpanded],
   );
 
-  const toggleNavigationExpanded = React.useCallback(() => {
-    setIsNavigationExpanded(!isNavigationExpanded);
-  }, [isNavigationExpanded, setIsNavigationExpanded]);
+  const handleToggleHeaderMenu = React.useCallback(
+    (isExpanded: boolean) => {
+      setIsNavigationExpanded(isExpanded);
+    },
+    [setIsNavigationExpanded],
+  );
 
   const handleNavigationLinkClick = React.useCallback(() => {
     setIsMobileNavigationExpanded(false);
@@ -250,35 +251,40 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const isDesktopMini = !disableCollapsibleSidebar && !isDesktopNavigationExpanded;
   const isMobileMini = !disableCollapsibleSidebar && !isMobileNavigationExpanded;
 
-  const getMenuIcon = React.useCallback(
-    (isExpanded: boolean) => {
-      const expandMenuActionText = 'Expand';
-      const collapseMenuActionText = 'Collapse';
-
-      return (
-        <Tooltip
-          title={`${isExpanded ? collapseMenuActionText : expandMenuActionText} menu`}
-          enterDelay={1000}
-        >
-          <div>
-            <IconButton
-              aria-label={`${isExpanded ? collapseMenuActionText : expandMenuActionText} navigation menu`}
-              onClick={toggleNavigationExpanded}
-            >
-              {isExpanded ? <MenuOpenIcon /> : <MenuIcon />}
-            </IconButton>
-          </div>
-        </Tooltip>
-      );
-    },
-    [toggleNavigationExpanded],
-  );
-
   const hasDrawerTransitions = isOverSmViewport && (!disableCollapsibleSidebar || isOverMdViewport);
 
-  const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
-  const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
   const SidebarFooterSlot = slots?.sidebarFooter ?? null;
+  const HeaderSlot = slots?.header ?? DashboardHeader;
+
+  const headerSlotProps: DashboardHeaderProps = React.useMemo(
+    () => ({
+      branding,
+      menuOpen: isNavigationExpanded,
+      onToggleMenu: handleToggleHeaderMenu,
+      hideMenuButton: hideNavigation || (isOverMdViewport && disableCollapsibleSidebar),
+      slots: {
+        appTitle: slots?.appTitle,
+        toolbarActions: slots?.toolbarActions,
+        toolbarAccount: slots?.toolbarAccount,
+      },
+      slotProps: {
+        appTitle: slotProps?.appTitle,
+        toolbarActions: slotProps?.toolbarActions,
+        toolbarAccount: slotProps?.toolbarAccount,
+      },
+      ...slotProps?.header,
+    }),
+    [
+      branding,
+      isNavigationExpanded,
+      handleToggleHeaderMenu,
+      hideNavigation,
+      isOverMdViewport,
+      disableCollapsibleSidebar,
+      slotProps,
+      slots,
+    ],
+  );
 
   const getDrawerContent = React.useCallback(
     (isMini: boolean, viewport: 'phone' | 'tablet' | 'desktop') => (
@@ -363,57 +369,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
         ...sx,
       }}
     >
-      <AppBar color="inherit" position="absolute" sx={{ displayPrint: 'none' }}>
-        <Toolbar sx={{ backgroundColor: 'inherit', mx: { xs: -0.75, sm: -1 } }}>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{
-              flexWrap: 'wrap',
-              width: '100%',
-            }}
-          >
-            <Stack direction="row">
-              {!hideNavigation ? (
-                <React.Fragment>
-                  <Box
-                    sx={{
-                      mr: { sm: disableCollapsibleSidebar ? 0 : 1 },
-                      display: { md: 'none' },
-                    }}
-                  >
-                    {getMenuIcon(isMobileNavigationExpanded)}
-                  </Box>
-                  <Box
-                    sx={{
-                      display: { xs: 'none', md: disableCollapsibleSidebar ? 'none' : 'block' },
-                      mr: disableCollapsibleSidebar ? 0 : 1,
-                    }}
-                  >
-                    {getMenuIcon(isDesktopNavigationExpanded)}
-                  </Box>
-                </React.Fragment>
-              ) : null}
-              {slots?.appTitle ? (
-                <slots.appTitle {...slotProps?.appTitle} />
-              ) : (
-                /* Hierarchy of application of `branding`
-                 * 1. Branding prop passed in the `slotProps.appTitle`
-                 * 2. Branding prop passed to the `DashboardLayout`
-                 * 3. Branding prop passed to the `AppProvider`
-                 */
-                <AppTitle branding={branding} {...slotProps?.appTitle} />
-              )}
-            </Stack>
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
-              <ToolbarActionsSlot {...slotProps?.toolbarActions} />
-              <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
-            </Stack>
-          </Stack>
-        </Toolbar>
-      </AppBar>
-
+      <HeaderSlot {...headerSlotProps} />
       {!hideNavigation ? (
         <React.Fragment>
           <Drawer
@@ -579,6 +535,26 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
         title: PropTypes.string,
       }),
     }),
+    header: PropTypes.shape({
+      branding: PropTypes.shape({
+        homeUrl: PropTypes.string,
+        logo: PropTypes.node,
+        title: PropTypes.string,
+      }),
+      hideMenuButton: PropTypes.bool,
+      menuOpen: PropTypes.bool.isRequired,
+      onToggleMenu: PropTypes.func.isRequired,
+      slotProps: PropTypes.shape({
+        appTitle: PropTypes.object,
+        toolbarAccount: PropTypes.object,
+        toolbarActions: PropTypes.object,
+      }),
+      slots: PropTypes.shape({
+        appTitle: PropTypes.elementType,
+        toolbarAccount: PropTypes.elementType,
+        toolbarActions: PropTypes.elementType,
+      }),
+    }),
     sidebarFooter: PropTypes.shape({
       mini: PropTypes.bool.isRequired,
     }),
@@ -607,6 +583,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   slots: PropTypes.shape({
     appTitle: PropTypes.elementType,
+    header: PropTypes.elementType,
     sidebarFooter: PropTypes.elementType,
     toolbarAccount: PropTypes.elementType,
     toolbarActions: PropTypes.elementType,

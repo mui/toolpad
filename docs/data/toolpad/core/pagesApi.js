@@ -8,6 +8,7 @@ export default [
   { pathname: '/toolpad/core/api/crud' },
   { pathname: '/toolpad/core/api/crud-form' },
   { pathname: '/toolpad/core/api/crud-provider' },
+  { pathname: '/toolpad/core/api/dashboard-header' },
   { pathname: '/toolpad/core/api/dashboard-layout' },
   { pathname: '/toolpad/core/api/dashboard-sidebar-page-item' },
   { pathname: '/toolpad/core/api/dialogs-provider' },

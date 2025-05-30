@@ -338,7 +338,7 @@ Certain parts of the CRUD UIs can be customized or replaced with custom componen
 
 #### Integration with Data Grid
 
-The `list` and then `dataGrid` slot and slot props can be used to replace the standard Data Grid with any of its [commercially licensed versions](https://mui.com/x/react-data-grid/#commercial-licenses).
+The `list` and then `dataGrid` slot and slot props can be used to customize the Data Grid used in the list view, and even replace the standard Data Grid with any of its [commercially licensed versions](https://mui.com/x/react-data-grid/#commercial-licenses).
 
 {{"demo": "CrudDataGridSlots.js", "height": 600, "iframe": true}}
 

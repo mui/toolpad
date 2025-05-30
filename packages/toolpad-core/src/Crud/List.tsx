@@ -422,6 +422,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
             onSortModelChange={setSortModel}
             filterModel={filterModel}
             onFilterModelChange={setFilterModel}
+            disableRowSelectionOnClick
             onRowClick={handleRowClick}
             loading={isLoading}
             initialState={initialState}

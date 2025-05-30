@@ -50,12 +50,11 @@ const AUTHENTICATION = {
 
 function DefaultLayout({ page }: { page: React.ReactElement<any> }) {
   const router = useRouter();
+  const pathname = router.asPath.split('?')[0];
   const { segments = [] } = router.query;
   const [orderId] = segments;
 
   const title = React.useMemo(() => {
-    const pathname = router.asPath.split('?')[0];
-
     if (pathname.endsWith('/orders/new')) {
       return 'New Order';
     }
@@ -66,7 +65,7 @@ function DefaultLayout({ page }: { page: React.ReactElement<any> }) {
       return `Order ${orderId}`;
     }
     return undefined;
-  }, [orderId, router.asPath]);
+  }, [orderId, pathname]);
 
   return (
     <DashboardLayout>

@@ -11,9 +11,7 @@
     "dev": "next dev --port 3003",
     "deploy": "git push upstream master:docs-v5",
     "icons": "rimraf public/static/icons/* && node ./scripts/buildIcons.js",
-    "typescript": "tsc -p tsconfig.json",
-    "typescript:transpile": "cross-env BABEL_ENV=development babel-node --extensions \".tsx,.ts,.js\" scripts/formattedTSDemos",
-    "typescript:transpile:dev": "cross-env BABEL_ENV=development babel-node --extensions \".tsx,.ts,.js\" scripts/formattedTSDemos --watch"
+    "typescript": "tsc -p tsconfig.json"
   },
   "dependencies": {
     "@babel/plugin-transform-object-assign": "7.25.9",

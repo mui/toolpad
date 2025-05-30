@@ -17,7 +17,6 @@
     "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --ignore docs --ignore playground-*",
     "docs:dev": "pnpm --filter docs dev",
     "docs:build": "pnpm --filter docs build",
-    "docs:build:api:core": "tsx --tsconfig ./scripts/tsconfig.json ./scripts/docs/buildCoreApiDocs/index.ts",
     "docs:build:api:studio": "tsx --tsconfig ./scripts/tsconfig.json ./scripts/docs/buildStudioApi.ts",
     "docs:build:api": "concurrently \"pnpm docs:build:api:studio\"",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",

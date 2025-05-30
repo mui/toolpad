@@ -24,7 +24,6 @@ function loadPkg(pkgPath: string): { version: string } {
   return JSON.parse(pkgContent);
 }
 
-const toolpadCorePkg = loadPkg('./packages/toolpad-core');
 const toolpadStudioPkg = loadPkg('./packages/toolpad-studio');
 
 export default withDocsInfra({
@@ -40,13 +39,11 @@ export default withDocsInfra({
   assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
   env: {
     // docs-infra
-    LIB_VERSION: toolpadCorePkg.version,
     SOURCE_CODE_REPO: 'https://github.com/mui/toolpad',
     SOURCE_GITHUB_BRANCH: 'master', // #default-branch-switch
     GITHUB_TEMPLATE_DOCS_FEEDBACK: '4.docs-feedback.yml',
     // Toolpad related
     // …
-    TOOLPAD_CORE_VERSION: toolpadCorePkg.version,
     TOOLPAD_STUDIO_VERSION: toolpadStudioPkg.version,
   },
   webpack: (config, options) => {
@@ -67,8 +64,6 @@ export default withDocsInfra({
             WORKSPACE_ROOT,
             './packages/toolpad-studio-runtime/src',
           ),
-          '@toolpad/utils': path.resolve(WORKSPACE_ROOT, './packages/toolpad-utils/src'),
-          '@toolpad/core': path.resolve(WORKSPACE_ROOT, './packages/toolpad-core/src'),
         },
       },
       module: {
@@ -88,12 +83,6 @@ export default withDocsInfra({
                       workspaceRoot: WORKSPACE_ROOT,
                       ignoreLanguagePages: LANGUAGES_IGNORE_PAGES,
                       languagesInProgress: LANGUAGES_IN_PROGRESS,
-                      packages: [
-                        {
-                          productId: 'toolpad-core',
-                          paths: [path.join(WORKSPACE_ROOT, 'packages/toolpad-core/src')],
-                        },
-                      ],
                       env: {
                         SOURCE_CODE_REPO: options.config.env.SOURCE_CODE_REPO,
                         LIB_VERSION: options.config.env.LIB_VERSION,

@@ -1,3 +1,0 @@
-<DashboardLayout>
-  <DemoPageContent pathname={demoRouter.pathname} />
-</DashboardLayout>

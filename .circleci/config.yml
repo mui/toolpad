@@ -108,11 +108,6 @@ jobs:
       - checkout
       - install_js
       - run:
-          name: '`pnpm docs:typescript:formatted` changes committed?'
-          command: |
-            pnpm docs:typescript:formatted --disable-cache
-            pnpm check-changes
-      - run:
           name: '`pnpm prettier:all` changes committed?'
           command: |
             pnpm prettier:all

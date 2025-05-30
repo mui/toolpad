@@ -104,15 +104,6 @@ module.exports = {
     'material-ui/disallow-react-api-in-server-components': 'off',
   },
   overrides: [
-    ...baseline.overrides.map((override) => {
-      if (override.rules['material-ui/disallow-react-api-in-server-components']) {
-        return {
-          ...override,
-          files: ['packages/toolpad-core/src/*/*.?(c|m)[jt]s?(x)'],
-        };
-      }
-      return override;
-    }),
     {
       files: ['**/*.test.js', '**/*.test.ts', '**/*.test.tsx'],
       extends: ['plugin:testing-library/react'],
@@ -142,12 +133,9 @@ module.exports = {
     },
     {
       files: [
-        'packages/create-toolpad-app/**/*',
-        'packages/toolpad-core/**/*',
         'packages/toolpad-studio/**/*',
         'packages/toolpad-studio-components/**/*',
         'packages/toolpad-studio-runtime/**/*',
-        'packages/toolpad-utils/**/*',
       ],
       excludedFiles: [
         'tsup.config.ts',
@@ -179,11 +167,8 @@ module.exports = {
     {
       // Starting small, we will progressively expand this to more packages.
       files: [
-        // 'packages/create-toolpad-app/**/*',
-        // 'packages/toolpad-core/**/*',
         // 'packages/toolpad-studio/**/*',
         // 'packages/toolpad-studio/**/*',
-        'packages/toolpad-utils/**/*',
         // 'packages/toolpad-studio-runtime/**/*',
         // 'packages/toolpad-studio-components/**/*',
       ],

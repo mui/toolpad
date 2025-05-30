@@ -10,10 +10,6 @@
       "@toolpad/studio-runtime/dateFormat": [
         "../packages/toolpad-studio-runtime/src/dateFormat.tsx"
       ],
-      "@toolpad/utils/*": [
-        "../packages/toolpad-utils/src/*.tsx",
-        "../packages/toolpad-utils/src/*.ts"
-      ],
       "@mui-internal/api-docs-builder": ["../node_modules/@mui/monorepo/packages/api-docs-builder"],
       "@mui-internal/api-docs-builder/*": [
         "../node_modules/@mui/monorepo/packages/api-docs-builder/*"

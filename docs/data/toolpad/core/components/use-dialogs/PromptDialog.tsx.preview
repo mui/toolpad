@@ -1,4 +1,0 @@
-const name = await dialogs.prompt("What's your name?");
-if (name) {
-  await dialogs.alert(`Hi there, ${name}`);
-}

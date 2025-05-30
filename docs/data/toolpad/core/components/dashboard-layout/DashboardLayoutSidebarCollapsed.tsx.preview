@@ -1,3 +1,0 @@
-<DashboardLayout defaultSidebarCollapsed>
-  <DemoPageContent pathname={pathname} />
-</DashboardLayout>

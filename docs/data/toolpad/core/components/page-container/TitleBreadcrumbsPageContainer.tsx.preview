@@ -1,3 +1,0 @@
-<Paper sx={{ width: '100%' }}>
-  <PageContainer />
-</Paper>

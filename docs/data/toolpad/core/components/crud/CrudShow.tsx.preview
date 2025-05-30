@@ -1,7 +1,0 @@
-<Show<Person>
-  id={1}
-  dataSource={peopleDataSource}
-  dataSourceCache={peopleCache}
-  onEditClick={handleEditClick}
-  onDelete={handleDelete}
-/>

@@ -164,18 +164,17 @@ module.exports = {
         'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
       },
     },
-    {
-      // Starting small, we will progressively expand this to more packages.
-      files: [
-        // 'packages/toolpad-studio/**/*',
-        // 'packages/toolpad-studio/**/*',
-        // 'packages/toolpad-studio-runtime/**/*',
-        // 'packages/toolpad-studio-components/**/*',
-      ],
-      rules: {
-        '@typescript-eslint/no-explicit-any': ['error'],
-      },
-    },
+    // {
+    //   // Starting small, we will progressively expand this to more packages.
+    //   files: [
+    //     'packages/toolpad-studio/**/*',
+    //     'packages/toolpad-studio-runtime/**/*',
+    //     'packages/toolpad-studio-components/**/*',
+    //   ],
+    //   rules: {
+    //     '@typescript-eslint/no-explicit-any': ['error'],
+    //   },
+    // },
     {
       files: ['packages/toolpad-studio/pages/**/*'],
       rules: {

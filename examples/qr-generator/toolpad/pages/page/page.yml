@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/toolpad/v0.13.0/docs/schemas/v1/definitions.json#properties/Page
+
+apiVersion: v1
+kind: page
+spec:
+  title: Default page
+  alias:
+    - 7cn1v4w
+  content:
+    - component: Button
+      name: button
+    - component: Autocomplete
+      name: autocomplete
+      layout:
+        columnSize: 1.506993006993007
+    - component: PageRow
+      name: pageRow
+      props:
+        justifyContent: start
+      children:
+        - component: PageColumn
+          name: pageColumn
+          layout:
+            columnSize: 1.3374125874125875
+          children:
+            - component: DataGrid
+              name: dataGrid
+              layout:
+                columnSize: 1
+            - component: Button
+              name: button2
+        - component: Button
+          name: button1
+          layout:
+            columnSize: 0.6625874125874126
+            horizontalAlign: center
+            verticalAlign: center

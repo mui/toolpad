@@ -1,0 +1,5 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/toolpad/v0.13.0/docs/schemas/v1/definitions.json#properties/Application
+
+apiVersion: v1
+kind: application
+spec: {}

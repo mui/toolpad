@@ -1,5 +1,0 @@
-<DashboardLayout
-  slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
->
-  <DemoPageContent pathname={pathname} />
-</DashboardLayout>

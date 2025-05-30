@@ -1,5 +1,0 @@
-<Account
-  slots={{
-    popoverContent: UserOrg,
-  }}
-/>

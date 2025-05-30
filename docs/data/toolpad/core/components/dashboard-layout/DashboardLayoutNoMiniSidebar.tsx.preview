@@ -1,3 +1,0 @@
-<DashboardLayout disableCollapsibleSidebar>
-  <DemoPageContent pathname={router.pathname} />
-</DashboardLayout>

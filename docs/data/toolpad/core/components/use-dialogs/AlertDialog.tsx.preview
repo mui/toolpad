@@ -1,1 +1,0 @@
-await dialogs.alert('Hello World');

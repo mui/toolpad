@@ -15,8 +15,6 @@ module.exports = {
         './packages/toolpad-studio-components/src',
       ),
       '@toolpad/studio-runtime': path.resolve(__dirname, './packages/toolpad-studio-runtime/src'),
-      '@toolpad/utils': path.resolve(__dirname, './packages/toolpad-utils/src'),
-      '@toolpad/core': path.resolve(__dirname, './packages/toolpad-core/src'),
       '@toolpad/studio-tests': path.resolve(__dirname, './test'),
       docs: path.resolve(__dirname, './node_modules/@mui/monorepo/docs'),
       'docs-toolpad': path.resolve(__dirname, './docs'),

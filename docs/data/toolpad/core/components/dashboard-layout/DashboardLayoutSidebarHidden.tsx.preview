@@ -1,3 +1,0 @@
-<DashboardLayout hideNavigation>
-  <DemoPageContent pathname={router.pathname} />
-</DashboardLayout>

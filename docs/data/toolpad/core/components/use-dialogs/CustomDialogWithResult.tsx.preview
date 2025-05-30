@@ -1,2 +1,0 @@
-const result = await dialogs.open(MyCustomDialog);
-await dialogs.alert(`Your name is "${result}"`);

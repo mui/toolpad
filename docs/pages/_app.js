@@ -21,7 +21,6 @@ import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl'
 import { DocsProvider } from '@mui/docs/DocsProvider';
 import { mapTranslations } from '@mui/docs/i18n';
 import toolpadStudioPages from '../data/toolpad/studio/pages';
-import toolpadCorePages from '../data/toolpad/core/pages';
 import * as config from '../config';
 
 // Remove the license warning from demonstration purposes
@@ -44,23 +43,16 @@ function getMuiPackageVersion(packageName, commitRef) {
 }
 
 ponyfillGlobal.muiDocConfig = {
-  csbIncludePeerDependencies: (deps, { versions }) => {
+  csbIncludePeerDependencies: (deps) => {
     const newDeps = { ...deps };
 
     newDeps.invariant = 'latest';
 
-    if (newDeps['@toolpad/core']) {
-      newDeps['@mui/material'] = versions['@mui/material'];
-      newDeps['@mui/icons-material'] = versions['@mui/icons-material'];
-    }
-
     return newDeps;
   },
-  csbGetVersions: (versions, { muiCommitRef }) => {
+  csbGetVersions: (versions) => {
     const output = {
       ...versions,
-      '@toolpad/core': getMuiPackageVersion('@toolpad/core', muiCommitRef),
-      '@toolpad/utils': getMuiPackageVersion('@toolpad/utils', muiCommitRef),
     };
     return output;
   },
@@ -212,23 +204,9 @@ function AppWrapper(props) {
           versions: [{ text: `v${process.env.TOOLPAD_STUDIO_VERSION}`, current: true }],
         };
         pages = toolpadStudioPages;
-      } else {
-        productIdentifier = {
-          metadata: '',
-          name: 'Toolpad Core',
-          versions: [{ text: `v${process.env.TOOLPAD_CORE_VERSION}`, current: true }],
-        };
-        pages = toolpadCorePages;
       }
     } else if (productCategoryId === 'toolpad') {
-      if (productId === 'toolpad-core') {
-        productIdentifier = {
-          metadata: '',
-          name: 'Toolpad Core',
-          versions: [{ text: `v${process.env.TOOLPAD_CORE_VERSION}`, current: true }],
-        };
-        pages = toolpadCorePages;
-      } else if (productId === 'toolpad-studio') {
+      if (productId === 'toolpad-studio') {
         productIdentifier = {
           metadata: '',
           name: 'Toolpad Studio',

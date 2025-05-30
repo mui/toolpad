@@ -108,19 +108,9 @@ jobs:
       - checkout
       - install_js
       - run:
-          name: '`pnpm docs:typescript:formatted` changes committed?'
-          command: |
-            pnpm docs:typescript:formatted --disable-cache
-            pnpm check-changes
-      - run:
           name: '`pnpm prettier:all` changes committed?'
           command: |
             pnpm prettier:all
-            pnpm check-changes
-      - run:
-          name: '`pnpm proptypes` changes committed?'
-          command: |
-            pnpm proptypes
             pnpm check-changes
       - run:
           name: '`pnpm jsonSchemas` changes committed?'
@@ -147,7 +137,7 @@ jobs:
       - run:
           name: Tests fake browser
           command: pnpm test
-      - codecov/upload
+      # - codecov/upload
 
   test_unit_browser:
     <<: *default-job

@@ -55,12 +55,6 @@ lerna-debug.log
 dist/
 build/
 
-# studio
-packages/toolpad-studio/public/web_modules
-packages/toolpad-studio/public/runtime
-packages/toolpad-studio/public/typings.json
-.toolpad-generated
-
 # examples
 examples/*/*/yarn.lock
 

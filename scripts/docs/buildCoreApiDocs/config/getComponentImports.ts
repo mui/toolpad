@@ -32,6 +32,9 @@ export function getComponentImports(name: string, filename: string) {
     const reactRouterRelativePath = path.resolve(relativePath, '../../react-router');
     const reactRouterFileName = findMatchingFileName(reactRouterRelativePath, `${name}.tsx`);
 
+    const tanStackRouterRelativePath = path.resolve(relativePath, '../../tanstack-router');
+    const tanStackRouterFileName = findMatchingFileName(tanStackRouterRelativePath, `${name}.tsx`);
+
     return [
       `import { ${name} } from '@toolpad/core/${name}';`,
       `import { ${name} } from '@toolpad/core';${
@@ -41,6 +44,10 @@ export function getComponentImports(name: string, filename: string) {
       }${
         reactRouterFileName
           ? `\nimport { ${reactRouterFileName} } from '@toolpad/core/react-router'; // React Router`
+          : ''
+      }${
+        tanStackRouterFileName
+          ? `\nimport { ${tanStackRouterFileName} } from '@toolpad/core/tanstack-router'; // TanStack Router`
           : ''
       }`,
     ];

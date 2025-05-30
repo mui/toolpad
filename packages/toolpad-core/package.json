@@ -45,7 +45,6 @@
     "@mui/utils": "^7.0.2",
     "@mui/x-data-grid": "^8.5.0",
     "@mui/x-date-pickers": "^8.5.0",
-    "@standard-schema/spec": "^1.0.0",
     "@toolpad/utils": "workspace:*",
     "client-only": "^0.0.1",
     "dayjs": "1.11.13",
@@ -58,6 +57,8 @@
     "@emotion/react": "11.14.0",
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",
+    "@standard-schema/spec": "^1.0.0",
+    "@tanstack/react-router": "^1.120.5",
     "@mui/x-data-grid-premium": "^8.5.0",
     "@mui/x-data-grid-pro": "^8.5.0",
     "@types/invariant": "2.2.37",
@@ -79,6 +80,7 @@
     "@emotion/react": "^11",
     "@mui/icons-material": "^7.0.0-beta || ^7.0.0",
     "@mui/material": "^7.0.0-beta || ^7.0.0",
+    "@tanstack/react-router": "^1",
     "next": "^14 || ^15",
     "react": "^18 || ^19",
     "react-dom": "^18 || ^19",
@@ -89,6 +91,9 @@
       "optional": true
     },
     "react-router": {
+      "optional": true
+    },
+    "@tanstack/react-router": {
       "optional": true
     }
   },

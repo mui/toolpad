@@ -113,11 +113,6 @@ jobs:
             pnpm prettier:all
             pnpm check-changes
       - run:
-          name: '`pnpm proptypes` changes committed?'
-          command: |
-            pnpm proptypes
-            pnpm check-changes
-      - run:
           name: '`pnpm jsonSchemas` changes committed?'
           command: |
             pnpm jsonSchemas

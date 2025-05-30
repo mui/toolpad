@@ -50,21 +50,22 @@ const AUTHENTICATION = {
 
 function DefaultLayout({ page }: { page: React.ReactElement<any> }) {
   const router = useRouter();
+  const pathname = router.asPath.split('?')[0];
   const { segments = [] } = router.query;
   const [orderId] = segments;
 
   const title = React.useMemo(() => {
-    if (router.asPath.split('?')[0] === '/orders/new') {
+    if (pathname.endsWith('/orders/new')) {
       return 'New Order';
     }
-    if (orderId && router.asPath.includes('/edit')) {
+    if (orderId && pathname.endsWith('/edit')) {
       return `Order ${orderId} - Edit`;
     }
     if (orderId) {
       return `Order ${orderId}`;
     }
     return undefined;
-  }, [orderId, router.asPath]);
+  }, [orderId, pathname]);
 
   return (
     <DashboardLayout>

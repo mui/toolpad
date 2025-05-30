@@ -7,13 +7,12 @@ function Layout() {
   const { pathname } = useLocation();
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { _splat } = useParams({ strict: false });
+  const orderId = _splat?.split('/')[0];
 
   const title = React.useMemo(() => {
     if (pathname.endsWith('/orders/new')) {
       return 'New Order';
     }
-
-    const orderId = _splat?.split('/')[0];
     if (orderId && pathname.endsWith('/edit')) {
       return `Order ${orderId} - Edit`;
     }
@@ -22,7 +21,7 @@ function Layout() {
     }
 
     return undefined;
-  }, [_splat, pathname]);
+  }, [orderId, pathname]);
 
   return (
     <DashboardLayout>

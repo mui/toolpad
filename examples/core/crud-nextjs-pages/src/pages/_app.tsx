@@ -42,21 +42,22 @@ const BRANDING = {
 
 function DefaultLayout({ page }: { page: React.ReactElement<any> }) {
   const router = useRouter();
+  const pathname = router.asPath.split('?')[0];
   const { segments = [] } = router.query;
   const [employeeId] = segments;
 
   const title = React.useMemo(() => {
-    if (router.asPath.split('?')[0] === '/employees/new') {
+    if (pathname.endsWith('/employees/new')) {
       return 'New Employee';
     }
-    if (employeeId && router.asPath.includes('/edit')) {
+    if (employeeId && pathname.endsWith('/edit')) {
       return `Employee ${employeeId} - Edit`;
     }
     if (employeeId) {
       return `Employee ${employeeId}`;
     }
     return undefined;
-  }, [employeeId, router.asPath]);
+  }, [employeeId, pathname]);
 
   return (
     <DashboardLayout>

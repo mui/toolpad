@@ -98,7 +98,7 @@
     "@types/babel__core": "^7.20.5",
     "@types/doctrine": "0.0.9",
     "@types/json-schema": "7.0.15",
-    "@types/react": "^19.1.2",
+    "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
     "@types/react-is": "^19.0.0",
     "@types/react-swipeable-views": "^0.13.6",

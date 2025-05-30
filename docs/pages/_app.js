@@ -31,17 +31,6 @@ const clientSideEmotionCache = createEmotionCache();
 
 let reloadInterval;
 
-function getMuiPackageVersion(packageName, commitRef) {
-  if (commitRef === undefined) {
-    // #default-branch-switch
-    // Use the "latest" npm tag for the master git branch
-    // Use the "next" npm tag for the next git branch
-    return 'latest';
-  }
-  const shortSha = commitRef.slice(0, 8);
-  return `https://pkg.csb.dev/mui/toolpad/commit/${shortSha}/${packageName}`;
-}
-
 ponyfillGlobal.muiDocConfig = {
   csbIncludePeerDependencies: (deps) => {
     const newDeps = { ...deps };

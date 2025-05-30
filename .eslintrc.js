@@ -104,6 +104,7 @@ module.exports = {
     'material-ui/disallow-react-api-in-server-components': 'off',
   },
   overrides: [
+    ...baseline.overrides,
     {
       files: ['**/*.test.js', '**/*.test.ts', '**/*.test.tsx'],
       extends: ['plugin:testing-library/react'],

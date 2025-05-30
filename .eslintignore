@@ -24,3 +24,6 @@ test
 /packages/toolpad-studio/
 /packages/toolpad-studio-runtime/
 /packages/toolpad-studio-components/
+
+# generated TanStack Router files
+routeTree.gen.ts

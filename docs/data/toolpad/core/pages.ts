@@ -55,6 +55,10 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/core/integrations/react-router',
         title: 'Vite with React Router',
       },
+      {
+        pathname: '/toolpad/core/integrations/tanstack-router',
+        title: 'TanStack Router',
+      },
     ],
   },
   {

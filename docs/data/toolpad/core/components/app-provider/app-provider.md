@@ -80,7 +80,7 @@ export default function App(props) {
 }
 ```
 
-## Client-side routing
+## React Router
 
 The `ReactRouterAppProvider` includes routing out-of-the-box for projects using [react-router](https://www.npmjs.com/package/react-router).
 
@@ -88,6 +88,14 @@ This specific `ReactRouterAppProvider` is recommended when building single-page 
 
 ```tsx
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
+```
+
+## Other Integrations
+
+### TanStack Router
+
+```tsx
+import { TanStackRouterAppProvider } from '@toolpad/core/tanstack-router';
 ```
 
 ## Theming

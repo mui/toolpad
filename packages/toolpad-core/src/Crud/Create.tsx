@@ -5,11 +5,11 @@ import invariant from 'invariant';
 import { useNotifications } from '../useNotifications';
 import { CrudContext } from '../shared/context';
 import { useLocaleText } from '../AppProvider/LocalizationProvider';
-import { CrudForm } from './CrudForm';
+import { CrudForm, CrudFormSlotProps, CrudFormSlots } from './CrudForm';
 import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
-import type { DataModel, DataSource, OmitId } from './types';
+import type { DataFieldFormValue, DataModel, DataSource, OmitId } from './types';
 
 export interface CreateProps<D extends DataModel> {
   /**
@@ -38,6 +38,20 @@ export interface CreateProps<D extends DataModel> {
    * Locale text for the component.
    */
   localeText?: CRUDLocaleText;
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots?: {
+    form?: CrudFormSlots;
+  };
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps?: {
+    form?: CrudFormSlotProps;
+  };
 }
 
 /**
@@ -57,6 +71,8 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
     resetOnSubmit = false,
     dataSourceCache,
     localeText: propsLocaleText,
+    slots,
+    slotProps,
   } = props;
 
   const globalLocaleText = useLocaleText();
@@ -88,7 +104,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
     values: {
       ...Object.fromEntries(
         fields
-          .filter(({ field }) => field !== 'id')
+          .filter(({ field, editable }) => field !== 'id' && editable !== false)
           .map(({ field, type }) => [
             field,
             type === 'boolean' ? (initialValues[field] ?? false) : initialValues[field],
@@ -116,7 +132,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
   }, []);
 
   const handleFormFieldChange = React.useCallback(
-    (name: keyof D, value: string | number | boolean | File | null) => {
+    (name: keyof D, value: DataFieldFormValue) => {
       const validateField = async (values: Partial<OmitId<D>>) => {
         if (validate) {
           const { issues } = await validate(values);
@@ -191,6 +207,8 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
       onSubmit={handleFormSubmit}
       onReset={handleFormReset}
       submitButtonLabel={localeText.createLabel}
+      slots={slots?.form}
+      slotProps={slotProps?.form}
     />
   );
 }
@@ -232,6 +250,32 @@ Create.propTypes /* remove-proptypes */ = {
    * @default false
    */
   resetOnSubmit: PropTypes.bool,
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps: PropTypes.shape({
+    form: PropTypes.shape({
+      checkbox: PropTypes.object,
+      datePicker: PropTypes.object,
+      dateTimePicker: PropTypes.object,
+      select: PropTypes.object,
+      textField: PropTypes.object,
+    }),
+  }),
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots: PropTypes.shape({
+    form: PropTypes.shape({
+      checkbox: PropTypes.elementType,
+      datePicker: PropTypes.elementType,
+      dateTimePicker: PropTypes.elementType,
+      select: PropTypes.elementType,
+      textField: PropTypes.elementType,
+    }),
+  }),
 } as any;
 
 export { Create };

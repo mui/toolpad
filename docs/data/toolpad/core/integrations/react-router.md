@@ -6,7 +6,7 @@ title: React Router - Integration
 
 <p class="description">To integrate Toolpad Core into a single-page app (with Vite, for example) using React Router, follow these steps.</p>
 
-## Wrap all your pages in a `ReactRouterAppProvider`
+## Wrap all your pages with a `ReactRouterAppProvider`
 
 In your router configuration (for example `src/main.tsx`), use a shared component or element (for example `src/App.tsx`) as a root **layout route** that wraps the whole application with the `ReactRouterAppProvider` from `@toolpad/core/react-router`.
 

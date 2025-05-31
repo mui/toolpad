@@ -1,0 +1,23 @@
+export const notesDataSource: DataSource<Note> = {
+  fields: [
+    { field: 'id', headerName: 'ID' },
+    { field: 'title', headerName: 'Title', flex: 1 },
+    { field: 'text', headerName: 'Text', flex: 1 },
+    {
+      field: 'createdAt',
+      headerName: 'Created at',
+      type: 'dateTime',
+      valueGetter: (value: string) => value && new Date(value),
+      editable: false,
+    },
+  ],
+
+// ...
+
+<Crud<Note>
+  dataSource={notesDataSource}
+  dataSourceCache={notesCache}
+  rootPath="/notes"
+  initialPageSize={10}
+  defaultValues={{ title: 'New note' }}
+/>

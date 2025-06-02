@@ -1,0 +1,401 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/toolpad/v0.1.50/docs/schemas/v1/definitions.json#properties/Page
+
+apiVersion: v1
+kind: page
+spec:
+  title: Customers
+  content:
+    - component: PageRow
+      name: pageRow13
+      children:
+        - component: PageColumn
+          name: pageColumn2
+          layout:
+            columnSize: 1
+          children:
+            - component: PageRow
+              name: pageRow3
+              props:
+                justifyContent: start
+              children:
+                - component: Image
+                  name: image1
+                  layout:
+                    columnSize: 0.13695090439276486
+                    verticalAlign: end
+                  props:
+                    src: https://iili.io/HoCHfyv.png
+                    width: 70
+                    height: 40
+                - component: Text
+                  name: typography3
+                  layout:
+                    columnSize: 1.8630490956072352
+                    horizontalAlign: center
+                  props:
+                    value: Acme corp. admin app
+                    variant: h3
+            - component: Text
+              name: typography4
+              props:
+                value: Acme corp. is a global e-com company and this is a support application to
+                  add new users
+            - component: PageRow
+              name: pageRow2
+              props:
+                justifyContent: start
+              children:
+                - component: Text
+                  name: typography1
+                  layout:
+                    columnSize: 2.030188679245283
+                    horizontalAlign: center
+                  props:
+                    value: Customer list
+                    variant: h4
+                - component: Button
+                  name: button1
+                  layout:
+                    columnSize: 0.4830188679245283
+                    horizontalAlign: center
+                  props:
+                    size: medium
+                    content: Refresh
+                    color: primary
+                    variant: outlined
+                    onClick:
+                      $$jsExpressionAction: getCustomers.refetch()
+                    loading: false
+                    fullWidth: true
+                - component: Button
+                  name: button
+                  layout:
+                    columnSize: 0.4867924528301887
+                  props:
+                    content: Delete user
+                    size: medium
+                    onClick:
+                      $$jsExpressionAction: |-
+                        await deleteCustomer.call();
+                        getCustomers.refetch();
+                    fullWidth: true
+                    disabled:
+                      $$jsExpression: |
+                        !customersGrid.selection
+            - component: DataGrid
+              name: customersGrid
+              props:
+                rows:
+                  $$jsExpression: |
+                    getCustomers.data
+                columns:
+                  - field: id
+                    type: number
+                    headerName: ID
+                  - field: name
+                    type: string
+                    width: 115
+                    headerName: Name
+                  - field: account_creation_date
+                    type: date
+                    headerName: Creation date
+                  - field: country_of_residence
+                    type: string
+                    headerName: Residence country
+                    width: 144
+                  - field: phone_number
+                    type: number
+                    headerName: Phone no.
+                  - field: email
+                    type: string
+                    headerName: Email
+                  - field: address
+                    type: string
+                    headerName: Address
+                  - field: gender
+                    type: string
+                    headerName: Gender
+                  - field: new
+                height: 416
+            - component: Text
+              name: typography2
+              layout:
+                columnSize: 1
+                horizontalAlign: start
+              props:
+                value: Update customer
+                variant: h4
+            - component: Form
+              name: updateCustomerForm
+              layout:
+                columnSize: 1
+              props:
+                onSubmit:
+                  $$jsExpressionAction: |-
+                    await updateCustomer.call();
+                    getCustomers.refetch();
+                submitButtonText: Update
+                hasResetButton: false
+                hideControls: false
+                formControlsFullWidth: false
+                formControlsAlign: end
+              children:
+                - component: PageRow
+                  name: pageRow14
+                  children:
+                    - component: PageColumn
+                      name: pageColumn4
+                      layout:
+                        columnSize: 1
+                      children:
+                        - component: TextField
+                          name: name
+                          props:
+                            defaultValue:
+                              $$jsExpression: |
+                                customersGrid.selection.name
+                            disabled: false
+                            fullWidth: true
+                            label: Name
+                            name: name
+                            isRequired: true
+                          layout:
+                            columnSize: 0.8268733850129198
+                        - component: PageRow
+                          name: pageRow
+                          props:
+                            justifyContent: start
+                          children:
+                            - component: PageColumn
+                              name: pageColumn5
+                              layout:
+                                columnSize: 0.4728682170542636
+                              children:
+                                - component: DatePicker
+                                  name: account_creation_date
+                                  props:
+                                    label: Creation date
+                                    defaultValue:
+                                      $$jsExpression: >
+                                        customersGrid.selection.account_creation_date
+                                    fullWidth: false
+                                    name: account_creation_date
+                                - component: Select
+                                  name: gender
+                                  props:
+                                    defaultValue:
+                                      $$jsExpression: |
+                                        customersGrid.selection.gender
+                                    label: Gender
+                                    fullWidth: false
+                                    options:
+                                      - Male
+                                      - Female
+                                      - Other
+                                    name: gender
+                                - component: TextField
+                                  name: phone_number
+                                  props:
+                                    label: Phone number
+                                    defaultValue:
+                                      $$jsExpression: |
+                                        customersGrid.selection.phone_number
+                                    name: phone_number
+                                    isRequired: true
+                                  layout:
+                                    columnSize: 1
+                            - component: PageColumn
+                              name: pageColumn6
+                              layout:
+                                columnSize: 1.5271317829457365
+                              children:
+                                - component: TextField
+                                  name: address
+                                  layout:
+                                    columnSize: 1.17312661498708
+                                  props:
+                                    label: Address
+                                    defaultValue:
+                                      $$jsExpression: |
+                                        customersGrid.selection.address
+                                    fullWidth: true
+                                    name: address
+                                - component: TextField
+                                  name: country
+                                  layout:
+                                    columnSize: 1
+                                  props:
+                                    label: Country
+                                    defaultValue:
+                                      $$jsExpression: >
+                                        customersGrid.selection.country_of_residence
+                                    fullWidth: true
+                                    isRequired: true
+                                    name: country_of_residence
+                                - component: TextField
+                                  name: email
+                                  layout:
+                                    columnSize: 1
+                                  props:
+                                    label: Email
+                                    defaultValue:
+                                      $$jsExpression: |
+                                        customersGrid.selection.email
+                                    isRequired: true
+                                    fullWidth: true
+                                    name: email
+            - component: Text
+              name: typography5
+              props:
+                value: Add Customer
+                variant: h4
+              layout:
+                columnSize: 1
+                horizontalAlign: start
+            - component: Form
+              name: addCustomerForm
+              layout:
+                columnSize: 1
+              props:
+                onSubmit:
+                  $$jsExpressionAction: |-
+                    await addCustomer.call();
+                    getCustomers.refetch();
+                submitButtonText: Add
+                hasResetButton: false
+                hideControls: false
+                formControlsFullWidth: false
+                formControlsAlign: end
+              children:
+                - component: PageRow
+                  name: pageRow1
+                  children:
+                    - component: PageColumn
+                      name: pageColumn1
+                      layout:
+                        columnSize: 1
+                      children:
+                        - component: TextField
+                          name: name1
+                          layout:
+                            columnSize: 0.8268733850129198
+                          props:
+                            label: Name
+                            disabled: false
+                            fullWidth: true
+                            isRequired: true
+                            name: name
+                            placeholder: John Doe
+                        - component: PageRow
+                          name: pageRow4
+                          props:
+                            justifyContent: start
+                          children:
+                            - component: PageColumn
+                              name: pageColumn3
+                              layout:
+                                columnSize: 0.4728505907960199
+                              children:
+                                - component: DatePicker
+                                  name: account_creation_date1
+                                  props:
+                                    label: Creation date
+                                    name: account_creation_date
+                                - component: Select
+                                  name: gender1
+                                  props:
+                                    label: Gender
+                                    options:
+                                      - Male
+                                      - Female
+                                      - Other
+                                    fullWidth: false
+                                    name: gender
+                                - component: TextField
+                                  name: phone_number1
+                                  layout:
+                                    columnSize: 1
+                                  props:
+                                    label: Phone number
+                                    isRequired: true
+                                    name: phone_number
+                                    placeholder: +1-123456789
+                            - component: PageColumn
+                              name: pageColumn7
+                              layout:
+                                columnSize: 1.5271494092039801
+                              children:
+                                - component: TextField
+                                  name: address1
+                                  layout:
+                                    columnSize: 1.17312661498708
+                                  props:
+                                    label: Address
+                                    fullWidth: true
+                                    name: address
+                                    placeholder: 12, X Block, ABC Street
+                                - component: TextField
+                                  name: country1
+                                  layout:
+                                    columnSize: 1
+                                  props:
+                                    label: Country
+                                    fullWidth: true
+                                    isRequired: true
+                                    name: country_of_residence
+                                    placeholder: USA
+                                - component: TextField
+                                  name: email1
+                                  layout:
+                                    columnSize: 1
+                                  props:
+                                    label: Email
+                                    isRequired: true
+                                    fullWidth: true
+                                    name: email
+                                    placeholder: xyz@gmail.com
+  queries:
+    - name: getCustomers
+      enabled: true
+      query:
+        function: getCustomers
+        kind: local
+      parameters:
+        - name: name
+          value: hi
+    - name: addCustomer
+      mode: mutation
+      query:
+        function: addCustomer
+        kind: local
+      parameters:
+        - name: values
+          value:
+            $$jsExpression: |
+              addCustomerForm.value
+    - name: updateCustomer
+      query:
+        function: updateCustomer
+        kind: local
+      mode: mutation
+      parameters:
+        - name: id
+          value:
+            $$jsExpression: |
+              customersGrid.selection?.id
+        - name: values
+          value:
+            $$jsExpression: |
+              updateCustomerForm.value
+    - name: deleteCustomer
+      query:
+        function: deleteCustomer
+        kind: local
+      parameters:
+        - name: id
+          value:
+            $$jsExpression: |
+              customersGrid.selection.id
+      mode: mutation
+  display: shell
+  displayName: Admin App(form based)

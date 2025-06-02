@@ -1,0 +1,181 @@
+apiVersion: v1
+kind: page
+spec:
+  title: Npm stats
+  queries:
+    - name: versionLastWeek
+      query:
+        kind: rest
+        url:
+          $$jsExpression: |
+            `https://api.npmjs.org/versions/${encodeURIComponent(
+              parameters.package
+            )}/last-week`
+        headers: []
+        method: GET
+        searchParams: []
+      parameters:
+        - name: package
+          value:
+            $$jsExpression: |
+              textField.value
+        - name: start_date
+          value:
+            $$jsExpression: |
+              datePicker.value
+        - name: end_date
+          value:
+            $$jsExpression: |
+              datePicker1.value
+    - name: totalRange
+      query:
+        kind: rest
+        url:
+          $$jsExpression: |
+            `https://api.npmjs.org/downloads/point/${parameters.start_date}:${
+              parameters.end_date
+            }/${encodeURIComponent(parameters.package)}`
+        headers: []
+        method: GET
+        searchParams: []
+      parameters:
+        - name: package
+          value:
+            $$jsExpression: |
+              textField.value
+        - name: start_date
+          value:
+            $$jsExpression: |
+              datePicker.value
+        - name: end_date
+          value:
+            $$jsExpression: |
+              datePicker1.value
+    - name: downloadsRange
+      query:
+        kind: rest
+        url:
+          $$jsExpression: |
+            `https://api.npmjs.org/downloads/range/${parameters.start_date}:${
+              parameters.end_date
+            }/${encodeURIComponent(parameters.package)}`
+        headers: []
+        method: GET
+        searchParams: []
+      parameters:
+        - name: package
+          value:
+            $$jsExpression: |
+              textField.value
+        - name: start_date
+          value:
+            $$jsExpression: |
+              datePicker.value
+        - name: end_date
+          value:
+            $$jsExpression: |
+              datePicker1.value
+  content:
+    - component: PageRow
+      name: pageRow5
+      children:
+        - component: Text
+          name: text
+          props:
+            value: npm stats
+            variant: h3
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: PageColumn
+          name: pageColumn
+          layout:
+            columnSize: 1
+          children:
+            - component: PageRow
+              name: pageRow3
+              props:
+                justifyContent: start
+              children:
+                - component: TextField
+                  name: textField
+                  layout:
+                    columnSize: 1.519495690426327
+                  props:
+                    defaultValue: '@toolpad/studio'
+                    label: package
+                    fullWidth: true
+                - component: DatePicker
+                  name: datePicker
+                  layout:
+                    columnSize: 0.7369213121310025
+                  props:
+                    defaultValue:
+                      $$jsExpression: |
+                        new Date(new Date().setMonth(new Date().getMonth() - 1))
+                          .toISOString()
+                          .slice(0, 10)
+                    label: since
+                    fullWidth: true
+                - component: DatePicker
+                  name: datePicker1
+                  layout:
+                    columnSize: 0.7435829974426705
+                  props:
+                    label: until
+                    fullWidth: true
+                    defaultValue:
+                      $$jsExpression: |
+                        new Date().toISOString().slice(0, 10)
+    - component: PageRow
+      name: pageRow1
+      children:
+        - component: Text
+          name: text4
+          props:
+            value:
+              $$jsExpression: |
+                `Total downloads: ${totalRange.data.downloads}`
+            variant: body1
+    - component: PageRow
+      name: pageRow2
+      children:
+        - component: Chart
+          name: downloadsChart
+          props:
+            data:
+              - kind: line
+                label: downloads
+                data:
+                  $$jsExpression: |
+                    downloadsRange.data.downloads
+                xKey: day
+                yKey: downloads
+                color: '#87bc45'
+            height: 300
+    - component: PageRow
+      name: pageRow4
+      children:
+        - component: Text
+          name: text3
+          props:
+            value: Downloads by version (last week only)
+    - component: PageRow
+      name: pageRow6
+      children:
+        - component: DataGrid
+          name: dataGrid
+          props:
+            rows:
+              $$jsExpression: |
+                Object.entries(versionLastWeek.data.downloads)
+            columns:
+              - field: '0'
+                type: string
+                headerName: Version
+                width: 160
+              - field: '1'
+                type: number
+                width: 152
+                headerName: No. of downloads
+  display: standalone

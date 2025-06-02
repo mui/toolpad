@@ -1,0 +1,17 @@
+{
+  "name": "qr-generator",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "toolpad-studio dev",
+    "build": "toolpad-studio build",
+    "start": "toolpad-studio start"
+  },
+  "dependencies": {
+    "@toolpad/studio": "0.5.2",
+    "qrcode": "^1.5.3"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.5"
+  }
+}

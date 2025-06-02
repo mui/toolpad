@@ -74,7 +74,7 @@ https://github.com/user-attachments/assets/f47466df-3790-4a05-8f38-f1aaa13a49f3/
 
 **Toolpad Studio has been deprecated**, but the project can be found in the [`toolpad-studio`](https://github.com/mui/toolpad/tree/toolpad-studio) branch of this repository, where it can also be published from.
 
-The `create-toolpad-app` CLI can also still be used to quickly start Toolpad Studio projects:
+The `create-toolpad-app` CLI can also still be used to quickly setup Toolpad Studio projects:
 
 ```bash
 npx create-toolpad-app@latest --studio my-toolpad-studio-app

@@ -25,7 +25,6 @@ function loadPkg(pkgPath: string): { version: string } {
 }
 
 const toolpadCorePkg = loadPkg('./packages/toolpad-core');
-const toolpadStudioPkg = loadPkg('./packages/toolpad-studio');
 
 export default withDocsInfra({
   experimental: {
@@ -55,7 +54,7 @@ export default withDocsInfra({
     // Toolpad related
     // …
     TOOLPAD_CORE_VERSION: toolpadCorePkg.version,
-    TOOLPAD_STUDIO_VERSION: toolpadStudioPkg.version,
+    TOOLPAD_STUDIO_VERSION: '0.13.0',
   },
   webpack: (config, options) => {
     return {

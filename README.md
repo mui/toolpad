@@ -25,21 +25,15 @@
 
 ## Product walkthrough
 
-- [Toolpad Core](https://mui.com/toolpad/core/introduction/) is a set of high level React components that abstract common concepts such as layout navigation and routing. It aims at helping you build and maintain dashboards and internal tooling faster. It's built on top of [Material UI](http://github.com/mui/material-ui/).
+[Toolpad Core](https://mui.com/toolpad/core/introduction/) is a set of high level React components that abstract common concepts such as layout navigation and routing. It aims at helping you build and maintain dashboards and internal tooling faster. It's built on top of [Material UI](http://github.com/mui/material-ui/).
 
 https://github.com/user-attachments/assets/d2a7ff8e-2dd6-4313-98d2-5f136513f9a9/
-
-- [Toolpad Studio](https://mui.com/toolpad/studio/getting-started/) is a self-hosted low-code admin builder designed to extend the Toolpad Core React components. It's for developers of all trades who want to save time building internal applications. Drag and drop from a catalog of pre-built components, connect to any data source and build apps quickly.
-
-https://github.com/user-attachments/assets/f47466df-3790-4a05-8f38-f1aaa13a49f3/
 
 ## Notice
 
 Toolpad is in its beta stages of development. Feel free to run this application to try it out for your use cases, and share any feedback, bug reports or feature requests that you come across.
 
 ## Quick setup locally
-
-Toolpad Core:
 
 ```bash
 npx create-toolpad-app@latest
@@ -49,30 +43,13 @@ pnpm create toolpad-app
 yarn create toolpad-app
 ```
 
-Toolpad Studio:
-
-```bash
-npx create-toolpad-app@latest --studio my-toolpad-studio-app
-# or
-yarn create toolpad-app --studio my-toolpad-studio-app
-# or
-pnpm create toolpad-app --studio my-toolpad-studio-app
-```
-
 ## Documentation
 
-Check out our [documentation](https://mui.com/toolpad/studio/getting-started/).
+Check out our [documentation](https://mui.com/toolpad/core/introduction/).
 
 ## Examples
 
-### Core
-
 Find a [list of example apps](https://mui.com/toolpad/core/introduction/examples/) on the docs to help you get started with Toolpad Core quickly.
-
-### Studio
-
-Check out our [mui-public](https://tools-public.mui.com/prod/pages/OverviewPage) app to see how a Toolpad Studio app looks in production.
-Our documentation contains more [examples](https://mui.com/toolpad/studio/examples/) to help you get started.
 
 ## Contributing
 
@@ -87,7 +64,25 @@ The [changelog](https://github.com/mui/toolpad/releases) is regularly updated to
 
 ## Roadmap
 
-Future plans and high-priority features and enhancements can be found in the [roadmap](https://mui.com/toolpad/studio/getting-started/roadmap/).
+Future plans and high-priority features and enhancements can be found in the [roadmap](https://mui.com/toolpad/core/introduction/roadmap/).
+
+## Toolpad Studio
+
+[Toolpad Studio](https://mui.com/toolpad/studio/getting-started/) is a self-hosted low-code admin builder designed to extend the Toolpad Core React components. It's for developers of all trades who want to save time building internal applications. Drag and drop from a catalog of pre-built components, connect to any data source and build apps quickly.
+
+https://github.com/user-attachments/assets/f47466df-3790-4a05-8f38-f1aaa13a49f3/
+
+**Toolpad Studio has been deprecated**, but the project can be found in the [`toolpad-studio`](https://github.com/mui/toolpad/tree/toolpad-studio) branch of this repository, where it can also be published from.
+
+The `create-toolpad-app` CLI can also still be used to quickly setup Toolpad Studio projects:
+
+```bash
+npx create-toolpad-app@latest --studio my-toolpad-studio-app
+# or
+yarn create toolpad-app --studio my-toolpad-studio-app
+# or
+pnpm create toolpad-app --studio my-toolpad-studio-app
+```
 
 ## License
 

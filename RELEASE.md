@@ -39,11 +39,6 @@
    - Commit message (#pr-number) @author
    - ...
 
-   ### `@toolpad/studio`
-
-   - Commit message (#pr-number) @author
-   - ...
-
    ### Docs
 
    - Commit message (#pr-number) @author
@@ -76,17 +71,6 @@
 
    And verify the app runs
 
-   b. Run Toolpad Studio
-
-   ```bash
-   pnpm dlx https://pkg.csb.dev/mui/toolpad/commit/<build>/create-toolpad-app --studio smoke
-   cd smoke
-   pnpm add https://pkg.csb.dev/mui/toolpad/commit/<build>/@toolpad/studio -S
-   pnpm dedupe && pnpm dev
-   ```
-
-   And verify the editor works
-
 1. Merge the PR changes, then check out the `master` branch and pull the last commit.
 
 1. Publish the package to `npm`
@@ -97,7 +81,7 @@
       npm login
       ```
 
-   1. Publish to `npm`
+   2. Publish to `npm`
 
       ```bash
       pnpm release:publish
@@ -120,8 +104,8 @@
 1. [Create a new GitHub release](https://github.com/mui/toolpad/releases/new).
 
    1. Use `<version number>` to **Choose a tag** (when you enter new version GH UI will pop a suggestion `Create new tag: *** on publish`)
-   1. Use `<commit of merged PR>` as the **target**
-   1. Use the cleaned changelog as the content of **Describe this release**
-   1. Use `<version number>` as the **Release title**
-   1. Mark as prerelease if necessary.
-   1. **Publish release**
+   2. Use `<commit of merged PR>` as the **target**
+   3. Use the cleaned changelog as the content of **Describe this release**
+   4. Use `<version number>` as the **Release title**
+   5. Mark as prerelease if necessary.
+   6. **Publish release**

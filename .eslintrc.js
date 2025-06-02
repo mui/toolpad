@@ -86,19 +86,6 @@ module.exports = {
         ignore: ['\\.md\\?muiMarkdown$'],
       },
     ],
-    'import/no-restricted-paths': [
-      'error',
-      {
-        zones: [
-          {
-            // Don't leak the internal runtime abstraction. It's on its way to be moved towards a separate package
-            target: './packages/toolpad-studio/src/runtime',
-            from: './packages/toolpad-studio/src/',
-            except: ['./runtime'],
-          },
-        ],
-      },
-    ],
     'material-ui/no-hardcoded-labels': 'off', // We are not really translating the docs/website anymore
     'react-compiler/react-compiler': 'error',
     'material-ui/disallow-react-api-in-server-components': 'off',
@@ -144,9 +131,6 @@ module.exports = {
       files: [
         'packages/create-toolpad-app/**/*',
         'packages/toolpad-core/**/*',
-        'packages/toolpad-studio/**/*',
-        'packages/toolpad-studio-components/**/*',
-        'packages/toolpad-studio-runtime/**/*',
         'packages/toolpad-utils/**/*',
       ],
       excludedFiles: [
@@ -163,40 +147,14 @@ module.exports = {
       },
     },
     {
-      files: [
-        /**
-         * Basically all code that is guaranteed being bundled for the client side and never used on serverside code
-         * can be dev dependencies to reduce the size of the published package
-         */
-        'packages/toolpad-studio/src/components/**/*',
-        'packages/toolpad-studio/src/toolpad/**/*',
-        'packages/toolpad-studio/src/runtime/**/*',
-      ],
-      excludedFiles: ['*.spec.ts', '*.spec.tsx'],
-      rules: {
-        'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
-      },
-    },
-    {
       // Starting small, we will progressively expand this to more packages.
       files: [
         // 'packages/create-toolpad-app/**/*',
         // 'packages/toolpad-core/**/*',
-        // 'packages/toolpad-studio/**/*',
-        // 'packages/toolpad-studio/**/*',
         'packages/toolpad-utils/**/*',
-        // 'packages/toolpad-studio-runtime/**/*',
-        // 'packages/toolpad-studio-components/**/*',
       ],
       rules: {
         '@typescript-eslint/no-explicit-any': ['error'],
-      },
-    },
-    {
-      files: ['packages/toolpad-studio/pages/**/*'],
-      rules: {
-        // The pattern is useful to type Next.js pages
-        'react/function-component-definition': 'off',
       },
     },
     // TODO remove, fix this rule in the codebase
@@ -205,10 +163,6 @@ module.exports = {
       rules: {
         'no-restricted-imports': ['error', noRestrictedImports],
       },
-    },
-    {
-      files: ['packages/toolpad-studio/src/**/*'],
-      rules: { 'react-compiler/react-compiler': 'off' },
     },
     {
       files: ['docs/**/*{.ts,.tsx,.js}'],

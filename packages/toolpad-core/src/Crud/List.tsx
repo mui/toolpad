@@ -36,6 +36,8 @@ import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import type { DataModel, DataModelId, DataSource } from './types';
 import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
+import { PageContainer } from '../PageContainer';
+import { useActivePage } from '../useActivePage';
 
 const ErrorOverlay = styled('div')(({ theme }) => ({
   position: 'absolute',
@@ -98,6 +100,10 @@ export interface ListProps<D extends DataModel> {
    */
   dataSourceCache?: DataSourceCache | null;
   /**
+   * The title of the page.
+   */
+  pageTitle?: string;
+  /**
    * The components used for each slot inside.
    * @default {}
    */
@@ -131,6 +137,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
     onEditClick,
     onDelete,
     dataSourceCache,
+    pageTitle,
     slots,
     slotProps,
     localeText: propsLocaleText,
@@ -158,6 +165,8 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const { getMany, deleteOne } = methods;
 
   const routerContext = React.useContext(RouterContext);
+
+  const activePage = useActivePage();
 
   const dialogs = useDialogs();
   const notifications = useNotifications();
@@ -418,71 +427,86 @@ function List<D extends DataModel>(props: ListProps<D>) {
   ]);
 
   return (
-    <Stack sx={{ flex: 1, width: '100%' }}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-        <Tooltip title={localeText.reloadButtonLabel} placement="right" enterDelay={1000}>
-          <div>
-            <IconButton aria-label="refresh" onClick={handleRefresh}>
-              <RefreshIcon />
-            </IconButton>
-          </div>
-        </Tooltip>
-        {onCreateClick ? (
-          <Button variant="contained" onClick={onCreateClick} startIcon={<AddIcon />}>
-            {localeText.createNewButtonLabel}
-          </Button>
-        ) : null}
-      </Stack>
-      <Box sx={{ flex: 1, position: 'relative', width: '100%' }}>
-        {/* Use NoSsr to prevent issue https://github.com/mui/mui-x/issues/17077 as DataGrid has no SSR support */}
-        <NoSsr>
-          <DataGridSlot
-            rows={rowsState.rows}
-            rowCount={rowsState.rowCount}
-            columns={columns}
-            pagination
-            sortingMode="server"
-            filterMode="server"
-            paginationMode="server"
-            paginationModel={paginationModel}
-            onPaginationModelChange={handlePaginationModelChange}
-            sortModel={sortModel}
-            onSortModelChange={handleSortModelChange}
-            filterModel={filterModel}
-            onFilterModelChange={handleFilterModelChange}
-            disableRowSelectionOnClick
-            onRowClick={handleRowClick}
-            loading={isLoading}
-            initialState={initialState}
-            slots={{ toolbar: GridToolbar }}
-            // Prevent type conflicts if slotProps don't match DataGrid used for dataGrid slot
-            {...(slotProps?.dataGrid as Record<string, unknown>)}
-            sx={{
-              [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
-                outline: 'transparent',
+    <PageContainer
+      title={pageTitle}
+      breadcrumbs={
+        activePage && pageTitle
+          ? [
+              ...activePage.breadcrumbs,
+              {
+                title: pageTitle,
+                path: routerContext?.pathname,
               },
-              [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]:
-                {
-                  outline: 'none',
+            ]
+          : undefined
+      }
+    >
+      <Stack sx={{ flex: 1, width: '100%' }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+          <Tooltip title={localeText.reloadButtonLabel} placement="right" enterDelay={1000}>
+            <div>
+              <IconButton aria-label="refresh" onClick={handleRefresh}>
+                <RefreshIcon />
+              </IconButton>
+            </div>
+          </Tooltip>
+          {onCreateClick ? (
+            <Button variant="contained" onClick={onCreateClick} startIcon={<AddIcon />}>
+              {localeText.createNewButtonLabel}
+            </Button>
+          ) : null}
+        </Stack>
+        <Box sx={{ flex: 1, position: 'relative', width: '100%' }}>
+          {/* Use NoSsr to prevent issue https://github.com/mui/mui-x/issues/17077 as DataGrid has no SSR support */}
+          <NoSsr>
+            <DataGridSlot
+              rows={rowsState.rows}
+              rowCount={rowsState.rowCount}
+              columns={columns}
+              pagination
+              sortingMode="server"
+              filterMode="server"
+              paginationMode="server"
+              paginationModel={paginationModel}
+              onPaginationModelChange={handlePaginationModelChange}
+              sortModel={sortModel}
+              onSortModelChange={handleSortModelChange}
+              filterModel={filterModel}
+              onFilterModelChange={handleFilterModelChange}
+              disableRowSelectionOnClick
+              onRowClick={handleRowClick}
+              loading={isLoading}
+              initialState={initialState}
+              slots={{ toolbar: GridToolbar }}
+              // Prevent type conflicts if slotProps don't match DataGrid used for dataGrid slot
+              {...(slotProps?.dataGrid as Record<string, unknown>)}
+              sx={{
+                [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
+                  outline: 'transparent',
                 },
-              ...(onRowClick
-                ? {
-                    [`& .${gridClasses.row}:hover`]: {
-                      cursor: 'pointer',
-                    },
-                  }
-                : {}),
-              ...slotProps?.dataGrid?.sx,
-            }}
-          />
-        </NoSsr>
-        {error && (
-          <ErrorOverlay>
-            <Typography variant="body1">{error.message}</Typography>
-          </ErrorOverlay>
-        )}
-      </Box>
-    </Stack>
+                [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]:
+                  {
+                    outline: 'none',
+                  },
+                ...(onRowClick
+                  ? {
+                      [`& .${gridClasses.row}:hover`]: {
+                        cursor: 'pointer',
+                      },
+                    }
+                  : {}),
+                ...slotProps?.dataGrid?.sx,
+              }}
+            />
+          </NoSsr>
+          {error && (
+            <ErrorOverlay>
+              <Typography variant="body1">{error.message}</Typography>
+            </ErrorOverlay>
+          )}
+        </Box>
+      </Stack>
+    </PageContainer>
   );
 }
 
@@ -530,6 +554,10 @@ List.propTypes /* remove-proptypes */ = {
    * Callback fired when a row is clicked. Not called if the target clicked is an interactive element added by the built-in columns.
    */
   onRowClick: PropTypes.func,
+  /**
+   * The title of the page.
+   */
+  pageTitle: PropTypes.string,
   /**
    * The props used for each slot inside.
    * @default {}

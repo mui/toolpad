@@ -6,13 +6,15 @@ import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import invariant from 'invariant';
 import { useNotifications } from '../useNotifications';
-import { CrudContext } from '../shared/context';
+import { CrudContext, RouterContext } from '../shared/context';
 import { useLocaleText } from '../AppProvider/LocalizationProvider';
 import { CrudForm, CrudFormSlotProps, CrudFormSlots } from './CrudForm';
 import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
 import type { DataFieldFormValue, DataModel, DataModelId, DataSource, OmitId } from './types';
+import { PageContainer } from '../PageContainer';
+import { useActivePage } from '../useActivePage';
 
 interface EditFormProps<D extends DataModel> {
   dataSource: DataSource<D> & Required<Pick<DataSource<D>, 'getOne' | 'updateOne'>>;
@@ -190,6 +192,10 @@ export interface EditProps<D extends DataModel> {
    */
   dataSourceCache?: DataSourceCache | null;
   /**
+   * The title of the page.
+   */
+  pageTitle?: string;
+  /**
    * Locale text for the component.
    */
   localeText?: CRUDLocaleText;
@@ -224,6 +230,7 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
     id,
     onSubmitSuccess,
     dataSourceCache,
+    pageTitle,
     localeText: propsLocaleText,
     slots,
     slotProps,
@@ -248,6 +255,10 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
 
   const { fields, validate, ...methods } = cachedDataSource;
   const { getOne, updateOne } = methods;
+
+  const routerContext = React.useContext(RouterContext);
+
+  const activePage = useActivePage();
 
   const [data, setData] = React.useState<D | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -329,7 +340,24 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
     slots,
   ]);
 
-  return <Box sx={{ display: 'flex', flex: 1 }}>{renderEdit}</Box>;
+  return (
+    <PageContainer
+      title={pageTitle}
+      breadcrumbs={
+        activePage && pageTitle
+          ? [
+              ...activePage.breadcrumbs,
+              {
+                title: pageTitle,
+                path: routerContext?.pathname,
+              },
+            ]
+          : undefined
+      }
+    >
+      <Box sx={{ display: 'flex', flex: 1 }}>{renderEdit}</Box>
+    </PageContainer>
+  );
 }
 
 Edit.propTypes /* remove-proptypes */ = {
@@ -363,6 +391,10 @@ Edit.propTypes /* remove-proptypes */ = {
    * Callback fired when the form is successfully submitted.
    */
   onSubmitSuccess: PropTypes.func,
+  /**
+   * The title of the page.
+   */
+  pageTitle: PropTypes.string,
   /**
    * The props used for each slot inside.
    * @default {}

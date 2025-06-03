@@ -3,13 +3,15 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import invariant from 'invariant';
 import { useNotifications } from '../useNotifications';
-import { CrudContext } from '../shared/context';
+import { CrudContext, RouterContext } from '../shared/context';
 import { useLocaleText } from '../AppProvider/LocalizationProvider';
 import { CrudForm, CrudFormSlotProps, CrudFormSlots } from './CrudForm';
 import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
 import type { DataFieldFormValue, DataModel, DataSource, OmitId } from './types';
+import { PageContainer } from '../PageContainer';
+import { useActivePage } from '../useActivePage';
 
 export interface CreateProps<D extends DataModel> {
   /**
@@ -34,6 +36,10 @@ export interface CreateProps<D extends DataModel> {
    * [Cache](https://mui.com/toolpad/core/react-crud/#data-caching) for the data source.
    */
   dataSourceCache?: DataSourceCache | null;
+  /**
+   * The title of the page.
+   */
+  pageTitle?: string;
   /**
    * Locale text for the component.
    */
@@ -70,6 +76,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
     onSubmitSuccess,
     resetOnSubmit = false,
     dataSourceCache,
+    pageTitle,
     localeText: propsLocaleText,
     slots,
     slotProps,
@@ -96,6 +103,10 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
   >;
 
   const { fields, createOne, validate } = cachedDataSource;
+
+  const routerContext = React.useContext(RouterContext);
+
+  const activePage = useActivePage();
 
   const [formState, setFormState] = React.useState<{
     values: Partial<OmitId<D>>;
@@ -200,16 +211,31 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
   ]);
 
   return (
-    <CrudForm
-      dataSource={dataSource}
-      formState={formState}
-      onFieldChange={handleFormFieldChange}
-      onSubmit={handleFormSubmit}
-      onReset={handleFormReset}
-      submitButtonLabel={localeText.createLabel}
-      slots={slots?.form}
-      slotProps={slotProps?.form}
-    />
+    <PageContainer
+      title={pageTitle}
+      breadcrumbs={
+        activePage && pageTitle
+          ? [
+              ...activePage.breadcrumbs,
+              {
+                title: pageTitle,
+                path: routerContext?.pathname,
+              },
+            ]
+          : undefined
+      }
+    >
+      <CrudForm
+        dataSource={dataSource}
+        formState={formState}
+        onFieldChange={handleFormFieldChange}
+        onSubmit={handleFormSubmit}
+        onReset={handleFormReset}
+        submitButtonLabel={localeText.createLabel}
+        slots={slots?.form}
+        slotProps={slotProps?.form}
+      />
+    </PageContainer>
   );
 }
 
@@ -245,6 +271,10 @@ Create.propTypes /* remove-proptypes */ = {
    * Callback fired when the form is successfully submitted.
    */
   onSubmitSuccess: PropTypes.func,
+  /**
+   * The title of the page.
+   */
+  pageTitle: PropTypes.string,
   /**
    * Whether the form fields should reset after the form is submitted.
    * @default false

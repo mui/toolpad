@@ -10,6 +10,7 @@
     "initialValues": { "type": { "name": "object" }, "default": "{}" },
     "localeText": { "type": { "name": "object" } },
     "onSubmitSuccess": { "type": { "name": "func" } },
+    "pageTitle": { "type": { "name": "string" } },
     "resetOnSubmit": { "type": { "name": "bool" }, "default": "false" },
     "slotProps": {
       "type": {

@@ -1,33 +1,11 @@
 import * as React from 'react';
-import { Outlet, createFileRoute, useLocation, useParams } from '@tanstack/react-router';
+import { Outlet, createFileRoute } from '@tanstack/react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
 
 function Layout() {
-  const { pathname } = useLocation();
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { _splat } = useParams({ strict: false });
-  const orderId = _splat?.split('/')[0];
-
-  const title = React.useMemo(() => {
-    if (pathname.endsWith('/orders/new')) {
-      return 'New Order';
-    }
-    if (orderId && pathname.endsWith('/edit')) {
-      return `Order ${orderId} - Edit`;
-    }
-    if (orderId) {
-      return `Order ${orderId}`;
-    }
-
-    return undefined;
-  }, [orderId, pathname]);
-
   return (
     <DashboardLayout>
-      <PageContainer title={title}>
-        <Outlet />
-      </PageContainer>
+      <Outlet />
     </DashboardLayout>
   );
 }

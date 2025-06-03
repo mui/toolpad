@@ -9,7 +9,8 @@
     },
     "localeText": { "type": { "name": "object" } },
     "onDelete": { "type": { "name": "func" } },
-    "onEditClick": { "type": { "name": "func" } }
+    "onEditClick": { "type": { "name": "func" } },
+    "pageTitle": { "type": { "name": "string" } }
   },
   "name": "Show",
   "imports": ["import { Show } from '@toolpad/core/Crud';"],

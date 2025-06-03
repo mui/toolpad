@@ -10,6 +10,12 @@
     },
     "defaultValues": { "type": { "name": "object" }, "default": "{}" },
     "initialPageSize": { "type": { "name": "number" }, "default": "100" },
+    "pageTitles": {
+      "type": {
+        "name": "shape",
+        "description": "{ create?: string, edit?: string, list?: string, show?: string }"
+      }
+    },
     "slotProps": {
       "type": {
         "name": "shape",

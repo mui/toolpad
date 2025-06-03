@@ -18,11 +18,13 @@ import dayjs from 'dayjs';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
 import { useLocaleText } from '../AppProvider/LocalizationProvider';
-import { CrudContext } from '../shared/context';
+import { CrudContext, RouterContext } from '../shared/context';
 import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import type { DataField, DataModel, DataModelId, DataSource } from './types';
 import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
+import { PageContainer } from '../PageContainer';
+import { useActivePage } from '../useActivePage';
 
 export interface ShowProps<D extends DataModel> {
   id: DataModelId;
@@ -43,6 +45,10 @@ export interface ShowProps<D extends DataModel> {
    */
   dataSourceCache?: DataSourceCache | null;
   /**
+   * The title of the page.
+   */
+  pageTitle?: string;
+  /**
    * Locale text for the component.
    */
   localeText?: CRUDLocaleText;
@@ -59,7 +65,14 @@ export interface ShowProps<D extends DataModel> {
  * - [Show API](https://mui.com/toolpad/core/api/show)
  */
 function Show<D extends DataModel>(props: ShowProps<D>) {
-  const { id, onEditClick, onDelete, dataSourceCache, localeText: propsLocaleText } = props;
+  const {
+    id,
+    onEditClick,
+    onDelete,
+    dataSourceCache,
+    pageTitle,
+    localeText: propsLocaleText,
+  } = props;
 
   const globalLocaleText = useLocaleText();
   const localeText = { ...CRUD_DEFAULT_LOCALE_TEXT, ...globalLocaleText, ...propsLocaleText };
@@ -81,6 +94,10 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
 
   const { fields, validate, ...methods } = cachedDataSource;
   const { getOne, deleteOne } = methods;
+
+  const routerContext = React.useContext(RouterContext);
+
+  const activePage = useActivePage();
 
   const dialogs = useDialogs();
   const notifications = useNotifications();
@@ -309,7 +326,24 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
     renderField,
   ]);
 
-  return <Box sx={{ display: 'flex', flex: 1, width: '100%' }}>{renderShow}</Box>;
+  return (
+    <PageContainer
+      title={pageTitle}
+      breadcrumbs={
+        activePage && pageTitle
+          ? [
+              ...activePage.breadcrumbs,
+              {
+                title: pageTitle,
+                path: routerContext?.pathname,
+              },
+            ]
+          : undefined
+      }
+    >
+      <Box sx={{ display: 'flex', flex: 1, width: '100%' }}>{renderShow}</Box>
+    </PageContainer>
+  );
 }
 
 Show.propTypes /* remove-proptypes */ = {
@@ -347,6 +381,10 @@ Show.propTypes /* remove-proptypes */ = {
    * Callback fired when the "Edit" button is clicked.
    */
   onEditClick: PropTypes.func,
+  /**
+   * The title of the page.
+   */
+  pageTitle: PropTypes.string,
 } as any;
 
 export { Show };

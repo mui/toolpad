@@ -9,7 +9,8 @@
     },
     "localeText": { "description": "Locale text for the component." },
     "onDelete": { "description": "Callback fired when the item is successfully deleted." },
-    "onEditClick": { "description": "Callback fired when the &quot;Edit&quot; button is clicked." }
+    "onEditClick": { "description": "Callback fired when the &quot;Edit&quot; button is clicked." },
+    "pageTitle": { "description": "The title of the page." }
   },
   "classDescriptions": {}
 }

@@ -37,6 +37,15 @@ export interface CrudProps<D extends DataModel> {
    */
   dataSourceCache?: DataSourceCache | null;
   /**
+   * The title of each CRUD page.
+   */
+  pageTitles?: {
+    list?: string;
+    show?: string;
+    create?: string;
+    edit?: string;
+  };
+  /**
    * The components used for each slot inside.
    * @default {}
    */
@@ -70,6 +79,7 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
     initialPageSize,
     defaultValues,
     dataSourceCache,
+    pageTitles,
     slots,
     slotProps,
   } = props;
@@ -121,6 +131,7 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
           onRowClick={handleRowClick}
           onCreateClick={handleCreateClick}
           onEditClick={handleEditClick}
+          pageTitle={pageTitles?.list}
           slots={slots?.list}
           slotProps={slotProps?.list}
         />
@@ -132,6 +143,7 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
           initialValues={defaultValues}
           onSubmitSuccess={handleCreate}
           resetOnSubmit={false}
+          pageTitle={pageTitles?.create}
           slots={
             slots?.form && {
               form: slots?.form,
@@ -149,7 +161,14 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
     if (showMatch) {
       const resourceId = showMatch.params.id;
       invariant(resourceId, 'No resource ID present in URL.');
-      return <Show<D> id={resourceId} onEditClick={handleEditClick} onDelete={handleDelete} />;
+      return (
+        <Show<D>
+          id={resourceId}
+          onEditClick={handleEditClick}
+          onDelete={handleDelete}
+          pageTitle={pageTitles?.show}
+        />
+      );
     }
     const editMatch = match<{ id: DataModelId }>(editPath)(pathname);
     if (editMatch) {
@@ -159,6 +178,7 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
         <Edit<D>
           id={resourceId}
           onSubmitSuccess={handleEdit}
+          pageTitle={pageTitles?.edit}
           slots={
             slots?.form && {
               form: slots?.form,
@@ -185,10 +205,16 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
     handleRowClick,
     initialPageSize,
     listPath,
+    pageTitles?.create,
+    pageTitles?.edit,
+    pageTitles?.list,
+    pageTitles?.show,
     routerContext?.pathname,
     showPath,
-    slotProps,
-    slots,
+    slotProps?.form,
+    slotProps?.list,
+    slots?.form,
+    slots?.list,
   ]);
 
   return (
@@ -227,6 +253,15 @@ Crud.propTypes /* remove-proptypes */ = {
    * @default 100
    */
   initialPageSize: PropTypes.number,
+  /**
+   * The title of each CRUD page.
+   */
+  pageTitles: PropTypes.shape({
+    create: PropTypes.string,
+    edit: PropTypes.string,
+    list: PropTypes.string,
+    show: PropTypes.string,
+  }),
   /**
    * Root path to CRUD pages.
    */

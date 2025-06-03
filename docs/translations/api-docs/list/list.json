@@ -17,6 +17,7 @@
     "onRowClick": {
       "description": "Callback fired when a row is clicked. Not called if the target clicked is an interactive element added by the built-in columns."
     },
+    "pageTitle": { "description": "The title of the page." },
     "slotProps": { "description": "The props used for each slot inside." },
     "slots": { "description": "The components used for each slot inside." }
   },

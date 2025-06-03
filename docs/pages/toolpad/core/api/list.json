@@ -13,6 +13,7 @@
     "onDelete": { "type": { "name": "func" } },
     "onEditClick": { "type": { "name": "func" } },
     "onRowClick": { "type": { "name": "func" } },
+    "pageTitle": { "type": { "name": "string" } },
     "slotProps": {
       "type": { "name": "shape", "description": "{ dataGrid?: object }" },
       "default": "{}"

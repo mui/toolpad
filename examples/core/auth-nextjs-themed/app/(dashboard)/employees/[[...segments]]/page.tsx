@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { Crud } from '@toolpad/core/Crud';
-import { useParams } from 'next/navigation';
+import { useParams } from 'react-router';
 import { employeesDataSource, Employee, employeesCache } from '../../../mocks/employees';
 import CustomDataGrid from '../../../components/CustomDataGrid';
 

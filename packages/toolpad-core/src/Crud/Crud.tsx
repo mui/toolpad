@@ -11,7 +11,8 @@ import { Create } from './Create';
 import { Edit } from './Edit';
 import { DataSourceCache } from './cache';
 import type { DataModel, DataModelId, DataSource, OmitId } from './types';
-import { CrudFormSlotProps, CrudFormSlots } from './CrudForm';
+import type { CrudFormSlotProps, CrudFormSlots } from './CrudForm';
+import { type PageContainerProps } from '../PageContainer';
 
 export interface CrudProps<D extends DataModel> {
   /**
@@ -52,6 +53,7 @@ export interface CrudProps<D extends DataModel> {
   slots?: {
     list?: ListSlots;
     form?: CrudFormSlots;
+    pageContainer?: React.JSXElementConstructor<PageContainerProps>;
   };
   /**
    * The props used for each slot inside.
@@ -60,6 +62,7 @@ export interface CrudProps<D extends DataModel> {
   slotProps?: {
     list?: ListSlotProps;
     form?: CrudFormSlotProps;
+    pageContainer?: PageContainerProps;
   };
 }
 /**
@@ -132,8 +135,22 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
           onCreateClick={handleCreateClick}
           onEditClick={handleEditClick}
           pageTitle={pageTitles?.list}
-          slots={slots?.list}
-          slotProps={slotProps?.list}
+          slots={{
+            ...(slots?.pageContainer
+              ? {
+                  pageContainer: slots?.pageContainer,
+                }
+              : {}),
+            ...slots?.list,
+          }}
+          slotProps={{
+            ...(slotProps?.pageContainer
+              ? {
+                  pageContainer: slotProps?.pageContainer,
+                }
+              : {}),
+            ...slotProps?.list,
+          }}
         />
       );
     }
@@ -144,16 +161,30 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
           onSubmitSuccess={handleCreate}
           resetOnSubmit={false}
           pageTitle={pageTitles?.create}
-          slots={
-            slots?.form && {
-              form: slots?.form,
-            }
-          }
-          slotProps={
-            slotProps?.form && {
-              form: slotProps?.form,
-            }
-          }
+          slots={{
+            ...(slots?.form
+              ? {
+                  form: slots?.form,
+                }
+              : {}),
+            ...(slots?.pageContainer
+              ? {
+                  pageContainer: slots?.pageContainer,
+                }
+              : {}),
+          }}
+          slotProps={{
+            ...(slotProps?.form
+              ? {
+                  form: slotProps?.form,
+                }
+              : {}),
+            ...(slotProps?.pageContainer
+              ? {
+                  pageContainer: slotProps?.pageContainer,
+                }
+              : {}),
+          }}
         />
       );
     }
@@ -167,6 +198,20 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
           onEditClick={handleEditClick}
           onDelete={handleDelete}
           pageTitle={pageTitles?.show}
+          slots={{
+            ...(slots?.pageContainer
+              ? {
+                  pageContainer: slots?.pageContainer,
+                }
+              : {}),
+          }}
+          slotProps={{
+            ...(slotProps?.pageContainer
+              ? {
+                  pageContainer: slotProps?.pageContainer,
+                }
+              : {}),
+          }}
         />
       );
     }
@@ -179,16 +224,30 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
           id={resourceId}
           onSubmitSuccess={handleEdit}
           pageTitle={pageTitles?.edit}
-          slots={
-            slots?.form && {
-              form: slots?.form,
-            }
-          }
-          slotProps={
-            slotProps?.form && {
-              form: slotProps?.form,
-            }
-          }
+          slots={{
+            ...(slots?.form
+              ? {
+                  form: slots?.form,
+                }
+              : {}),
+            ...(slots?.pageContainer
+              ? {
+                  pageContainer: slots?.pageContainer,
+                }
+              : {}),
+          }}
+          slotProps={{
+            ...(slotProps?.form
+              ? {
+                  form: slotProps?.form,
+                }
+              : {}),
+            ...(slotProps?.pageContainer
+              ? {
+                  pageContainer: slotProps?.pageContainer,
+                }
+              : {}),
+          }}
         />
       );
     }
@@ -205,16 +264,11 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
     handleRowClick,
     initialPageSize,
     listPath,
-    pageTitles?.create,
-    pageTitles?.edit,
-    pageTitles?.list,
-    pageTitles?.show,
+    pageTitles,
     routerContext?.pathname,
     showPath,
-    slotProps?.form,
-    slotProps?.list,
-    slots?.form,
-    slots?.list,
+    slotProps,
+    slots,
   ]);
 
   return (
@@ -280,7 +334,9 @@ Crud.propTypes /* remove-proptypes */ = {
     }),
     list: PropTypes.shape({
       dataGrid: PropTypes.object,
+      pageContainer: PropTypes.object,
     }),
+    pageContainer: PropTypes.object,
   }),
   /**
    * The components used for each slot inside.
@@ -296,7 +352,9 @@ Crud.propTypes /* remove-proptypes */ = {
     }),
     list: PropTypes.shape({
       dataGrid: PropTypes.func,
+      pageContainer: PropTypes.elementType,
     }),
+    pageContainer: PropTypes.elementType,
   }),
 } as any;
 

@@ -10,7 +10,7 @@ import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
 import type { DataFieldFormValue, DataModel, DataSource, OmitId } from './types';
-import { PageContainer } from '../PageContainer';
+import { PageContainer, type PageContainerProps } from '../PageContainer';
 import { useActivePage } from '../useActivePage';
 
 export interface CreateProps<D extends DataModel> {
@@ -50,6 +50,7 @@ export interface CreateProps<D extends DataModel> {
    */
   slots?: {
     form?: CrudFormSlots;
+    pageContainer?: React.JSXElementConstructor<PageContainerProps>;
   };
   /**
    * The props used for each slot inside.
@@ -57,6 +58,7 @@ export interface CreateProps<D extends DataModel> {
    */
   slotProps?: {
     form?: CrudFormSlotProps;
+    pageContainer?: PageContainerProps;
   };
 }
 
@@ -210,8 +212,10 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
     validate,
   ]);
 
+  const PageContainerSlot = slots?.pageContainer ?? PageContainer;
+
   return (
-    <PageContainer
+    <PageContainerSlot
       title={pageTitle}
       breadcrumbs={
         activePage && pageTitle
@@ -224,6 +228,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
             ]
           : undefined
       }
+      {...slotProps?.pageContainer}
     >
       <CrudForm
         dataSource={dataSource}
@@ -235,7 +240,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
         slots={slots?.form}
         slotProps={slotProps?.form}
       />
-    </PageContainer>
+    </PageContainerSlot>
   );
 }
 
@@ -292,6 +297,7 @@ Create.propTypes /* remove-proptypes */ = {
       select: PropTypes.object,
       textField: PropTypes.object,
     }),
+    pageContainer: PropTypes.object,
   }),
   /**
    * The components used for each slot inside.
@@ -305,6 +311,7 @@ Create.propTypes /* remove-proptypes */ = {
       select: PropTypes.elementType,
       textField: PropTypes.elementType,
     }),
+    pageContainer: PropTypes.elementType,
   }),
 } as any;
 

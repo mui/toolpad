@@ -15,11 +15,14 @@
     "onRowClick": { "type": { "name": "func" } },
     "pageTitle": { "type": { "name": "string" } },
     "slotProps": {
-      "type": { "name": "shape", "description": "{ dataGrid?: object }" },
+      "type": { "name": "shape", "description": "{ dataGrid?: object, pageContainer?: object }" },
       "default": "{}"
     },
     "slots": {
-      "type": { "name": "shape", "description": "{ dataGrid?: func }" },
+      "type": {
+        "name": "shape",
+        "description": "{ dataGrid?: func, pageContainer?: elementType }"
+      },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }
     }
@@ -32,7 +35,8 @@
       "description": "The DataGrid component used to list the items.",
       "default": "DataGrid",
       "class": null
-    }
+    },
+    { "name": "pageContainer", "description": "", "class": null }
   ],
   "classes": [],
   "muiName": "List",

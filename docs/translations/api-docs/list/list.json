@@ -22,5 +22,8 @@
     "slots": { "description": "The components used for each slot inside." }
   },
   "classDescriptions": {},
-  "slotDescriptions": { "dataGrid": "The DataGrid component used to list the items." }
+  "slotDescriptions": {
+    "dataGrid": "The DataGrid component used to list the items.",
+    "pageContainer": ""
+  }
 }

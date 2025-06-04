@@ -36,7 +36,7 @@ import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import type { DataModel, DataModelId, DataSource } from './types';
 import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
-import { PageContainer } from '../PageContainer';
+import { PageContainer, type PageContainerProps } from '../PageContainer';
 import { useActivePage } from '../useActivePage';
 
 const ErrorOverlay = styled('div')(({ theme }) => ({
@@ -56,6 +56,7 @@ const ErrorOverlay = styled('div')(({ theme }) => ({
 
 export interface ListSlotProps {
   dataGrid?: Partial<DataGridProps | DataGridProProps | DataGridPremiumProps>;
+  pageContainer?: PageContainerProps;
 }
 
 export interface ListSlots {
@@ -67,6 +68,7 @@ export interface ListSlots {
     | React.JSXElementConstructor<DataGridProps>
     | React.JSXElementConstructor<DataGridProProps>
     | React.JSXElementConstructor<DataGridPremiumProps>;
+  pageContainer?: React.JSXElementConstructor<PageContainerProps>;
 }
 
 export interface ListProps<D extends DataModel> {
@@ -366,6 +368,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
   );
 
   const DataGridSlot = slots?.dataGrid ?? DataGrid;
+  const PageContainerSlot = slots?.pageContainer ?? PageContainer;
 
   const initialState = React.useMemo(
     () => ({
@@ -427,7 +430,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
   ]);
 
   return (
-    <PageContainer
+    <PageContainerSlot
       title={pageTitle}
       breadcrumbs={
         activePage && pageTitle
@@ -440,6 +443,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
             ]
           : undefined
       }
+      {...slotProps?.pageContainer}
     >
       <Stack sx={{ flex: 1, width: '100%' }}>
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
@@ -506,7 +510,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
           )}
         </Box>
       </Stack>
-    </PageContainer>
+    </PageContainerSlot>
   );
 }
 
@@ -564,6 +568,7 @@ List.propTypes /* remove-proptypes */ = {
    */
   slotProps: PropTypes.shape({
     dataGrid: PropTypes.object,
+    pageContainer: PropTypes.object,
   }),
   /**
    * The components used for each slot inside.
@@ -571,6 +576,7 @@ List.propTypes /* remove-proptypes */ = {
    */
   slots: PropTypes.shape({
     dataGrid: PropTypes.func,
+    pageContainer: PropTypes.elementType,
   }),
 } as any;
 

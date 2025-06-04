@@ -23,7 +23,7 @@ import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import type { DataField, DataModel, DataModelId, DataSource } from './types';
 import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
-import { PageContainer } from '../PageContainer';
+import { PageContainer, type PageContainerProps } from '../PageContainer';
 import { useActivePage } from '../useActivePage';
 
 export interface ShowProps<D extends DataModel> {
@@ -52,6 +52,20 @@ export interface ShowProps<D extends DataModel> {
    * Locale text for the component.
    */
   localeText?: CRUDLocaleText;
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots?: {
+    pageContainer?: React.JSXElementConstructor<PageContainerProps>;
+  };
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps?: {
+    pageContainer?: PageContainerProps;
+  };
 }
 
 /**
@@ -72,6 +86,8 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
     dataSourceCache,
     pageTitle,
     localeText: propsLocaleText,
+    slots,
+    slotProps,
   } = props;
 
   const globalLocaleText = useLocaleText();
@@ -326,8 +342,10 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
     renderField,
   ]);
 
+  const PageContainerSlot = slots?.pageContainer ?? PageContainer;
+
   return (
-    <PageContainer
+    <PageContainerSlot
       title={pageTitle}
       breadcrumbs={
         activePage && pageTitle
@@ -340,9 +358,10 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
             ]
           : undefined
       }
+      {...slotProps?.pageContainer}
     >
       <Box sx={{ display: 'flex', flex: 1, width: '100%' }}>{renderShow}</Box>
-    </PageContainer>
+    </PageContainerSlot>
   );
 }
 
@@ -385,6 +404,20 @@ Show.propTypes /* remove-proptypes */ = {
    * The title of the page.
    */
   pageTitle: PropTypes.string,
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps: PropTypes.shape({
+    pageContainer: PropTypes.object,
+  }),
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots: PropTypes.shape({
+    pageContainer: PropTypes.elementType,
+  }),
 } as any;
 
 export { Show };

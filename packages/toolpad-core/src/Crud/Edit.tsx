@@ -13,7 +13,7 @@ import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
 import type { DataFieldFormValue, DataModel, DataModelId, DataSource, OmitId } from './types';
-import { PageContainer } from '../PageContainer';
+import { PageContainer, type PageContainerProps } from '../PageContainer';
 import { useActivePage } from '../useActivePage';
 
 interface EditFormProps<D extends DataModel> {
@@ -205,6 +205,7 @@ export interface EditProps<D extends DataModel> {
    */
   slots?: {
     form?: CrudFormSlots;
+    pageContainer?: React.JSXElementConstructor<PageContainerProps>;
   };
   /**
    * The props used for each slot inside.
@@ -212,6 +213,7 @@ export interface EditProps<D extends DataModel> {
    */
   slotProps?: {
     form?: CrudFormSlotProps;
+    pageContainer?: PageContainerProps;
   };
 }
 
@@ -340,8 +342,10 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
     slots,
   ]);
 
+  const PageContainerSlot = slots?.pageContainer ?? PageContainer;
+
   return (
-    <PageContainer
+    <PageContainerSlot
       title={pageTitle}
       breadcrumbs={
         activePage && pageTitle
@@ -354,9 +358,10 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
             ]
           : undefined
       }
+      {...slotProps?.pageContainer}
     >
       <Box sx={{ display: 'flex', flex: 1 }}>{renderEdit}</Box>
-    </PageContainer>
+    </PageContainerSlot>
   );
 }
 
@@ -407,6 +412,7 @@ Edit.propTypes /* remove-proptypes */ = {
       select: PropTypes.object,
       textField: PropTypes.object,
     }),
+    pageContainer: PropTypes.object,
   }),
   /**
    * The components used for each slot inside.
@@ -420,6 +426,7 @@ Edit.propTypes /* remove-proptypes */ = {
       select: PropTypes.elementType,
       textField: PropTypes.elementType,
     }),
+    pageContainer: PropTypes.elementType,
   }),
 } as any;
 

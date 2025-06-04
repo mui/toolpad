@@ -15,14 +15,14 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ form?: { checkbox?: object, datePicker?: object, dateTimePicker?: object, select?: object, textField?: object } }"
+        "description": "{ form?: { checkbox?: object, datePicker?: object, dateTimePicker?: object, select?: object, textField?: object }, pageContainer?: object }"
       },
       "default": "{}"
     },
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ form?: { checkbox?: elementType, datePicker?: elementType, dateTimePicker?: elementType, select?: elementType, textField?: elementType } }"
+        "description": "{ form?: { checkbox?: elementType, datePicker?: elementType, dateTimePicker?: elementType, select?: elementType, textField?: elementType }, pageContainer?: elementType }"
       },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }

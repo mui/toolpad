@@ -19,14 +19,14 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ form?: { checkbox?: object, datePicker?: object, dateTimePicker?: object, select?: object, textField?: object }, list?: { dataGrid?: object } }"
+        "description": "{ form?: { checkbox?: object, datePicker?: object, dateTimePicker?: object, select?: object, textField?: object }, list?: { dataGrid?: object, pageContainer?: object }, pageContainer?: object }"
       },
       "default": "{}"
     },
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ form?: { checkbox?: elementType, datePicker?: elementType, dateTimePicker?: elementType, select?: elementType, textField?: elementType }, list?: { dataGrid?: func } }"
+        "description": "{ form?: { checkbox?: elementType, datePicker?: elementType, dateTimePicker?: elementType, select?: elementType, textField?: elementType }, list?: { dataGrid?: func, pageContainer?: elementType }, pageContainer?: elementType }"
       },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }

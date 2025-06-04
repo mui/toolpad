@@ -5,8 +5,7 @@ const indexPage: Template = (options) => {
   const routerType = options.router;
 
   let imports = `import * as React from 'react';
-import Typography from '@mui/material/Typography';
-import { PageContainer } from '@toolpad/core/PageContainer';`;
+import Typography from '@mui/material/Typography';`;
 
   let sessionHandling = '';
 
@@ -52,9 +51,7 @@ export default ${isAsync}function HomePage() {
 
   return (    
       <Typography>
-        <PageContainer>
-          ${welcomeMessage}
-        </PageContainer>
+        ${welcomeMessage}
       </Typography>
   );
 }${requireAuth}

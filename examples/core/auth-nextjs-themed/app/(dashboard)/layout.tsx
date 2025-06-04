@@ -2,6 +2,8 @@
 import * as React from 'react';
 import Stack from '@mui/material/Stack';
 import { DashboardLayout, ThemeSwitcher } from '@toolpad/core/DashboardLayout';
+import { usePathname, useParams } from 'next/navigation';
+import { PageContainer } from '@toolpad/core/PageContainer';
 import Copyright from '../components/Copyright';
 import SidebarFooterAccount, { ToolbarAccountOverride } from './SidebarFooterAccount';
 
@@ -15,6 +17,23 @@ function CustomActions() {
 }
 
 export default function Layout(props: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const params = useParams();
+  const [employeeId] = params.segments ?? [];
+
+  const title = React.useMemo(() => {
+    if (pathname.endsWith('/employees/new')) {
+      return 'New Employee';
+    }
+    if (employeeId && pathname.endsWith('/edit')) {
+      return `Employee ${employeeId} - Edit`;
+    }
+    if (employeeId) {
+      return `Employee ${employeeId}`;
+    }
+    return undefined;
+  }, [employeeId, pathname]);
+
   return (
     <DashboardLayout
       slots={{
@@ -22,8 +41,10 @@ export default function Layout(props: { children: React.ReactNode }) {
         sidebarFooter: SidebarFooterAccount,
       }}
     >
-      {props.children}
-      <Copyright sx={{ my: 4 }} />
+      <PageContainer title={title}>
+        {props.children}
+        <Copyright sx={{ my: 4 }} />
+      </PageContainer>
     </DashboardLayout>
   );
 }

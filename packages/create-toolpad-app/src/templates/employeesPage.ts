@@ -3,12 +3,9 @@ import { Template } from '../types';
 const ordersPage: Template = (options) => {
   const authEnabled = options.auth;
   const routerType = options.router;
-  const framework = options.framework;
 
-  let imports = `${routerType === 'nextjs-app' ? 'use client;' : ''}import * as React from 'react';
-${routerType === 'nextjs-pages' ? `import { useRouter } from 'next/router';` : ''}
-${routerType === 'nextjs-app' ? `import { useParams } from 'next/navigation';` : ''}
-${framework === 'vite' ? `import { useParams } from 'react-router';` : ''}
+  let imports = `import * as React from 'react';
+${routerType === 'nextjs-pages' ? `import { useRouter } from 'next/router';` : ``}
 import { Crud } from '@toolpad/core/Crud';
 import { employeesDataSource, Employee, employeesCache } from '${routerType === 'nextjs-app' ? `../../../` : ``}${routerType === 'nextjs-pages' ? `../` : ``}../data/employees';`;
 
@@ -43,32 +40,17 @@ import { employeesDataSource, Employee, employeesCache } from '${routerType === 
 
 
 export default ${isAsync}function EmployeesCrudPage() {
-  ${
-    routerType === 'nextjs-pages'
-      ? `const router = useRouter();
-  const { segments = [] } = router.query;
-  const [employeeId] = segments;`
-      : ''
-  }
-  ${routerType === 'nextjs-app' ? 'const { employeeId } = useParams();' : ''}
-  ${framework === 'vite' ? 'const { employeeId } = useParams();' : ''}
-  
-  ${sessionHandling}
+  ${routerType === 'nextjs-pages' ? `const router = useRouter();\n` : ``}${sessionHandling}
 
-  return ${routerType === 'nextjs-pages' ? `router.isReady ? ` : ''}(
+  return ${routerType === 'nextjs-pages' ? `router.isReady ? ` : ``}(
     <Crud<Employee>
       dataSource={employeesDataSource}
       dataSourceCache={employeesCache}
       rootPath="/employees"
       initialPageSize={25}
       defaultValues={{ itemCount: 1 }}
-      pageTitles={{
-        show: \`Employee \${employeeId}\`,
-        create: 'New Employee',
-        edit: \`Employee \${employeeId} - Edit\`,
-      }}
     />
-  )${routerType === 'nextjs-pages' ? ` : null` : ''};
+  )${routerType === 'nextjs-pages' ? ` : null` : ``};
 }${requireAuth}
 `;
 };

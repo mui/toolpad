@@ -4,7 +4,6 @@ import { createTheme } from '@mui/material/styles';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
 import {
   Create,
   CrudProvider,
@@ -223,22 +222,6 @@ function CrudAdvanced(props) {
   const createPath = `${rootPath}/new`;
   const editPath = `${rootPath}/:noteId/edit`;
 
-  const title = React.useMemo(() => {
-    if (router.pathname === createPath) {
-      return 'New Note';
-    }
-    const editNoteId = matchPath(editPath, router.pathname);
-    if (editNoteId) {
-      return `Note ${editNoteId} - Edit`;
-    }
-    const showNoteId = matchPath(showPath, router.pathname);
-    if (showNoteId) {
-      return `Note ${showNoteId}`;
-    }
-
-    return undefined;
-  }, [createPath, editPath, router.pathname, showPath]);
-
   const handleRowClick = React.useCallback(
     (noteId) => {
       router.navigate(`${rootPath}/${String(noteId)}`);
@@ -282,37 +265,41 @@ function CrudAdvanced(props) {
         window={demoWindow}
       >
         <DashboardLayout defaultSidebarCollapsed>
-          <PageContainer title={title}>
-            {/* preview-start */}
-            <CrudProvider dataSource={notesDataSource} dataSourceCache={notesCache}>
-              {router.pathname === listPath ? (
-                <List
-                  initialPageSize={10}
-                  onRowClick={handleRowClick}
-                  onCreateClick={handleCreateClick}
-                  onEditClick={handleEditClick}
-                />
-              ) : null}
-              {router.pathname === createPath ? (
-                <Create
-                  initialValues={{ title: 'New note' }}
-                  onSubmitSuccess={handleCreate}
-                  resetOnSubmit={false}
-                />
-              ) : null}
-              {router.pathname !== createPath && showNoteId ? (
-                <Show
-                  id={showNoteId}
-                  onEditClick={handleEditClick}
-                  onDelete={handleDelete}
-                />
-              ) : null}
-              {editNoteId ? (
-                <Edit id={editNoteId} onSubmitSuccess={handleEdit} />
-              ) : null}
-            </CrudProvider>
-            {/* preview-end */}
-          </PageContainer>
+          {/* preview-start */}
+          <CrudProvider dataSource={notesDataSource} dataSourceCache={notesCache}>
+            {router.pathname === listPath ? (
+              <List
+                initialPageSize={10}
+                onRowClick={handleRowClick}
+                onCreateClick={handleCreateClick}
+                onEditClick={handleEditClick}
+              />
+            ) : null}
+            {router.pathname === createPath ? (
+              <Create
+                initialValues={{ title: 'New note' }}
+                onSubmitSuccess={handleCreate}
+                resetOnSubmit={false}
+                pageTitle="New Note"
+              />
+            ) : null}
+            {router.pathname !== createPath && showNoteId ? (
+              <Show
+                id={showNoteId}
+                onEditClick={handleEditClick}
+                onDelete={handleDelete}
+                pageTitle={`Note ${showNoteId}`}
+              />
+            ) : null}
+            {editNoteId ? (
+              <Edit
+                id={editNoteId}
+                onSubmitSuccess={handleEdit}
+                pageTitle={`Note ${editNoteId} - Edit`}
+              />
+            ) : null}
+          </CrudProvider>
+          {/* preview-end */}
         </DashboardLayout>
       </AppProvider>
     </DemoProvider>

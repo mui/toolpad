@@ -10,7 +10,6 @@ import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
 import { Crud, DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
 import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
@@ -312,21 +311,7 @@ export default function CrudCustomFormField(props: DemoProps) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
-  const title = React.useMemo(() => {
-    if (router.pathname === '/notes/new') {
-      return 'New Note';
-    }
-    const editNoteId = matchPath('/notes/:noteId/edit', router.pathname);
-    if (editNoteId) {
-      return `Note ${editNoteId} - Edit`;
-    }
-    const showNoteId = matchPath('/notes/:noteId', router.pathname);
-    if (showNoteId) {
-      return `Note ${showNoteId}`;
-    }
-
-    return undefined;
-  }, [router.pathname]);
+  const noteId = matchPath('/notes/:noteId', router.pathname);
 
   return (
     // Remove this provider when copying and pasting into your project.
@@ -338,15 +323,18 @@ export default function CrudCustomFormField(props: DemoProps) {
         window={demoWindow}
       >
         <DashboardLayout defaultSidebarCollapsed>
-          <PageContainer title={title}>
-            <Crud<Note>
-              dataSource={notesDataSource}
-              dataSourceCache={notesCache}
-              rootPath="/notes"
-              initialPageSize={10}
-              defaultValues={{ title: 'New note' }}
-            />
-          </PageContainer>
+          <Crud<Note>
+            dataSource={notesDataSource}
+            dataSourceCache={notesCache}
+            rootPath="/notes"
+            initialPageSize={10}
+            defaultValues={{ title: 'New note' }}
+            pageTitles={{
+              create: 'New Note',
+              edit: `Note ${noteId} - Edit`,
+              show: `Note ${noteId}`,
+            }}
+          />
         </DashboardLayout>
       </AppProvider>
     </DemoProvider>

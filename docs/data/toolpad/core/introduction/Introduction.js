@@ -230,6 +230,8 @@ function matchPath(pattern, pathname) {
 }
 
 function DemoPageContent({ pathname }) {
+  const personId = matchPath('/people/:personId', pathname);
+
   if (pathname.includes('/people')) {
     return (
       <Crud
@@ -238,22 +240,29 @@ function DemoPageContent({ pathname }) {
         rootPath="/people"
         initialPageSize={4}
         defaultValues={{ age: 18 }}
+        pageTitles={{
+          create: 'New Person',
+          edit: `Person ${personId} - Edit`,
+          show: `Person ${personId}`,
+        }}
       />
     );
   }
 
   return (
-    <Box
-      sx={{
-        py: 4,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        textAlign: 'center',
-      }}
-    >
-      <Typography>Dashboard content for {pathname}</Typography>
-    </Box>
+    <PageContainer>
+      <Box
+        sx={{
+          py: 4,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          textAlign: 'center',
+        }}
+      >
+        <Typography>Dashboard content for {pathname}</Typography>
+      </Box>
+    </PageContainer>
   );
 }
 
@@ -269,22 +278,6 @@ function Introduction(props) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
-  const title = React.useMemo(() => {
-    if (router.pathname === '/people/new') {
-      return 'New Person';
-    }
-    const editPersonId = matchPath('/people/:peopleId/edit', router.pathname);
-    if (editPersonId) {
-      return `Person ${editPersonId} - Edit`;
-    }
-    const showPersonId = matchPath('/people/:peopleId', router.pathname);
-    if (showPersonId) {
-      return `Person ${showPersonId}`;
-    }
-
-    return undefined;
-  }, [router.pathname]);
-
   return (
     // Remove this provider when copying and pasting into your project.
     <DemoProvider window={demoWindow}>
@@ -296,9 +289,7 @@ function Introduction(props) {
         window={demoWindow}
       >
         <DashboardLayout defaultSidebarCollapsed>
-          <PageContainer title={title}>
-            <DemoPageContent pathname={router.pathname} />
-          </PageContainer>
+          <DemoPageContent pathname={router.pathname} />
         </DashboardLayout>
       </AppProvider>
       {/* preview-end */}

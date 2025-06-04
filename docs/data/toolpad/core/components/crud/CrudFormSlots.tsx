@@ -3,7 +3,6 @@ import { createTheme } from '@mui/material/styles';
 import LocalActivityIcon from '@mui/icons-material/LocalActivity';
 import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
 import { Crud, DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
 import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
@@ -236,21 +235,7 @@ export default function CrudFormSlots(props: DemoProps) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
-  const title = React.useMemo(() => {
-    if (router.pathname === '/things/new') {
-      return 'New Thing';
-    }
-    const editThingId = matchPath('/things/:thingId/edit', router.pathname);
-    if (editThingId) {
-      return `Thing ${editThingId} - Edit`;
-    }
-    const showThingId = matchPath('/things/:thingId', router.pathname);
-    if (showThingId) {
-      return `Thing ${showThingId}`;
-    }
-
-    return undefined;
-  }, [router.pathname]);
+  const thingId = matchPath('/things/:thingId', router.pathname);
 
   return (
     // Remove this provider when copying and pasting into your project.
@@ -262,33 +247,36 @@ export default function CrudFormSlots(props: DemoProps) {
         window={demoWindow}
       >
         <DashboardLayout defaultSidebarCollapsed>
-          <PageContainer title={title}>
-            {/* preview-start */}
-            <Crud<Thing>
-              dataSource={thingsDataSource}
-              dataSourceCache={thingsCache}
-              rootPath="/things"
-              initialPageSize={10}
-              defaultValues={{ title: 'New thing' }}
-              slotProps={{
-                form: {
-                  textField: {
-                    variant: 'filled',
-                  },
-                  checkbox: {
-                    color: 'secondary',
-                  },
-                  datePicker: {
-                    views: ['year', 'month'],
-                  },
-                  select: {
-                    variant: 'standard',
-                  },
+          {/* preview-start */}
+          <Crud<Thing>
+            dataSource={thingsDataSource}
+            dataSourceCache={thingsCache}
+            rootPath="/things"
+            initialPageSize={10}
+            defaultValues={{ title: 'New thing' }}
+            pageTitles={{
+              create: 'New Thing',
+              edit: `Thing ${thingId} - Edit`,
+              show: `Thing ${thingId}`,
+            }}
+            slotProps={{
+              form: {
+                textField: {
+                  variant: 'filled',
                 },
-              }}
-            />
-            {/* preview-end */}
-          </PageContainer>
+                checkbox: {
+                  color: 'secondary',
+                },
+                datePicker: {
+                  views: ['year', 'month'],
+                },
+                select: {
+                  variant: 'standard',
+                },
+              },
+            }}
+          />
+          {/* preview-end */}
         </DashboardLayout>
       </AppProvider>
     </DemoProvider>

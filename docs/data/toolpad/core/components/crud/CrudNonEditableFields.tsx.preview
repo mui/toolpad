@@ -20,4 +20,9 @@ export const notesDataSource: DataSource<Note> = {
   rootPath="/notes"
   initialPageSize={10}
   defaultValues={{ title: 'New note' }}
+  pageTitles={{
+    create: 'New Note',
+    edit: `Note ${noteId} - Edit`,
+    show: `Note ${noteId}`,
+  }}
 />

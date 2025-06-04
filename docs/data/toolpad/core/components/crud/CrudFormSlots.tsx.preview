@@ -4,6 +4,11 @@
   rootPath="/things"
   initialPageSize={10}
   defaultValues={{ title: 'New thing' }}
+  pageTitles={{
+    create: 'New Thing',
+    edit: `Thing ${thingId} - Edit`,
+    show: `Thing ${thingId}`,
+  }}
   slotProps={{
     form: {
       textField: {

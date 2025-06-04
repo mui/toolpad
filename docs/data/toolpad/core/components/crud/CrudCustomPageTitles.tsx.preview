@@ -1,0 +1,13 @@
+<Crud<Note>
+  dataSource={notesDataSource}
+  dataSourceCache={notesCache}
+  rootPath="/notes"
+  initialPageSize={10}
+  defaultValues={{ title: 'New note' }}
+  pageTitles={{
+    list: 'Custom Title for List',
+    create: 'Custom Title for Create',
+    edit: 'Custom Title for Edit',
+    show: 'Custom Title for Show',
+  }}
+/>

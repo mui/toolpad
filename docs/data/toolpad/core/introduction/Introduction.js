@@ -230,7 +230,8 @@ function matchPath(pattern, pathname) {
 }
 
 function DemoPageContent({ pathname }) {
-  const personId = matchPath('/people/:personId', pathname);
+  const showPersonId = matchPath('/people/:personId', pathname);
+  const editPersonId = matchPath('/people/:personId/edit', pathname);
 
   if (pathname.includes('/people')) {
     return (
@@ -242,8 +243,8 @@ function DemoPageContent({ pathname }) {
         defaultValues={{ age: 18 }}
         pageTitles={{
           create: 'New Person',
-          edit: `Person ${personId} - Edit`,
-          show: `Person ${personId}`,
+          edit: `Person ${editPersonId} - Edit`,
+          show: `Person ${showPersonId}`,
         }}
       />
     );

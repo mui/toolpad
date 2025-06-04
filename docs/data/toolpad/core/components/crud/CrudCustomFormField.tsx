@@ -311,7 +311,8 @@ export default function CrudCustomFormField(props: DemoProps) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
-  const noteId = matchPath('/notes/:noteId', router.pathname);
+  const showNoteId = matchPath('/notes/:noteId', router.pathname);
+  const editNoteId = matchPath('/notes/:noteId/edit', router.pathname);
 
   return (
     // Remove this provider when copying and pasting into your project.
@@ -331,8 +332,8 @@ export default function CrudCustomFormField(props: DemoProps) {
             defaultValues={{ title: 'New note' }}
             pageTitles={{
               create: 'New Note',
-              edit: `Note ${noteId} - Edit`,
-              show: `Note ${noteId}`,
+              edit: `Note ${editNoteId} - Edit`,
+              show: `Note ${showNoteId}`,
             }}
           />
         </DashboardLayout>

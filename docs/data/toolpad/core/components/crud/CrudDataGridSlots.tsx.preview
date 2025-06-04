@@ -6,8 +6,8 @@
   defaultValues={{ title: 'New note' }}
   pageTitles={{
     create: 'New Note',
-    edit: `Note ${noteId} - Edit`,
-    show: `Note ${noteId}`,
+    edit: `Note ${editNoteId} - Edit`,
+    show: `Note ${showNoteId}`,
   }}
   slots={{ list: { dataGrid: DataGridPro } }}
   slotProps={{

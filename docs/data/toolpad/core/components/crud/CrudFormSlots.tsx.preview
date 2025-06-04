@@ -6,8 +6,8 @@
   defaultValues={{ title: 'New thing' }}
   pageTitles={{
     create: 'New Thing',
-    edit: `Thing ${thingId} - Edit`,
-    show: `Thing ${thingId}`,
+    edit: `Thing ${editThingId} - Edit`,
+    show: `Thing ${showThingId}`,
   }}
   slotProps={{
     form: {

@@ -215,7 +215,8 @@ function CrudFormSlots(props) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
-  const thingId = matchPath('/things/:thingId', router.pathname);
+  const showThingId = matchPath('/things/:thingId', router.pathname);
+  const editThingId = matchPath('/things/:thingId/edit', router.pathname);
 
   return (
     // Remove this provider when copying and pasting into your project.
@@ -236,8 +237,8 @@ function CrudFormSlots(props) {
             defaultValues={{ title: 'New thing' }}
             pageTitles={{
               create: 'New Thing',
-              edit: `Thing ${thingId} - Edit`,
-              show: `Thing ${thingId}`,
+              edit: `Thing ${editThingId} - Edit`,
+              show: `Thing ${showThingId}`,
             }}
             slotProps={{
               form: {

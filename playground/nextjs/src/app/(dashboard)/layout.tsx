@@ -1,6 +1,5 @@
 'use client';
 import * as React from 'react';
-import { usePathname, useParams } from 'next/navigation';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MenuList from '@mui/material/MenuList';
@@ -17,7 +16,6 @@ import {
   AccountPreviewProps,
 } from '@toolpad/core/Account';
 import { DashboardLayout, SidebarFooterProps, ThemeSwitcher } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
 
 function ToolbarActions() {
   return (
@@ -166,23 +164,6 @@ function SidebarFooterAccount({ mini }: SidebarFooterProps) {
 }
 
 export default function DashboardPagesLayout(props: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const params = useParams();
-  const [orderId] = params.segments ?? [];
-
-  const title = React.useMemo(() => {
-    if (pathname.endsWith('/orders/new')) {
-      return 'New Order';
-    }
-    if (orderId && pathname.endsWith('/edit')) {
-      return `Order ${orderId} - Edit`;
-    }
-    if (orderId) {
-      return `Order ${orderId}`;
-    }
-    return undefined;
-  }, [orderId, pathname]);
-
   return (
     <DashboardLayout
       slots={{
@@ -190,7 +171,7 @@ export default function DashboardPagesLayout(props: { children: React.ReactNode 
         toolbarActions: ToolbarActions,
       }}
     >
-      <PageContainer title={title}>{props.children}</PageContainer>
+      {props.children}
     </DashboardLayout>
   );
 }

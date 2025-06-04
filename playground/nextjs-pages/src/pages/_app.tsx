@@ -1,7 +1,5 @@
 import * as React from 'react';
-import { useRouter } from 'next/router';
 import { NextAppProvider } from '@toolpad/core/nextjs';
-import { PageContainer } from '@toolpad/core/PageContainer';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import Head from 'next/head';
 import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
@@ -49,29 +47,7 @@ const AUTHENTICATION = {
 };
 
 function DefaultLayout({ page }: { page: React.ReactElement<any> }) {
-  const router = useRouter();
-  const pathname = router.asPath.split('?')[0];
-  const { segments = [] } = router.query;
-  const [orderId] = segments;
-
-  const title = React.useMemo(() => {
-    if (pathname.endsWith('/orders/new')) {
-      return 'New Order';
-    }
-    if (orderId && pathname.endsWith('/edit')) {
-      return `Order ${orderId} - Edit`;
-    }
-    if (orderId) {
-      return `Order ${orderId}`;
-    }
-    return undefined;
-  }, [orderId, pathname]);
-
-  return (
-    <DashboardLayout>
-      <PageContainer title={title}>{page}</PageContainer>
-    </DashboardLayout>
-  );
+  return <DashboardLayout>{page}</DashboardLayout>;
 }
 
 function getDefaultLayout(page: React.ReactElement<any>) {

@@ -18,7 +18,7 @@ import dayjs from 'dayjs';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
 import { useLocaleText } from '../AppProvider/LocalizationProvider';
-import { CrudContext, RouterContext } from '../shared/context';
+import { CrudContext } from '../shared/context';
 import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import type { DataField, DataModel, DataModelId, DataSource } from './types';
@@ -110,8 +110,6 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
 
   const { fields, validate, ...methods } = cachedDataSource;
   const { getOne, deleteOne } = methods;
-
-  const routerContext = React.useContext(RouterContext);
 
   const activePage = useActivePage();
 
@@ -353,7 +351,6 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
               ...activePage.breadcrumbs,
               {
                 title: pageTitle,
-                path: routerContext?.pathname,
               },
             ]
           : undefined

@@ -3,7 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import invariant from 'invariant';
 import { useNotifications } from '../useNotifications';
-import { CrudContext, RouterContext } from '../shared/context';
+import { CrudContext } from '../shared/context';
 import { useLocaleText } from '../AppProvider/LocalizationProvider';
 import { CrudForm, CrudFormSlotProps, CrudFormSlots } from './CrudForm';
 import { DataSourceCache } from './cache';
@@ -105,8 +105,6 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
   >;
 
   const { fields, createOne, validate } = cachedDataSource;
-
-  const routerContext = React.useContext(RouterContext);
 
   const activePage = useActivePage();
 
@@ -223,7 +221,6 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
               ...activePage.breadcrumbs,
               {
                 title: pageTitle,
-                path: routerContext?.pathname,
               },
             ]
           : undefined

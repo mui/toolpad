@@ -438,7 +438,6 @@ function List<D extends DataModel>(props: ListProps<D>) {
               ...activePage.breadcrumbs,
               {
                 title: pageTitle,
-                path: routerContext?.pathname,
               },
             ]
           : undefined

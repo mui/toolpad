@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import invariant from 'invariant';
 import { useNotifications } from '../useNotifications';
-import { CrudContext, RouterContext } from '../shared/context';
+import { CrudContext } from '../shared/context';
 import { useLocaleText } from '../AppProvider/LocalizationProvider';
 import { CrudForm, CrudFormSlotProps, CrudFormSlots } from './CrudForm';
 import { DataSourceCache } from './cache';
@@ -258,8 +258,6 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
   const { fields, validate, ...methods } = cachedDataSource;
   const { getOne, updateOne } = methods;
 
-  const routerContext = React.useContext(RouterContext);
-
   const activePage = useActivePage();
 
   const [data, setData] = React.useState<D | null>(null);
@@ -353,7 +351,6 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
               ...activePage.breadcrumbs,
               {
                 title: pageTitle,
-                path: routerContext?.pathname,
               },
             ]
           : undefined

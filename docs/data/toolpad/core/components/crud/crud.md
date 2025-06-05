@@ -354,7 +354,7 @@ The `form` slots and slot props can be used, for example, to customize component
 
 {{"demo": "CrudFormSlots.js", "height": 600, "iframe": true}}
 
-#### Hide page titles and breadcrumbs
+#### Override default page container
 
 The `pageContainer` slot can be used to override the default page container and use a custom wrapper component instead:
 

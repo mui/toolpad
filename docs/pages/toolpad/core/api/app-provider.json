@@ -41,7 +41,7 @@
   "name": "AppProvider",
   "imports": [
     "import { AppProvider } from '@toolpad/core/AppProvider';",
-    "import { AppProvider } from '@toolpad/core';\nimport { NextAppProvider } from '@toolpad/core/nextjs'; // Next.js\nimport { ReactRouterAppProvider } from '@toolpad/core/react-router'; // React Router"
+    "import { AppProvider } from '@toolpad/core';\nimport { NextAppProvider } from '@toolpad/core/nextjs'; // Next.js\nimport { ReactRouterAppProvider } from '@toolpad/core/react-router'; // React Router\nimport { TanStackRouterAppProvider } from '@toolpad/core/tanstack-router'; // TanStack Router"
   ],
   "classes": [],
   "spread": true,

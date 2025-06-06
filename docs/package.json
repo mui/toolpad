@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@babel/plugin-transform-object-assign": "7.27.1",
-    "@babel/runtime-corejs2": "7.27.1",
+    "@babel/runtime-corejs2": "7.27.6",
     "@date-io/date-fns-jalali": "3.2.0",
     "@docsearch/react": "3.9.0",
     "@emotion/cache": "11.14.0",
@@ -92,7 +92,7 @@
     "zod": "3.25.36"
   },
   "devDependencies": {
-    "@babel/core": "7.27.1",
+    "@babel/core": "7.27.4",
     "@babel/plugin-transform-react-constant-elements": "7.27.1",
     "@babel/preset-typescript": "7.27.1",
     "@types/babel__core": "^7.20.5",

@@ -4,7 +4,6 @@ import { createTheme } from '@mui/material/styles';
 import PersonIcon from '@mui/icons-material/Person';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
 import { Create, DataSourceCache } from '@toolpad/core/Crud';
 import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
@@ -124,17 +123,16 @@ function CrudCreate(props) {
         window={demoWindow}
       >
         <DashboardLayout defaultSidebarCollapsed>
-          <PageContainer title="New Person">
-            {/* preview-start */}
-            <Create
-              dataSource={peopleDataSource}
-              dataSourceCache={peopleCache}
-              initialValues={{ age: 18 }}
-              onSubmitSuccess={handleSubmitSuccess}
-              resetOnSubmit
-            />
-            {/* preview-end */}
-          </PageContainer>
+          {/* preview-start */}
+          <Create
+            dataSource={peopleDataSource}
+            dataSourceCache={peopleCache}
+            initialValues={{ age: 18 }}
+            onSubmitSuccess={handleSubmitSuccess}
+            resetOnSubmit
+            pageTitle="New Person"
+          />
+          {/* preview-end */}
         </DashboardLayout>
       </AppProvider>
     </DemoProvider>

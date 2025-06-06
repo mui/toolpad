@@ -9,7 +9,17 @@
     },
     "localeText": { "type": { "name": "object" } },
     "onDelete": { "type": { "name": "func" } },
-    "onEditClick": { "type": { "name": "func" } }
+    "onEditClick": { "type": { "name": "func" } },
+    "pageTitle": { "type": { "name": "string" } },
+    "slotProps": {
+      "type": { "name": "shape", "description": "{ pageContainer?: object }" },
+      "default": "{}"
+    },
+    "slots": {
+      "type": { "name": "shape", "description": "{ pageContainer?: elementType }" },
+      "default": "{}",
+      "additionalInfo": { "slotsApi": true }
+    }
   },
   "name": "Show",
   "imports": ["import { Show } from '@toolpad/core/Crud';"],

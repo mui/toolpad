@@ -15,6 +15,7 @@
       initialValues={{ title: 'New note' }}
       onSubmitSuccess={handleCreate}
       resetOnSubmit={false}
+      pageTitle="New Note"
     />
   ) : null}
   {router.pathname !== createPath && showNoteId ? (
@@ -22,9 +23,14 @@
       id={showNoteId}
       onEditClick={handleEditClick}
       onDelete={handleDelete}
+      pageTitle={`Note ${showNoteId}`}
     />
   ) : null}
   {editNoteId ? (
-    <Edit<Note> id={editNoteId} onSubmitSuccess={handleEdit} />
+    <Edit<Note>
+      id={editNoteId}
+      onSubmitSuccess={handleEdit}
+      pageTitle={`Note ${editNoteId} - Edit`}
+    />
   ) : null}
 </CrudProvider>

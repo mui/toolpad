@@ -10,6 +10,7 @@
     "initialValues": { "description": "Initial form values." },
     "localeText": { "description": "Locale text for the component." },
     "onSubmitSuccess": { "description": "Callback fired when the form is successfully submitted." },
+    "pageTitle": { "description": "The title of the page." },
     "resetOnSubmit": {
       "description": "Whether the form fields should reset after the form is submitted."
     },

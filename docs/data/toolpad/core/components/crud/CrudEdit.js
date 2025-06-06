@@ -4,7 +4,6 @@ import { createTheme } from '@mui/material/styles';
 import PersonIcon from '@mui/icons-material/Person';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
 import { DataSourceCache, Edit } from '@toolpad/core/Crud';
 import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
@@ -145,16 +144,15 @@ function CrudEdit(props) {
         window={demoWindow}
       >
         <DashboardLayout defaultSidebarCollapsed>
-          <PageContainer title="Edit Person">
-            {/* preview-start */}
-            <Edit
-              id={1}
-              dataSource={peopleDataSource}
-              dataSourceCache={peopleCache}
-              onSubmitSuccess={handleSubmitSuccess}
-            />
-            {/* preview-end */}
-          </PageContainer>
+          {/* preview-start */}
+          <Edit
+            id={1}
+            dataSource={peopleDataSource}
+            dataSourceCache={peopleCache}
+            onSubmitSuccess={handleSubmitSuccess}
+            pageTitle="Person 1 - Edit"
+          />
+          {/* preview-end */}
         </DashboardLayout>
       </AppProvider>
     </DemoProvider>

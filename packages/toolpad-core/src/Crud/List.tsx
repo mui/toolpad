@@ -36,6 +36,8 @@ import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import type { DataModel, DataModelId, DataSource } from './types';
 import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
+import { PageContainer, type PageContainerProps } from '../PageContainer';
+import { useActivePage } from '../useActivePage';
 
 const ErrorOverlay = styled('div')(({ theme }) => ({
   position: 'absolute',
@@ -54,6 +56,7 @@ const ErrorOverlay = styled('div')(({ theme }) => ({
 
 export interface ListSlotProps {
   dataGrid?: Partial<DataGridProps | DataGridProProps | DataGridPremiumProps>;
+  pageContainer?: PageContainerProps;
 }
 
 export interface ListSlots {
@@ -65,6 +68,7 @@ export interface ListSlots {
     | React.JSXElementConstructor<DataGridProps>
     | React.JSXElementConstructor<DataGridProProps>
     | React.JSXElementConstructor<DataGridPremiumProps>;
+  pageContainer?: React.JSXElementConstructor<PageContainerProps>;
 }
 
 export interface ListProps<D extends DataModel> {
@@ -97,6 +101,10 @@ export interface ListProps<D extends DataModel> {
    * [Cache](https://mui.com/toolpad/core/react-crud/#data-caching) for the data source.
    */
   dataSourceCache?: DataSourceCache | null;
+  /**
+   * The title of the page.
+   */
+  pageTitle?: string;
   /**
    * The components used for each slot inside.
    * @default {}
@@ -131,6 +139,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
     onEditClick,
     onDelete,
     dataSourceCache,
+    pageTitle,
     slots,
     slotProps,
     localeText: propsLocaleText,
@@ -158,6 +167,8 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const { getMany, deleteOne } = methods;
 
   const routerContext = React.useContext(RouterContext);
+
+  const activePage = useActivePage();
 
   const dialogs = useDialogs();
   const notifications = useNotifications();
@@ -357,6 +368,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
   );
 
   const DataGridSlot = slots?.dataGrid ?? DataGrid;
+  const PageContainerSlot = slots?.pageContainer ?? PageContainer;
 
   const initialState = React.useMemo(
     () => ({
@@ -366,6 +378,12 @@ function List<D extends DataModel>(props: ListProps<D>) {
   );
 
   const columns = React.useMemo<GridColDef[]>(() => {
+    const pinnedColumnsOverride = (slotProps?.dataGrid as DataGridProProps | DataGridPremiumProps)
+      ?.initialState?.pinnedColumns;
+    const isActionsColumnPinned =
+      pinnedColumnsOverride?.left?.includes('actions') ||
+      pinnedColumnsOverride?.right?.includes('actions');
+
     return [
       ...fields.map((field) => ({
         ...field,
@@ -374,7 +392,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
       {
         field: 'actions',
         type: 'actions',
-        flex: 1,
+        flex: isActionsColumnPinned ? undefined : 1,
         align: 'right',
         getActions: ({ id }) => [
           ...(onEditClick
@@ -408,74 +426,90 @@ function List<D extends DataModel>(props: ListProps<D>) {
     localeText.deleteLabel,
     localeText.editLabel,
     onEditClick,
+    slotProps?.dataGrid,
   ]);
 
   return (
-    <Stack sx={{ flex: 1, width: '100%' }}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-        <Tooltip title={localeText.reloadButtonLabel} placement="right" enterDelay={1000}>
-          <div>
-            <IconButton aria-label="refresh" onClick={handleRefresh}>
-              <RefreshIcon />
-            </IconButton>
-          </div>
-        </Tooltip>
-        {onCreateClick ? (
-          <Button variant="contained" onClick={onCreateClick} startIcon={<AddIcon />}>
-            {localeText.createNewButtonLabel}
-          </Button>
-        ) : null}
-      </Stack>
-      <Box sx={{ flex: 1, position: 'relative', width: '100%' }}>
-        {/* Use NoSsr to prevent issue https://github.com/mui/mui-x/issues/17077 as DataGrid has no SSR support */}
-        <NoSsr>
-          <DataGridSlot
-            rows={rowsState.rows}
-            rowCount={rowsState.rowCount}
-            columns={columns}
-            pagination
-            sortingMode="server"
-            filterMode="server"
-            paginationMode="server"
-            paginationModel={paginationModel}
-            onPaginationModelChange={handlePaginationModelChange}
-            sortModel={sortModel}
-            onSortModelChange={handleSortModelChange}
-            filterModel={filterModel}
-            onFilterModelChange={handleFilterModelChange}
-            disableRowSelectionOnClick
-            onRowClick={handleRowClick}
-            loading={isLoading}
-            initialState={initialState}
-            slots={{ toolbar: GridToolbar }}
-            // Prevent type conflicts if slotProps don't match DataGrid used for dataGrid slot
-            {...(slotProps?.dataGrid as Record<string, unknown>)}
-            sx={{
-              [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
-                outline: 'transparent',
+    <PageContainerSlot
+      title={pageTitle}
+      breadcrumbs={
+        activePage && pageTitle
+          ? [
+              ...activePage.breadcrumbs,
+              {
+                title: pageTitle,
               },
-              [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]:
-                {
-                  outline: 'none',
+            ]
+          : undefined
+      }
+      {...slotProps?.pageContainer}
+    >
+      <Stack sx={{ flex: 1, width: '100%' }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+          <Tooltip title={localeText.reloadButtonLabel} placement="right" enterDelay={1000}>
+            <div>
+              <IconButton aria-label="refresh" onClick={handleRefresh}>
+                <RefreshIcon />
+              </IconButton>
+            </div>
+          </Tooltip>
+          {onCreateClick ? (
+            <Button variant="contained" onClick={onCreateClick} startIcon={<AddIcon />}>
+              {localeText.createNewButtonLabel}
+            </Button>
+          ) : null}
+        </Stack>
+        <Box sx={{ flex: 1, position: 'relative', width: '100%' }}>
+          {/* Use NoSsr to prevent issue https://github.com/mui/mui-x/issues/17077 as DataGrid has no SSR support */}
+          <NoSsr>
+            <DataGridSlot
+              rows={rowsState.rows}
+              rowCount={rowsState.rowCount}
+              columns={columns}
+              pagination
+              sortingMode="server"
+              filterMode="server"
+              paginationMode="server"
+              paginationModel={paginationModel}
+              onPaginationModelChange={handlePaginationModelChange}
+              sortModel={sortModel}
+              onSortModelChange={handleSortModelChange}
+              filterModel={filterModel}
+              onFilterModelChange={handleFilterModelChange}
+              disableRowSelectionOnClick
+              onRowClick={handleRowClick}
+              loading={isLoading}
+              initialState={initialState}
+              slots={{ toolbar: GridToolbar }}
+              // Prevent type conflicts if slotProps don't match DataGrid used for dataGrid slot
+              {...(slotProps?.dataGrid as Record<string, unknown>)}
+              sx={{
+                [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
+                  outline: 'transparent',
                 },
-              ...(onRowClick
-                ? {
-                    [`& .${gridClasses.row}:hover`]: {
-                      cursor: 'pointer',
-                    },
-                  }
-                : {}),
-              ...slotProps?.dataGrid?.sx,
-            }}
-          />
-        </NoSsr>
-        {error && (
-          <ErrorOverlay>
-            <Typography variant="body1">{error.message}</Typography>
-          </ErrorOverlay>
-        )}
-      </Box>
-    </Stack>
+                [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]:
+                  {
+                    outline: 'none',
+                  },
+                ...(onRowClick
+                  ? {
+                      [`& .${gridClasses.row}:hover`]: {
+                        cursor: 'pointer',
+                      },
+                    }
+                  : {}),
+                ...slotProps?.dataGrid?.sx,
+              }}
+            />
+          </NoSsr>
+          {error && (
+            <ErrorOverlay>
+              <Typography variant="body1">{error.message}</Typography>
+            </ErrorOverlay>
+          )}
+        </Box>
+      </Stack>
+    </PageContainerSlot>
   );
 }
 
@@ -524,11 +558,16 @@ List.propTypes /* remove-proptypes */ = {
    */
   onRowClick: PropTypes.func,
   /**
+   * The title of the page.
+   */
+  pageTitle: PropTypes.string,
+  /**
    * The props used for each slot inside.
    * @default {}
    */
   slotProps: PropTypes.shape({
     dataGrid: PropTypes.object,
+    pageContainer: PropTypes.object,
   }),
   /**
    * The components used for each slot inside.
@@ -536,6 +575,7 @@ List.propTypes /* remove-proptypes */ = {
    */
   slots: PropTypes.shape({
     dataGrid: PropTypes.func,
+    pageContainer: PropTypes.elementType,
   }),
 } as any;
 

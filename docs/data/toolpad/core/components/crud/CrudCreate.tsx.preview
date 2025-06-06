@@ -4,4 +4,5 @@
   initialValues={{ age: 18 }}
   onSubmitSuccess={handleSubmitSuccess}
   resetOnSubmit
+  pageTitle="New Person"
 />

@@ -11,7 +11,8 @@ import { Create } from './Create';
 import { Edit } from './Edit';
 import { DataSourceCache } from './cache';
 import type { DataModel, DataModelId, DataSource, OmitId } from './types';
-import { CrudFormSlotProps, CrudFormSlots } from './CrudForm';
+import type { CrudFormSlotProps, CrudFormSlots } from './CrudForm';
+import { type PageContainerProps } from '../PageContainer';
 
 export interface CrudProps<D extends DataModel> {
   /**
@@ -37,12 +38,22 @@ export interface CrudProps<D extends DataModel> {
    */
   dataSourceCache?: DataSourceCache | null;
   /**
+   * The title of each CRUD page.
+   */
+  pageTitles?: {
+    list?: string;
+    show?: string;
+    create?: string;
+    edit?: string;
+  };
+  /**
    * The components used for each slot inside.
    * @default {}
    */
   slots?: {
     list?: ListSlots;
     form?: CrudFormSlots;
+    pageContainer?: React.JSXElementConstructor<PageContainerProps>;
   };
   /**
    * The props used for each slot inside.
@@ -51,6 +62,7 @@ export interface CrudProps<D extends DataModel> {
   slotProps?: {
     list?: ListSlotProps;
     form?: CrudFormSlotProps;
+    pageContainer?: PageContainerProps;
   };
 }
 /**
@@ -70,6 +82,7 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
     initialPageSize,
     defaultValues,
     dataSourceCache,
+    pageTitles,
     slots,
     slotProps,
   } = props;
@@ -121,8 +134,23 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
           onRowClick={handleRowClick}
           onCreateClick={handleCreateClick}
           onEditClick={handleEditClick}
-          slots={slots?.list}
-          slotProps={slotProps?.list}
+          pageTitle={pageTitles?.list}
+          slots={{
+            ...(slots?.pageContainer
+              ? {
+                  pageContainer: slots?.pageContainer,
+                }
+              : {}),
+            ...slots?.list,
+          }}
+          slotProps={{
+            ...(slotProps?.pageContainer
+              ? {
+                  pageContainer: slotProps?.pageContainer,
+                }
+              : {}),
+            ...slotProps?.list,
+          }}
         />
       );
     }
@@ -132,16 +160,31 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
           initialValues={defaultValues}
           onSubmitSuccess={handleCreate}
           resetOnSubmit={false}
-          slots={
-            slots?.form && {
-              form: slots?.form,
-            }
-          }
-          slotProps={
-            slotProps?.form && {
-              form: slotProps?.form,
-            }
-          }
+          pageTitle={pageTitles?.create}
+          slots={{
+            ...(slots?.form
+              ? {
+                  form: slots?.form,
+                }
+              : {}),
+            ...(slots?.pageContainer
+              ? {
+                  pageContainer: slots?.pageContainer,
+                }
+              : {}),
+          }}
+          slotProps={{
+            ...(slotProps?.form
+              ? {
+                  form: slotProps?.form,
+                }
+              : {}),
+            ...(slotProps?.pageContainer
+              ? {
+                  pageContainer: slotProps?.pageContainer,
+                }
+              : {}),
+          }}
         />
       );
     }
@@ -149,7 +192,28 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
     if (showMatch) {
       const resourceId = showMatch.params.id;
       invariant(resourceId, 'No resource ID present in URL.');
-      return <Show<D> id={resourceId} onEditClick={handleEditClick} onDelete={handleDelete} />;
+      return (
+        <Show<D>
+          id={resourceId}
+          onEditClick={handleEditClick}
+          onDelete={handleDelete}
+          pageTitle={pageTitles?.show}
+          slots={{
+            ...(slots?.pageContainer
+              ? {
+                  pageContainer: slots?.pageContainer,
+                }
+              : {}),
+          }}
+          slotProps={{
+            ...(slotProps?.pageContainer
+              ? {
+                  pageContainer: slotProps?.pageContainer,
+                }
+              : {}),
+          }}
+        />
+      );
     }
     const editMatch = match<{ id: DataModelId }>(editPath)(pathname);
     if (editMatch) {
@@ -159,16 +223,31 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
         <Edit<D>
           id={resourceId}
           onSubmitSuccess={handleEdit}
-          slots={
-            slots?.form && {
-              form: slots?.form,
-            }
-          }
-          slotProps={
-            slotProps?.form && {
-              form: slotProps?.form,
-            }
-          }
+          pageTitle={pageTitles?.edit}
+          slots={{
+            ...(slots?.form
+              ? {
+                  form: slots?.form,
+                }
+              : {}),
+            ...(slots?.pageContainer
+              ? {
+                  pageContainer: slots?.pageContainer,
+                }
+              : {}),
+          }}
+          slotProps={{
+            ...(slotProps?.form
+              ? {
+                  form: slotProps?.form,
+                }
+              : {}),
+            ...(slotProps?.pageContainer
+              ? {
+                  pageContainer: slotProps?.pageContainer,
+                }
+              : {}),
+          }}
         />
       );
     }
@@ -185,6 +264,7 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
     handleRowClick,
     initialPageSize,
     listPath,
+    pageTitles,
     routerContext?.pathname,
     showPath,
     slotProps,
@@ -228,6 +308,15 @@ Crud.propTypes /* remove-proptypes */ = {
    */
   initialPageSize: PropTypes.number,
   /**
+   * The title of each CRUD page.
+   */
+  pageTitles: PropTypes.shape({
+    create: PropTypes.string,
+    edit: PropTypes.string,
+    list: PropTypes.string,
+    show: PropTypes.string,
+  }),
+  /**
    * Root path to CRUD pages.
    */
   rootPath: PropTypes.string.isRequired,
@@ -245,7 +334,9 @@ Crud.propTypes /* remove-proptypes */ = {
     }),
     list: PropTypes.shape({
       dataGrid: PropTypes.object,
+      pageContainer: PropTypes.object,
     }),
+    pageContainer: PropTypes.object,
   }),
   /**
    * The components used for each slot inside.
@@ -261,7 +352,9 @@ Crud.propTypes /* remove-proptypes */ = {
     }),
     list: PropTypes.shape({
       dataGrid: PropTypes.func,
+      pageContainer: PropTypes.elementType,
     }),
+    pageContainer: PropTypes.elementType,
   }),
 } as any;
 

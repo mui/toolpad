@@ -688,10 +688,10 @@ importers:
         version: 17.0.4
       '@vitejs/plugin-react':
         specifier: 4.4.1
-        version: 4.4.1(vite@6.3.5(@types/node@20.17.57)(terser@5.39.0)(tsx@4.19.4)(yaml@2.5.1))
+        version: 4.4.1(vite@5.4.19(@types/node@20.17.57)(terser@5.39.0))
       '@vitest/browser':
         specifier: 2.1.9
-        version: 2.1.9(@types/node@20.17.57)(playwright@1.52.0)(typescript@5.8.3)(vite@6.3.5(@types/node@20.17.57)(terser@5.39.0)(tsx@4.19.4)(yaml@2.5.1))(vitest@2.1.9)
+        version: 2.1.9(@types/node@20.17.57)(playwright@1.52.0)(typescript@5.8.3)(vite@5.4.19(@types/node@20.17.57)(terser@5.39.0))(vitest@2.1.9)
       next:
         specifier: ^15.3.2
         version: 15.3.2(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -14874,7 +14874,6 @@ snapshots:
       - typescript
       - utf-8-validate
       - vite
-    optional: true
 
   '@vitest/browser@2.1.9(@types/node@20.17.57)(playwright@1.52.0)(typescript@5.8.3)(vite@6.3.5(@types/node@20.17.57)(terser@5.39.0)(tsx@4.19.4)(yaml@2.5.1))(vitest@2.1.9)':
     dependencies:

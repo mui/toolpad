@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.27.6",
-    "@mui/utils": "^7.1.0",
+    "@mui/utils": "^7.1.1",
     "@mui/x-data-grid": "^8.5.0",
     "@mui/x-date-pickers": "^8.5.0",
     "@toolpad/utils": "workspace:*",
@@ -55,8 +55,8 @@
   "devDependencies": {
     "@emotion/cache": "11.14.0",
     "@emotion/react": "11.14.0",
-    "@mui/icons-material": "^7.1.0",
-    "@mui/material": "^7.1.0",
+    "@mui/icons-material": "^7.1.1",
+    "@mui/material": "^7.1.1",
     "@mui/x-data-grid-premium": "^8.5.0",
     "@mui/x-data-grid-pro": "^8.5.0",
     "@standard-schema/spec": "^1.0.0",

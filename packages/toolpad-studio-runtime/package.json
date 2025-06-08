@@ -53,7 +53,7 @@
     "fractional-indexing": "3.2.0",
     "invariant": "2.2.4",
     "nanoid": "5.1.5",
-    "react-error-boundary": "4.0.13",
+    "react-error-boundary": "4.1.2",
     "react-is": "^19.1.0"
   },
   "devDependencies": {

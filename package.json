@@ -5,9 +5,6 @@
   "description": "Components and APIs for building dashboards and internal tools",
   "repository": "https://github.com/mui/toolpad.git",
   "private": true,
-  "bin": {
-    "toolpad-studio": "./dist/index.js"
-  },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "proptypes": "tsx ./scripts/generateProptypes.ts",
@@ -19,7 +16,6 @@
     "docs:dev": "pnpm --filter docs dev",
     "docs:build": "pnpm --filter docs build",
     "docs:build:api:core": "tsx --tsconfig ./scripts/tsconfig.json ./scripts/docs/buildCoreApiDocs/index.ts",
-    "docs:build:api:studio": "tsx --tsconfig ./scripts/tsconfig.json ./scripts/docs/buildStudioApi.ts",
     "docs:build:api": "concurrently \"pnpm docs:build:api:core\"",
     "docs:typescript:formatted": "tsx ./docs/scripts/formattedTSDemos",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
@@ -28,18 +24,14 @@
     "release:version": "lerna version --exact --no-changelog --no-push --no-git-tag-version",
     "release:publish": "pnpm dedupe && pnpm release:build && pnpm publish --recursive --tag latest",
     "release:changelog": "dotenv -- node ./scripts/releaseChangelog.mjs --repo toolpad",
-    "test:build": "lerna run build --scope @toolpad/studio-runtime --scope @toolpad/studio-components --stream",
-    "test:integration": "rimraf ./node_modules/.vite && playwright test --config ./test/playwright.config.ts",
     "test:browser": "FORCE_COLOR=1 pnpm run -r test:browser",
     "test:argos": "node ./scripts/pushArgos.mjs test/regressions/screenshots/chrome",
     "test": "lerna run test --stream",
     "check-types": "lerna run --concurrency 1 check-types",
-    "toolpad-studio": "node --enable-source-maps packages/toolpad-studio/cli.mjs",
     "jsonSchemas": "tsx ./scripts/docs/generateJsonSchemas.ts",
     "monorepo:update": "tsx ./scripts/updateMonorepo.ts",
     "monorepo:canary": "tsx ./scripts/canaryMonorepo.ts",
     "check-changes": "git add -A && git diff --exit-code --staged",
-    "test:rest:start": "tsx ./scripts/restTestServer.ts",
     "clean": "pnpm -r exec rm -rf build dist"
   },
   "devDependencies": {
@@ -56,6 +48,7 @@
     "@mui/internal-docs-utils": "2.0.1",
     "@mui/internal-markdown": "2.0.6",
     "@mui/internal-scripts": "2.0.9",
+    "@mui/material": "^7.0.2",
     "@mui/monorepo": "github:mui/material-ui#fc576551ae6a43c8a0859f48547ed9f280c0bfe5",
     "@mui/x-charts": "^8.5.0",
     "@next/eslint-plugin-next": "14.2.28",

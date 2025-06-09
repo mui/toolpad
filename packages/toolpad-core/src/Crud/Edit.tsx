@@ -260,21 +260,34 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
 
   const activePage = useActivePage();
 
-  const [data, setData] = React.useState<D | null>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const cachedData = React.useMemo(
+    () => cache && (cache.get(JSON.stringify(['getOne', id])) as D),
+    [cache, id],
+  );
+
+  const [data, setData] = React.useState<D | null>(cachedData);
+  const [isLoading, setIsLoading] = React.useState(!cachedData);
   const [error, setError] = React.useState<Error | null>(null);
 
   const loadData = React.useCallback(async () => {
     setError(null);
-    setIsLoading(true);
-    try {
-      const showData = await getOne(id);
+
+    let showData = cachedData;
+    if (!showData) {
+      setIsLoading(true);
+
+      try {
+        showData = await getOne(id);
+      } catch (showDataError) {
+        setError(showDataError as Error);
+      }
+    }
+
+    if (showData) {
       setData(showData);
-    } catch (showDataError) {
-      setError(showDataError as Error);
     }
     setIsLoading(false);
-  }, [getOne, id]);
+  }, [cachedData, getOne, id]);
 
   React.useEffect(() => {
     loadData();

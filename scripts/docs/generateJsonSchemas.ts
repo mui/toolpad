@@ -2,9 +2,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import * as z from 'zod';
-// TODO: Enable this rule, make eslint recognize the import path
-// eslint-disable-next-line import/no-relative-packages
-import { META } from '../../packages/toolpad-studio/src/server/schema';
+import { META } from './toolpadStudioServerSchema';
 import { writePrettifiedFile } from './utils';
 
 const currentDirectory = __dirname;

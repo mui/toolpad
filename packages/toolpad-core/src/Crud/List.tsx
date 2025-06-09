@@ -1,13 +1,12 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled } from '@mui/material';
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
 import {
   DataGrid,
   GridToolbar,
@@ -38,21 +37,6 @@ import type { DataModel, DataModelId, DataSource } from './types';
 import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
 import { PageContainer, type PageContainerProps } from '../PageContainer';
 import { useActivePage } from '../useActivePage';
-
-const ErrorOverlay = styled('div')(({ theme }) => ({
-  position: 'absolute',
-  backgroundColor: theme.palette.error.light,
-  borderRadius: '4px',
-  top: 0,
-  height: '100%',
-  width: '100%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  textAlign: 'center',
-  p: 1,
-  zIndex: 10,
-}));
 
 export interface ListSlotProps {
   dataGrid?: Partial<DataGridProps | DataGridProProps | DataGridPremiumProps>;
@@ -173,11 +157,6 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const dialogs = useDialogs();
   const notifications = useNotifications();
 
-  const [rowsState, setRowsState] = React.useState<{ rows: D[]; rowCount: number }>({
-    rows: [],
-    rowCount: 0,
-  });
-
   const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>({
     page: routerContext?.searchParams.get('page')
       ? Number(routerContext?.searchParams.get('page'))
@@ -197,7 +176,30 @@ function List<D extends DataModel>(props: ListProps<D>) {
       : [],
   );
 
-  const [isLoading, setIsLoading] = React.useState(true);
+  const cachedData = React.useMemo(
+    () =>
+      cache &&
+      (cache.get(
+        JSON.stringify([
+          'getMany',
+          {
+            paginationModel,
+            sortModel,
+            filterModel,
+          },
+        ]),
+      ) as {
+        items: D[];
+        itemCount: number;
+      }),
+    [cache, filterModel, paginationModel, sortModel],
+  );
+
+  const [rowsState, setRowsState] = React.useState<{ rows: D[]; rowCount: number }>({
+    rows: cachedData?.items ?? [],
+    rowCount: cachedData?.itemCount ?? 0,
+  });
+  const [isLoading, setIsLoading] = React.useState(!cachedData);
   const [error, setError] = React.useState<Error | null>(null);
 
   const handlePaginationModelChange = React.useCallback(
@@ -274,26 +276,34 @@ function List<D extends DataModel>(props: ListProps<D>) {
 
   const loadData = React.useCallback(async () => {
     setError(null);
-    setIsLoading(true);
-    try {
-      const listData = await getMany({
-        paginationModel,
-        sortModel,
-        filterModel,
-      });
+
+    let listData = cachedData;
+    if (!listData) {
+      setIsLoading(true);
+
+      try {
+        listData = await getMany({
+          paginationModel,
+          sortModel,
+          filterModel,
+        });
+      } catch (listDataError) {
+        setError(listDataError as Error);
+      }
+    }
+
+    if (listData) {
       setRowsState({
         rows: listData.items,
         rowCount: listData.itemCount,
       });
-    } catch (listDataError) {
-      setError(listDataError as Error);
     }
     setIsLoading(false);
-  }, [filterModel, getMany, paginationModel, sortModel]);
+  }, [cachedData, filterModel, getMany, paginationModel, sortModel]);
 
   React.useEffect(() => {
     loadData();
-  }, [filterModel, getMany, loadData, paginationModel, sortModel]);
+  }, [loadData]);
 
   const handleRefresh = React.useCallback(() => {
     if (!isLoading) {
@@ -445,69 +455,75 @@ function List<D extends DataModel>(props: ListProps<D>) {
       {...slotProps?.pageContainer}
     >
       <Stack sx={{ flex: 1, width: '100%' }}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-          <Tooltip title={localeText.reloadButtonLabel} placement="right" enterDelay={1000}>
-            <div>
-              <IconButton aria-label="refresh" onClick={handleRefresh}>
-                <RefreshIcon />
-              </IconButton>
-            </div>
-          </Tooltip>
-          {onCreateClick ? (
-            <Button variant="contained" onClick={onCreateClick} startIcon={<AddIcon />}>
-              {localeText.createNewButtonLabel}
-            </Button>
-          ) : null}
-        </Stack>
-        <Box sx={{ flex: 1, position: 'relative', width: '100%' }}>
-          {/* Use NoSsr to prevent issue https://github.com/mui/mui-x/issues/17077 as DataGrid has no SSR support */}
-          <NoSsr>
-            <DataGridSlot
-              rows={rowsState.rows}
-              rowCount={rowsState.rowCount}
-              columns={columns}
-              pagination
-              sortingMode="server"
-              filterMode="server"
-              paginationMode="server"
-              paginationModel={paginationModel}
-              onPaginationModelChange={handlePaginationModelChange}
-              sortModel={sortModel}
-              onSortModelChange={handleSortModelChange}
-              filterModel={filterModel}
-              onFilterModelChange={handleFilterModelChange}
-              disableRowSelectionOnClick
-              onRowClick={handleRowClick}
-              loading={isLoading}
-              initialState={initialState}
-              slots={{ toolbar: GridToolbar }}
-              // Prevent type conflicts if slotProps don't match DataGrid used for dataGrid slot
-              {...(slotProps?.dataGrid as Record<string, unknown>)}
-              sx={{
-                [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
-                  outline: 'transparent',
-                },
-                [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]:
-                  {
-                    outline: 'none',
+        {error ? (
+          <Box sx={{ flexGrow: 1 }}>
+            <Alert severity="error">{error.message}</Alert>
+          </Box>
+        ) : (
+          <React.Fragment>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+              sx={{ mb: 1 }}
+            >
+              <Tooltip title={localeText.reloadButtonLabel} placement="right" enterDelay={1000}>
+                <div>
+                  <IconButton aria-label="refresh" onClick={handleRefresh}>
+                    <RefreshIcon />
+                  </IconButton>
+                </div>
+              </Tooltip>
+              {onCreateClick ? (
+                <Button variant="contained" onClick={onCreateClick} startIcon={<AddIcon />}>
+                  {localeText.createNewButtonLabel}
+                </Button>
+              ) : null}
+            </Stack>
+            {/* Use NoSsr to prevent issue https://github.com/mui/mui-x/issues/17077 as DataGrid has no SSR support */}
+            <NoSsr>
+              <DataGridSlot
+                rows={rowsState.rows}
+                rowCount={rowsState.rowCount}
+                columns={columns}
+                pagination
+                sortingMode="server"
+                filterMode="server"
+                paginationMode="server"
+                paginationModel={paginationModel}
+                onPaginationModelChange={handlePaginationModelChange}
+                sortModel={sortModel}
+                onSortModelChange={handleSortModelChange}
+                filterModel={filterModel}
+                onFilterModelChange={handleFilterModelChange}
+                disableRowSelectionOnClick
+                onRowClick={handleRowClick}
+                loading={isLoading}
+                initialState={initialState}
+                slots={{ toolbar: GridToolbar }}
+                // Prevent type conflicts if slotProps don't match DataGrid used for dataGrid slot
+                {...(slotProps?.dataGrid as Record<string, unknown>)}
+                sx={{
+                  [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
+                    outline: 'transparent',
                   },
-                ...(onRowClick
-                  ? {
-                      [`& .${gridClasses.row}:hover`]: {
-                        cursor: 'pointer',
-                      },
-                    }
-                  : {}),
-                ...slotProps?.dataGrid?.sx,
-              }}
-            />
-          </NoSsr>
-          {error && (
-            <ErrorOverlay>
-              <Typography variant="body1">{error.message}</Typography>
-            </ErrorOverlay>
-          )}
-        </Box>
+                  [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]:
+                    {
+                      outline: 'none',
+                    },
+                  ...(onRowClick
+                    ? {
+                        [`& .${gridClasses.row}:hover`]: {
+                          cursor: 'pointer',
+                        },
+                      }
+                    : {}),
+                  ...slotProps?.dataGrid?.sx,
+                }}
+              />
+            </NoSsr>
+          </React.Fragment>
+        )}
       </Stack>
     </PageContainerSlot>
   );

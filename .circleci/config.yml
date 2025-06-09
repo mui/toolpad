@@ -218,29 +218,15 @@ workflows:
           <<: *default-context
       - test_lint:
           <<: *default-context
-          requires:
-            - checkout
       - test_types:
           <<: *default-context
-          requires:
-            - checkout
       - test_static:
           <<: *default-context
-          requires:
-            - checkout
       - test_unit:
           <<: *default-context
-          requires:
-            - checkout
       - test_unit_browser:
           <<: *default-context
-          requires:
-            - checkout
       - test_integration:
           <<: *default-context
-          requires:
-            - checkout
       - test_bundle_size_monitor:
           <<: *default-context
-          requires:
-            - checkout

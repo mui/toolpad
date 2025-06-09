@@ -721,8 +721,8 @@ importers:
         specifier: 2.2.4
         version: 2.2.4
       prettier:
-        specifier: 3.4.2
-        version: 3.4.2
+        specifier: 3.5.3
+        version: 3.5.3
       react:
         specifier: ^18.0.0 || ^19.0.0
         version: 19.1.0

@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "invariant": "2.2.4",
-    "prettier": "3.4.2",
+    "prettier": "3.5.3",
     "react-is": "^19.1.0",
     "title": "4.0.1",
     "yaml": "2.5.1",

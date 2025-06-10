@@ -16,7 +16,7 @@
     "@tanstack/router-plugin": "^1.120.20",
     "@toolpad/core": "workspace:*",
     "@types/react": "^19.1.6",
-    "@types/react-dom": "^19.1.5",
+    "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.3.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

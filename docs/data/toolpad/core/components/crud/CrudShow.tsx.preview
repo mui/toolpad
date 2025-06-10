@@ -4,4 +4,5 @@
   dataSourceCache={peopleCache}
   onEditClick={handleEditClick}
   onDelete={handleDelete}
+  pageTitle="Person 1"
 />

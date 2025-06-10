@@ -4,14 +4,7 @@ import { createTheme } from '@mui/material/styles';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import {
-  Create,
-  CrudProvider,
-  DataSourceCache,
-  Edit,
-  List,
-  Show,
-} from '@toolpad/core/Crud';
+import { Crud, DataSourceCache } from '@toolpad/core/Crud';
 import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
@@ -182,6 +175,7 @@ export const notesDataSource = {
     if (!formValues.title) {
       issues = [...issues, { message: 'Title is required', path: ['title'] }];
     }
+
     if (formValues.title && formValues.title.length < 3) {
       issues = [
         ...issues,
@@ -191,6 +185,7 @@ export const notesDataSource = {
         },
       ];
     }
+
     if (!formValues.text) {
       issues = [...issues, { message: 'Text is required', path: ['text'] }];
     }
@@ -201,59 +196,13 @@ export const notesDataSource = {
 
 const notesCache = new DataSourceCache();
 
-function matchPath(pattern, pathname) {
-  const regex = new RegExp(`^${pattern.replace(/:[^/]+/g, '([^/]+)')}$`);
-  const match = pathname.match(regex);
-  return match ? match[1] : null;
-}
-
-function CrudAdvanced(props) {
+function CrudCustomPageTitles(props) {
   const { window } = props;
+
+  const router = useDemoRouter('/notes');
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
-
-  const rootPath = '/notes';
-
-  const router = useDemoRouter(rootPath);
-
-  const listPath = rootPath;
-  const showPath = `${rootPath}/:noteId`;
-  const createPath = `${rootPath}/new`;
-  const editPath = `${rootPath}/:noteId/edit`;
-
-  const handleRowClick = React.useCallback(
-    (noteId) => {
-      router.navigate(`${rootPath}/${String(noteId)}`);
-    },
-    [router],
-  );
-
-  const handleCreateClick = React.useCallback(() => {
-    router.navigate(createPath);
-  }, [createPath, router]);
-
-  const handleEditClick = React.useCallback(
-    (noteId) => {
-      router.navigate(`${rootPath}/${String(noteId)}/edit`);
-    },
-    [router],
-  );
-
-  const handleCreate = React.useCallback(() => {
-    router.navigate(listPath);
-  }, [listPath, router]);
-
-  const handleEdit = React.useCallback(() => {
-    router.navigate(listPath);
-  }, [listPath, router]);
-
-  const handleDelete = React.useCallback(() => {
-    router.navigate(listPath);
-  }, [listPath, router]);
-
-  const showNoteId = matchPath(showPath, router.pathname);
-  const editNoteId = matchPath(editPath, router.pathname);
 
   return (
     // Remove this provider when copying and pasting into your project.
@@ -266,39 +215,19 @@ function CrudAdvanced(props) {
       >
         <DashboardLayout defaultSidebarCollapsed>
           {/* preview-start */}
-          <CrudProvider dataSource={notesDataSource} dataSourceCache={notesCache}>
-            {router.pathname === listPath ? (
-              <List
-                initialPageSize={10}
-                onRowClick={handleRowClick}
-                onCreateClick={handleCreateClick}
-                onEditClick={handleEditClick}
-              />
-            ) : null}
-            {router.pathname === createPath ? (
-              <Create
-                initialValues={{ title: 'New note' }}
-                onSubmitSuccess={handleCreate}
-                resetOnSubmit={false}
-                pageTitle="New Note"
-              />
-            ) : null}
-            {router.pathname !== createPath && showNoteId ? (
-              <Show
-                id={showNoteId}
-                onEditClick={handleEditClick}
-                onDelete={handleDelete}
-                pageTitle={`Note ${showNoteId}`}
-              />
-            ) : null}
-            {editNoteId ? (
-              <Edit
-                id={editNoteId}
-                onSubmitSuccess={handleEdit}
-                pageTitle={`Note ${editNoteId} - Edit`}
-              />
-            ) : null}
-          </CrudProvider>
+          <Crud
+            dataSource={notesDataSource}
+            dataSourceCache={notesCache}
+            rootPath="/notes"
+            initialPageSize={10}
+            defaultValues={{ title: 'New note' }}
+            pageTitles={{
+              list: 'Custom Title for List',
+              create: 'Custom Title for Create',
+              edit: 'Custom Title for Edit',
+              show: 'Custom Title for Show',
+            }}
+          />
           {/* preview-end */}
         </DashboardLayout>
       </AppProvider>
@@ -306,7 +235,7 @@ function CrudAdvanced(props) {
   );
 }
 
-CrudAdvanced.propTypes = {
+CrudCustomPageTitles.propTypes = {
   /**
    * Injected by the documentation to work in an iframe.
    * Remove this when copying and pasting into your project.
@@ -314,4 +243,4 @@ CrudAdvanced.propTypes = {
   window: PropTypes.func,
 };
 
-export default CrudAdvanced;
+export default CrudCustomPageTitles;

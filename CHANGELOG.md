@@ -243,7 +243,7 @@ _Dec 12, 2024_
 
 A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
 
-- **BREAKING** `toolbar` slot in the `PageContainer` component has been moved to new `PageHeader` component, which can be used in the `header` slot in `PageContainer`. New usage example [here](https://mui.com/toolpad/core/react-page-container/#actions).
+- **BREAKING** `toolbar` slot in the `PageContainer` component has been moved to new `PageHeader` component, which can be used in the `header` slot in `PageContainer`. [New usage example](https://mui.com/toolpad/core/react-page-container/#actions).
 - Add `homeUrl` to `branding` properties, and `appTitle` slot to override layout header branding.
 - Allow full-size content inside `PageContainer`.
 - Add "rememberMe" slot to `SignInPage`.
@@ -2361,7 +2361,7 @@ _Mar 20, 2023_
 
 A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
 
-Today we're taking a big step. We're making Toolpad focus much more on integrating with your IDE, while providing the ease of building UI fast with a drag and drop. Read more [here](https://github.com/mui/toolpad/discussions/1748).
+Today we're taking a big step. We're making Toolpad focus much more on integrating with your IDE, while providing the ease of building UI fast with a drag and drop. [Read more](https://github.com/mui/toolpad/discussions/1748).
 
 - Add create-toolpad-app CLI (#1700) @bharatkashyap
 - Direction 13 (#1651) @Janpot

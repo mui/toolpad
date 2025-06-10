@@ -271,7 +271,7 @@ Through the `theme` prop in the [AppProvider](https://mui.com/toolpad/core/react
 {{"demo": "ThemeSignInPage.js", "iframe": true, "height": 700 }}
 
 :::info
-Find a full-fledged example using the Next.js App Router, Auth.js and this theme [here](https://codesandbox.io/p/sandbox/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed).
+For a full-fledged example using the Next.js App Router, Auth.js and this theme, see the [Toolpad Core Next.js App with Auth.js themed example](https://codesandbox.io/p/sandbox/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed).
 :::
 
 ### Slots

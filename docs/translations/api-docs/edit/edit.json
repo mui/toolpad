@@ -9,6 +9,7 @@
     },
     "localeText": { "description": "Locale text for the component." },
     "onSubmitSuccess": { "description": "Callback fired when the form is successfully submitted." },
+    "pageTitle": { "description": "The title of the page." },
     "slotProps": { "description": "The props used for each slot inside." },
     "slots": { "description": "The components used for each slot inside." }
   },

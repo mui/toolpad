@@ -5,6 +5,8 @@ import { ordersDataSource, Order, ordersCache } from '../../data/orders';
 
 export default function OrdersCrudPage() {
   const router = useRouter();
+  const { segments = [] } = router.query;
+  const [orderId] = segments;
 
   return router.isReady ? (
     <Crud<Order>
@@ -13,6 +15,11 @@ export default function OrdersCrudPage() {
       rootPath="/orders"
       initialPageSize={25}
       defaultValues={{ itemCount: 1 }}
+      pageTitles={{
+        show: `Order ${orderId}`,
+        create: 'New Order',
+        edit: `Order ${orderId} - Edit`,
+      }}
     />
   ) : null;
 }

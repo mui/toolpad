@@ -101,7 +101,7 @@ importers:
         specifier: 2.0.9
         version: 2.0.9
       '@mui/material':
-        specifier: ^7.0.2
+        specifier: ^7.1.1
         version: 7.1.1(@emotion/react@11.14.0(@types/react@19.1.6)(react@19.1.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.1.6)(react@19.1.0))(@types/react@19.1.6)(react@19.1.0))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@mui/monorepo':
         specifier: github:mui/material-ui#fc576551ae6a43c8a0859f48547ed9f280c0bfe5

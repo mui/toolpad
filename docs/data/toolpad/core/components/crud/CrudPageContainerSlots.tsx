@@ -1,20 +1,14 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { createTheme } from '@mui/material/styles';
+import Box from '@mui/material/Box';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
-import { AppProvider } from '@toolpad/core/AppProvider';
+import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import {
-  Create,
-  CrudProvider,
-  DataSourceCache,
-  Edit,
-  List,
-  Show,
-} from '@toolpad/core/Crud';
+import { Crud, DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
 import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
+import { Typography } from '@mui/material';
 
-const NAVIGATION = [
+const NAVIGATION: Navigation = [
   {
     segment: 'notes',
     title: 'Notes',
@@ -39,17 +33,24 @@ const demoTheme = createTheme({
   },
 });
 
-let notesStore = [
+export interface Note extends DataModel {
+  id: number;
+  title: string;
+  text: string;
+}
+
+let notesStore: Note[] = [
   { id: 1, title: 'Grocery List Item', text: 'Buy more coffee.' },
   { id: 2, title: 'Personal Goal', text: 'Finish reading the book.' },
 ];
 
-export const notesDataSource = {
+export const notesDataSource: DataSource<Note> = {
   fields: [
     { field: 'id', headerName: 'ID' },
     { field: 'title', headerName: 'Title', flex: 1 },
     { field: 'text', headerName: 'Text', flex: 1 },
   ],
+
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
     // Simulate loading delay
     await new Promise((resolve) => {
@@ -84,9 +85,9 @@ export const notesDataSource = {
                 .toLowerCase()
                 .endsWith(String(value).toLowerCase());
             case '>':
-              return noteValue > value;
+              return (noteValue as number) > value;
             case '<':
-              return noteValue < value;
+              return (noteValue as number) < value;
             default:
               return true;
           }
@@ -98,10 +99,10 @@ export const notesDataSource = {
     if (sortModel?.length) {
       processedNotes.sort((a, b) => {
         for (const { field, sort } of sortModel) {
-          if (a[field] < b[field]) {
+          if ((a[field] as number) < (b[field] as number)) {
             return sort === 'asc' ? -1 : 1;
           }
-          if (a[field] > b[field]) {
+          if ((a[field] as number) > (b[field] as number)) {
             return sort === 'asc' ? 1 : -1;
           }
         }
@@ -119,6 +120,7 @@ export const notesDataSource = {
       itemCount: processedNotes.length,
     };
   },
+
   getOne: async (noteId) => {
     // Simulate loading delay
     await new Promise((resolve) => {
@@ -132,6 +134,7 @@ export const notesDataSource = {
     }
     return noteToShow;
   },
+
   createOne: async (data) => {
     // Simulate loading delay
     await new Promise((resolve) => {
@@ -141,19 +144,20 @@ export const notesDataSource = {
     const newNote = {
       id: notesStore.reduce((max, note) => Math.max(max, note.id), 0) + 1,
       ...data,
-    };
+    } as Note;
 
     notesStore = [...notesStore, newNote];
 
     return newNote;
   },
+
   updateOne: async (noteId, data) => {
     // Simulate loading delay
     await new Promise((resolve) => {
       setTimeout(resolve, 750);
     });
 
-    let updatedNote = null;
+    let updatedNote: Note | null = null;
 
     notesStore = notesStore.map((note) => {
       if (note.id === Number(noteId)) {
@@ -168,6 +172,7 @@ export const notesDataSource = {
     }
     return updatedNote;
   },
+
   deleteOne: async (noteId) => {
     // Simulate loading delay
     await new Promise((resolve) => {
@@ -176,12 +181,14 @@ export const notesDataSource = {
 
     notesStore = notesStore.filter((note) => note.id !== Number(noteId));
   },
+
   validate: (formValues) => {
-    let issues = [];
+    let issues: { message: string; path: [keyof Note] }[] = [];
 
     if (!formValues.title) {
       issues = [...issues, { message: 'Title is required', path: ['title'] }];
     }
+
     if (formValues.title && formValues.title.length < 3) {
       issues = [
         ...issues,
@@ -191,6 +198,7 @@ export const notesDataSource = {
         },
       ];
     }
+
     if (!formValues.text) {
       issues = [...issues, { message: 'Text is required', path: ['text'] }];
     }
@@ -201,59 +209,32 @@ export const notesDataSource = {
 
 const notesCache = new DataSourceCache();
 
-function matchPath(pattern, pathname) {
-  const regex = new RegExp(`^${pattern.replace(/:[^/]+/g, '([^/]+)')}$`);
-  const match = pathname.match(regex);
-  return match ? match[1] : null;
+interface DemoProps {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window?: () => Window;
 }
 
-function CrudAdvanced(props) {
+function CustomPageContainer({ children }: { children?: React.ReactNode }) {
+  return (
+    <Box sx={{ p: 2 }}>
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        My External Title
+      </Typography>
+      {children}
+    </Box>
+  );
+}
+
+export default function CrudPageContainerSlots(props: DemoProps) {
   const { window } = props;
+
+  const router = useDemoRouter('/notes');
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
-
-  const rootPath = '/notes';
-
-  const router = useDemoRouter(rootPath);
-
-  const listPath = rootPath;
-  const showPath = `${rootPath}/:noteId`;
-  const createPath = `${rootPath}/new`;
-  const editPath = `${rootPath}/:noteId/edit`;
-
-  const handleRowClick = React.useCallback(
-    (noteId) => {
-      router.navigate(`${rootPath}/${String(noteId)}`);
-    },
-    [router],
-  );
-
-  const handleCreateClick = React.useCallback(() => {
-    router.navigate(createPath);
-  }, [createPath, router]);
-
-  const handleEditClick = React.useCallback(
-    (noteId) => {
-      router.navigate(`${rootPath}/${String(noteId)}/edit`);
-    },
-    [router],
-  );
-
-  const handleCreate = React.useCallback(() => {
-    router.navigate(listPath);
-  }, [listPath, router]);
-
-  const handleEdit = React.useCallback(() => {
-    router.navigate(listPath);
-  }, [listPath, router]);
-
-  const handleDelete = React.useCallback(() => {
-    router.navigate(listPath);
-  }, [listPath, router]);
-
-  const showNoteId = matchPath(showPath, router.pathname);
-  const editNoteId = matchPath(editPath, router.pathname);
 
   return (
     // Remove this provider when copying and pasting into your project.
@@ -266,52 +247,19 @@ function CrudAdvanced(props) {
       >
         <DashboardLayout defaultSidebarCollapsed>
           {/* preview-start */}
-          <CrudProvider dataSource={notesDataSource} dataSourceCache={notesCache}>
-            {router.pathname === listPath ? (
-              <List
-                initialPageSize={10}
-                onRowClick={handleRowClick}
-                onCreateClick={handleCreateClick}
-                onEditClick={handleEditClick}
-              />
-            ) : null}
-            {router.pathname === createPath ? (
-              <Create
-                initialValues={{ title: 'New note' }}
-                onSubmitSuccess={handleCreate}
-                resetOnSubmit={false}
-                pageTitle="New Note"
-              />
-            ) : null}
-            {router.pathname !== createPath && showNoteId ? (
-              <Show
-                id={showNoteId}
-                onEditClick={handleEditClick}
-                onDelete={handleDelete}
-                pageTitle={`Note ${showNoteId}`}
-              />
-            ) : null}
-            {editNoteId ? (
-              <Edit
-                id={editNoteId}
-                onSubmitSuccess={handleEdit}
-                pageTitle={`Note ${editNoteId} - Edit`}
-              />
-            ) : null}
-          </CrudProvider>
+          <Crud<Note>
+            dataSource={notesDataSource}
+            dataSourceCache={notesCache}
+            rootPath="/notes"
+            initialPageSize={10}
+            defaultValues={{ title: 'New note' }}
+            slots={{
+              pageContainer: CustomPageContainer,
+            }}
+          />
           {/* preview-end */}
         </DashboardLayout>
       </AppProvider>
     </DemoProvider>
   );
 }
-
-CrudAdvanced.propTypes = {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * Remove this when copying and pasting into your project.
-   */
-  window: PropTypes.func,
-};
-
-export default CrudAdvanced;

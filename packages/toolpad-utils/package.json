@@ -46,7 +46,7 @@
     "yaml-diff-patch": "2.0.0"
   },
   "devDependencies": {
-    "@types/express": "5.0.2",
+    "@types/express": "5.0.3",
     "@types/invariant": "2.2.37",
     "@types/react": "^19.1.6",
     "@types/react-is": "^19.0.0",

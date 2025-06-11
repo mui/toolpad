@@ -31,6 +31,7 @@
     "@mui/lab": "6.0.0-dev.240424162023-9968b4889d",
     "@mui/material": "^7.1.1",
     "@mui/material-nextjs": "^7.1.1",
+    "@mui/stylis-plugin-rtl": "^7.1.0",
     "@mui/system": "^7.1.1",
     "@mui/utils": "^7.1.1",
     "@mui/x-data-grid": "^8.5.0",
@@ -86,8 +87,6 @@
     "rimraf": "6.0.1",
     "styled-components": "6.1.18",
     "stylis": "4.3.6",
-    "stylis-plugin-rtl": "npm:stylis-plugin-rtl@^2.1.1",
-    "stylis-plugin-rtl-sc": "npm:stylis-plugin-rtl@^2.1.1",
     "webpack-bundle-analyzer": "4.10.2",
     "zod": "3.25.36"
   },

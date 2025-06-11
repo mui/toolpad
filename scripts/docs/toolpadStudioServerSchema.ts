@@ -1,5 +1,5 @@
-import type { SimplePaletteColorOptions, ThemeOptions } from '@mui/material';
 import { z } from 'zod';
+import type { SimplePaletteColorOptions, ThemeOptions } from '@mui/material';
 
 export const API_VERSION = 'v1';
 

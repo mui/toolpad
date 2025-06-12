@@ -50,7 +50,12 @@ export default ${isAsync}function EmployeesCrudPage() {
   const [employeeId] = segments;`
       : ''
   }
-  ${routerType === 'nextjs-app' ? 'const { employeeId } = useParams();' : ''}
+  ${
+    routerType === 'nextjs-app'
+      ? `const params = useParams();
+  const [employeeId] = params.segments ?? [];`
+      : ''
+  }
   ${framework === 'vite' ? 'const { employeeId } = useParams();' : ''}
   
   ${sessionHandling}

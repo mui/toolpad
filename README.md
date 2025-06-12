@@ -29,9 +29,6 @@
 
 https://github.com/user-attachments/assets/d2a7ff8e-2dd6-4313-98d2-5f136513f9a9/
 
-Toolpad Core is _currently on hold_.
-When starting a new project from scratch, we recommend Material UI over Toolpad Core because we can guarantee ongoing support.
-
 Keep in mind that the maintainers are primarily focused on other projects and may not be able to respond in a timely manner to issues or pull requests related to Toolpad Core.
 
 ## Notice

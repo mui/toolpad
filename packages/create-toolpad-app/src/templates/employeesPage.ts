@@ -5,7 +5,7 @@ const ordersPage: Template = (options) => {
   const routerType = options.router;
   const framework = options.framework;
 
-  let imports = `${routerType === 'nextjs-app' ? 'use client;' : ''}import * as React from 'react';
+  let imports = `${routerType === 'nextjs-app' ? `'use client';\n` : ''}import * as React from 'react';
 ${routerType === 'nextjs-pages' ? `import { useRouter } from 'next/router';` : ''}
 ${routerType === 'nextjs-app' ? `import { useParams } from 'next/navigation';` : ''}
 ${framework === 'vite' ? `import { useParams } from 'react-router';` : ''}
@@ -32,8 +32,6 @@ import { employeesDataSource, Employee, employeesCache } from '${routerType === 
     }
   }
 
-  const isAsync = authEnabled && routerType === 'nextjs-app' ? 'async ' : '';
-
   let requireAuth = '';
   if (authEnabled && routerType === 'nextjs-pages') {
     requireAuth = `\n\nEmployeesCrudPage.requireAuth = true;`;
@@ -42,7 +40,7 @@ import { employeesDataSource, Employee, employeesCache } from '${routerType === 
   return `${imports}
 
 
-export default ${isAsync}function EmployeesCrudPage() {
+export default function EmployeesCrudPage() {
   ${
     routerType === 'nextjs-pages'
       ? `const router = useRouter();
@@ -50,7 +48,12 @@ export default ${isAsync}function EmployeesCrudPage() {
   const [employeeId] = segments;`
       : ''
   }
-  ${routerType === 'nextjs-app' ? 'const { employeeId } = useParams();' : ''}
+  ${
+    routerType === 'nextjs-app'
+      ? `const params = useParams();
+  const [employeeId] = params.segments ?? [];`
+      : ''
+  }
   ${framework === 'vite' ? 'const { employeeId } = useParams();' : ''}
   
   ${sessionHandling}

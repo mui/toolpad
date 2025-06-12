@@ -13,7 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as LayoutRouteImport } from './routes/_layout/route'
 import { Route as LayoutIndexImport } from './routes/_layout/index'
-import { Route as LayoutOrdersSplatImport } from './routes/_layout/orders.$'
+import { Route as LayoutEmployeesSplatImport } from './routes/_layout/employees.$'
 
 // Create/Update Routes
 
@@ -28,9 +28,9 @@ const LayoutIndexRoute = LayoutIndexImport.update({
   getParentRoute: () => LayoutRouteRoute,
 } as any)
 
-const LayoutOrdersSplatRoute = LayoutOrdersSplatImport.update({
-  id: '/orders/$',
-  path: '/orders/$',
+const LayoutEmployeesSplatRoute = LayoutEmployeesSplatImport.update({
+  id: '/employees/$',
+  path: '/employees/$',
   getParentRoute: () => LayoutRouteRoute,
 } as any)
 
@@ -52,11 +52,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutIndexImport
       parentRoute: typeof LayoutRouteImport
     }
-    '/_layout/orders/$': {
-      id: '/_layout/orders/$'
-      path: '/orders/$'
-      fullPath: '/orders/$'
-      preLoaderRoute: typeof LayoutOrdersSplatImport
+    '/_layout/employees/$': {
+      id: '/_layout/employees/$'
+      path: '/employees/$'
+      fullPath: '/employees/$'
+      preLoaderRoute: typeof LayoutEmployeesSplatImport
       parentRoute: typeof LayoutRouteImport
     }
   }
@@ -66,12 +66,12 @@ declare module '@tanstack/react-router' {
 
 interface LayoutRouteRouteChildren {
   LayoutIndexRoute: typeof LayoutIndexRoute
-  LayoutOrdersSplatRoute: typeof LayoutOrdersSplatRoute
+  LayoutEmployeesSplatRoute: typeof LayoutEmployeesSplatRoute
 }
 
 const LayoutRouteRouteChildren: LayoutRouteRouteChildren = {
   LayoutIndexRoute: LayoutIndexRoute,
-  LayoutOrdersSplatRoute: LayoutOrdersSplatRoute,
+  LayoutEmployeesSplatRoute: LayoutEmployeesSplatRoute,
 }
 
 const LayoutRouteRouteWithChildren = LayoutRouteRoute._addFileChildren(
@@ -81,27 +81,27 @@ const LayoutRouteRouteWithChildren = LayoutRouteRoute._addFileChildren(
 export interface FileRoutesByFullPath {
   '': typeof LayoutRouteRouteWithChildren
   '/': typeof LayoutIndexRoute
-  '/orders/$': typeof LayoutOrdersSplatRoute
+  '/employees/$': typeof LayoutEmployeesSplatRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof LayoutIndexRoute
-  '/orders/$': typeof LayoutOrdersSplatRoute
+  '/employees/$': typeof LayoutEmployeesSplatRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_layout': typeof LayoutRouteRouteWithChildren
   '/_layout/': typeof LayoutIndexRoute
-  '/_layout/orders/$': typeof LayoutOrdersSplatRoute
+  '/_layout/employees/$': typeof LayoutEmployeesSplatRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/' | '/orders/$'
+  fullPaths: '' | '/' | '/employees/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/orders/$'
-  id: '__root__' | '/_layout' | '/_layout/' | '/_layout/orders/$'
+  to: '/' | '/employees/$'
+  id: '__root__' | '/_layout' | '/_layout/' | '/_layout/employees/$'
   fileRoutesById: FileRoutesById
 }
 
@@ -130,15 +130,15 @@ export const routeTree = rootRoute
       "filePath": "_layout/route.tsx",
       "children": [
         "/_layout/",
-        "/_layout/orders/$"
+        "/_layout/employees/$"
       ]
     },
     "/_layout/": {
       "filePath": "_layout/index.tsx",
       "parent": "/_layout"
     },
-    "/_layout/orders/$": {
-      "filePath": "_layout/orders.$.tsx",
+    "/_layout/employees/$": {
+      "filePath": "_layout/employees.$.tsx",
       "parent": "/_layout"
     }
   }

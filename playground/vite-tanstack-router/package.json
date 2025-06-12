@@ -9,18 +9,19 @@
   "devDependencies": {
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.0",
-    "@mui/icons-material": "^7.0.2",
-    "@mui/material": "^7.0.2",
-    "@tanstack/react-router": "^1.114.3",
-    "@tanstack/react-router-devtools": "^1.114.3",
-    "@tanstack/router-plugin": "^1.114.3",
+    "@mui/icons-material": "^7.1.1",
+    "@mui/material": "^7.1.1",
+    "@tanstack/react-router": "^1.120.20",
+    "@tanstack/react-router-devtools": "^1.120.20",
+    "@tanstack/router-plugin": "^1.120.20",
     "@toolpad/core": "workspace:*",
-    "@types/react": "^19.0.8",
-    "@types/react-dom": "^19.0.3",
-    "@vitejs/plugin-react": "^4.3.4",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "vite": "^6.1.0",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.5.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "vite": "^6.3.5",
     "zod": "3.24.3"
-  }
+  },
+  "version": "0.16.0"
 }

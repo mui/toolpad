@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/utils",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "author": "MUI Team",
   "description": "Shared utilities used by Toolpad packages.",
   "homepage": "https://github.com/mui/toolpad#readme",
@@ -39,16 +39,16 @@
   },
   "dependencies": {
     "invariant": "2.2.4",
-    "prettier": "3.4.2",
+    "prettier": "3.5.3",
     "react-is": "^19.1.0",
     "title": "4.0.1",
     "yaml": "2.5.1",
     "yaml-diff-patch": "2.0.0"
   },
   "devDependencies": {
-    "@types/express": "5.0.1",
+    "@types/express": "5.0.3",
     "@types/invariant": "2.2.37",
-    "@types/react": "^19.1.2",
+    "@types/react": "^19.1.6",
     "@types/react-is": "^19.0.0",
     "@types/title": "3.4.3",
     "vitest": "2.1.9"

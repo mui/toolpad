@@ -332,13 +332,19 @@ This function receives `value`, `onChange` and `error` as arguments for the resp
 
 {{"demo": "CrudCustomFormField.js", "height": 600, "iframe": true}}
 
+### Custom page titles
+
+The `pageTitles` prop can be used to set custom page titles for each CRUD page.
+
+{{"demo": "CrudCustomPageTitles.js", "height": 600, "iframe": true}}
+
 ### Slots
 
 Certain parts of the CRUD UIs can be customized or replaced with custom components by using the `slots` and `slotProps` props.
 
 #### Integration with Data Grid
 
-The `list` and then `dataGrid` slot and slot props can be used to replace the standard Data Grid with any of its [commercially licensed versions](https://mui.com/x/react-data-grid/#commercial-licenses).
+The `list` and then `dataGrid` slot and slot props can be used to customize the Data Grid used in the list view, and even replace the standard Data Grid with any of its [commercially licensed versions](https://mui.com/x/react-data-grid/#commercial-licenses).
 
 {{"demo": "CrudDataGridSlots.js", "height": 600, "iframe": true}}
 
@@ -348,6 +354,12 @@ The `form` slots and slot props can be used, for example, to customize component
 
 {{"demo": "CrudFormSlots.js", "height": 600, "iframe": true}}
 
+#### Override default page container
+
+The `pageContainer` slot can be used to override the default page container and use a custom wrapper component instead:
+
+{{"demo": "CrudPageContainerSlots.js", "height": 500, "iframe": true}}
+
 ## Advanced configuration
 
 For more flexibility of customization, and especially if you want full control over where to place the different CRUD pages, you can use the `List`, `Show`, `Create` and `Edit` subcomponents instead of the all-in-one `Crud` component.
@@ -356,6 +368,8 @@ For more flexibility of customization, and especially if you want full control o
 
 The `CrudProvider` component is optional, but it can be used to easily pass a single `dataSource` and `dataSourceCache` to the CRUD subcomponents inside it as context.
 Alternatively, each of those components can take its own `dataSource` and `dataSourceCache` as props.
+
+Each component has a `pageTitle` prop that can be used to set a page title.
 
 ### `List` component
 

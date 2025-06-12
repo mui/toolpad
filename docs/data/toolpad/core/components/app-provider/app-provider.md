@@ -80,7 +80,7 @@ export default function App(props) {
 }
 ```
 
-## React Router Integration
+## React Router
 
 The `ReactRouterAppProvider` includes routing out-of-the-box for projects using [react-router](https://www.npmjs.com/package/react-router).
 
@@ -91,8 +91,6 @@ import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 ```
 
 ## Other Integrations
-
-We also provide the following integrations for the app provider:
 
 ### TanStack Router
 

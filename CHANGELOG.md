@@ -1,5 +1,45 @@
 # Changelog
 
+## v0.16.0
+
+<!-- generated comparing v0.15.0..master -->
+
+_Jun 11, 2025_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+- CRUD improvements including non-editable fields, rendering custom fields, and page containers out-of-the-box!
+
+**BREAKING CHANGE**: CRUD pages now include a `PageContainer` based on the `pageTitles` prop. Either remove the `PageContainer` you were using in these pages and set the `pageTitles` prop, or override the container using the `pageContainer` slot.
+You can find more detailed instructions and examples in the [CRUD component documentation](https://mui.com/toolpad/core/react-crud/).
+
+- New app provider for [Tanstack React Router](https://mui.com/toolpad/core/integrations/tanstack-router/).
+- New `useNavigationHook` to access your navigation configuration from anywhere.
+- Japanese locale support.
+
+### `@toolpad/core`
+
+- Support non-editable items in CRUD form pages (#4918) @apedroferreira
+- Allow custom form fields in CRUD (#4968) @apedroferreira
+- Add Tanstack React Router provider (#4971) @apedroferreira
+- CRUD page titles with `pageTitles` and `pageTitle` props (#4930) @apedroferreira
+- Add new `useNavigation` hook (#4965) @apedroferreira
+- Make CRUD forms React 18 compatible (#4966) @apedroferreira
+- Allow full customization for dashboard header (#4820) @rkristelijn
+- Fix closing behavior under strict mode (#4973) @Janpot
+- CRUD UI improvements (#4937) @apedroferreira
+- Add Japanese locale support (#4970) @yuito-it
+- Small adjustment to Data Grid selection in CRUD. (#4983) @apedroferreira
+- Use named imports for locales (#4945) @yuito-it
+
+### Core
+
+- Remove Toolpad Studio (#4987) @apedroferreira
+- Remove @vitejs/plugin-react as dependency (#4977) @Janpot
+- Remove required checkout step (f916976) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot, @oliviertassinari, @rkristelijn, @yuito-it
+
 ## v0.15.0
 
 <!-- generated comparing v0.14.0..master -->
@@ -243,7 +283,7 @@ _Dec 12, 2024_
 
 A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
 
-- **BREAKING** `toolbar` slot in the `PageContainer` component has been moved to new `PageHeader` component, which can be used in the `header` slot in `PageContainer`. New usage example [here](https://mui.com/toolpad/core/react-page-container/#actions).
+- **BREAKING** `toolbar` slot in the `PageContainer` component has been moved to new `PageHeader` component, which can be used in the `header` slot in `PageContainer`. [New usage example](https://mui.com/toolpad/core/react-page-container/#actions).
 - Add `homeUrl` to `branding` properties, and `appTitle` slot to override layout header branding.
 - Allow full-size content inside `PageContainer`.
 - Add "rememberMe" slot to `SignInPage`.
@@ -2361,7 +2401,7 @@ _Mar 20, 2023_
 
 A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
 
-Today we're taking a big step. We're making Toolpad focus much more on integrating with your IDE, while providing the ease of building UI fast with a drag and drop. Read more [here](https://github.com/mui/toolpad/discussions/1748).
+Today we're taking a big step. We're making Toolpad focus much more on integrating with your IDE, while providing the ease of building UI fast with a drag and drop. [Read more](https://github.com/mui/toolpad/discussions/1748).
 
 - Add create-toolpad-app CLI (#1700) @bharatkashyap
 - Direction 13 (#1651) @Janpot

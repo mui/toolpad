@@ -51,11 +51,11 @@ export default ${isAsync}function HomePage() {
   ${sessionHandling}
 
   return (    
+    <PageContainer>
       <Typography>
-        <PageContainer>
-          ${welcomeMessage}
-        </PageContainer>
+        ${welcomeMessage}
       </Typography>
+    </PageContainer>
   );
 }${requireAuth}
 `;

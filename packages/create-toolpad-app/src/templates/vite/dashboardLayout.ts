@@ -9,9 +9,8 @@ const dashboardTemplate: Template = (options) => {
 `
       : ``
   }
-import { Outlet } from 'react-router';
+import { Outlet${auth ? `, Navigate, useLocation` : ''} } from 'react-router';
 import { DashboardLayout${auth ? ', ThemeSwitcher' : ''} } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
 ${
   auth
     ? `import { Account } from '@toolpad/core/Account';
@@ -55,7 +54,7 @@ export default function Layout() {
   }
 
   return (
-    <DashboardLayout title={title} ${auth ? ` slots={{ toolbarActions: CustomActions }}` : ''}>
+    <DashboardLayout ${auth ? ` slots={{ toolbarActions: CustomActions }}` : ''}>
       <Outlet />
     </DashboardLayout>
   );

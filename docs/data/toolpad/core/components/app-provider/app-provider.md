@@ -28,7 +28,7 @@ In the following example, an `AppProvider` component wrapping the page provides 
 
 For more details on how to define a `navigation` to be used by the `DashboardLayout` component, please see the [Navigation](/toolpad/core/react-dashboard-layout/#navigation) section for that component.
 
-## Next.js Integration
+## Next.js
 
 The `NextAppProvider` includes some Next.js integrations out-of-the-box.
 

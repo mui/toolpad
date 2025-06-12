@@ -9,7 +9,7 @@ const dashboardTemplate: Template = (options) => {
 `
       : ``
   }
-import { Outlet } from 'react-router';
+import { Outlet${auth ? `, Navigate, useLocation` : ''} } from 'react-router';
 import { DashboardLayout${auth ? ', ThemeSwitcher' : ''} } from '@toolpad/core/DashboardLayout';
 ${
   auth

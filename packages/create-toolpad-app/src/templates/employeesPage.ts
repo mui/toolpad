@@ -32,8 +32,6 @@ import { employeesDataSource, Employee, employeesCache } from '${routerType === 
     }
   }
 
-  const isAsync = authEnabled && routerType === 'nextjs-app' ? 'async ' : '';
-
   let requireAuth = '';
   if (authEnabled && routerType === 'nextjs-pages') {
     requireAuth = `\n\nEmployeesCrudPage.requireAuth = true;`;
@@ -42,7 +40,7 @@ import { employeesDataSource, Employee, employeesCache } from '${routerType === 
   return `${imports}
 
 
-export default ${isAsync}function EmployeesCrudPage() {
+export default function EmployeesCrudPage() {
   ${
     routerType === 'nextjs-pages'
       ? `const router = useRouter();

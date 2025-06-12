@@ -1,4 +1,3 @@
-import { SimplePaletteColorOptions, ThemeOptions } from '@mui/material';
 import { z } from 'zod';
 
 export const API_VERSION = 'v1';
@@ -370,14 +369,14 @@ export const pageSchema = toolpadObjectSchema(
   }),
 );
 
-const simplePaletteColorOptionsSchema: z.ZodType<SimplePaletteColorOptions> = z.object({
+const simplePaletteColorOptionsSchema: z.ZodType = z.object({
   main: z.string(),
   light: z.string().optional(),
   dark: z.string().optional(),
   contrastText: z.string().optional(),
 });
 
-const themeOptionsSchema: z.ZodType<ThemeOptions> = z
+const themeOptionsSchema: z.ZodType = z
   .object({
     // TODO: expand to full MUI theme object
     palette: z

@@ -53,9 +53,7 @@ export default ${isAsync}function HomePage() {
   return (    
     <PageContainer>
       <Typography>
-        <PageContainer>
-          ${welcomeMessage}
-        </PageContainer>
+        ${welcomeMessage}
       </Typography>
     </PageContainer>
   );

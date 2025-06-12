@@ -5,7 +5,7 @@ const ordersPage: Template = (options) => {
   const routerType = options.router;
   const framework = options.framework;
 
-  let imports = `${routerType === 'nextjs-app' ? 'use client;' : ''}import * as React from 'react';
+  let imports = `${routerType === 'nextjs-app' ? `'use client;'\n` : ''}import * as React from 'react';
 ${routerType === 'nextjs-pages' ? `import { useRouter } from 'next/router';` : ''}
 ${routerType === 'nextjs-app' ? `import { useParams } from 'next/navigation';` : ''}
 ${framework === 'vite' ? `import { useParams } from 'react-router';` : ''}

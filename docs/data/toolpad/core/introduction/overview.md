@@ -10,6 +10,10 @@ Toolpad Core is a set of full-stack react components that leverages existing MUI
 
 {{"demo": "./Introduction.js", "height": 600, "iframe": true, "hideToolbar": true}}
 
+:::warning
+Keep in mind that the maintainers are primarily focused on other projects and may not be able to respond in a timely manner to issues or pull requests related to Toolpad Core.
+:::
+
 ## Overview
 
 :::info

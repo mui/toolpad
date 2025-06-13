@@ -112,7 +112,6 @@ export const Route = createFileRoute('/_layout/orders')({
 
 That's it! You now have Toolpad Core integrated into your project with TanStack Router!
 
-<!-- :::info
-@TODO: Uncomment when example is live
+:::info
 For a full working example, see the [Toolpad Core Vite app with TanStack Router example](https://github.com/mui/toolpad/tree/master/examples/core/vite-tanstack-router/)
-::: -->
+:::

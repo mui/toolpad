@@ -1,0 +1,22 @@
+const providers = [
+  { id: 'github', name: 'GitHub' },
+  { id: 'google', name: 'Google' },
+  { id: 'facebook', name: 'Facebook' },
+  { id: 'twitter', name: 'Twitter' },
+  { id: 'linkedin', name: 'LinkedIn' },
+];
+
+// ...
+
+const promise = new Promise((resolve) => {
+  setTimeout(() => {
+    console.log(`Sign up with ${provider.id}`);
+    resolve({ error: 'This is a fake error' } as SignUpActionResponse);
+  }, 500);
+}) as Promise<SignUpActionResponse>;
+
+// ...
+
+<AppProvider theme={theme}>
+  <SignUpPage signUp={signUp} providers={providers} />
+</AppProvider>

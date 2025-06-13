@@ -29,6 +29,8 @@
 
 https://github.com/user-attachments/assets/d2a7ff8e-2dd6-4313-98d2-5f136513f9a9/
 
+Keep in mind that the maintainers are primarily focused on other projects and may not be able to respond in a timely manner to issues or pull requests related to Toolpad Core.
+
 ## Notice
 
 Toolpad is in its beta stages of development. Feel free to run this application to try it out for your use cases, and share any feedback, bug reports or feature requests that you come across.

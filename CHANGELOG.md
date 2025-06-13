@@ -14,7 +14,7 @@ A big thanks to the 5 contributors who made this release possible. Here are some
 You can find more detailed instructions and examples in the [CRUD component documentation](https://mui.com/toolpad/core/react-crud/).
 
 - New app provider for [Tanstack React Router](https://mui.com/toolpad/core/integrations/tanstack-router/).
-- New `useNavigationHook` to access your navigation configuration from anywhere.
+- New `useNavigation` hook to access your navigation configuration from anywhere.
 - Japanese locale support.
 
 ### `@toolpad/core`

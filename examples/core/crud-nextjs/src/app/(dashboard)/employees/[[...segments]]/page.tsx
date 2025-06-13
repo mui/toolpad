@@ -5,7 +5,8 @@ import { useParams } from 'next/navigation';
 import { employeesDataSource, Employee, employeesCache } from '../../../../data/employees';
 
 export default function EmployeesCrudPage() {
-  const { employeeId } = useParams();
+  const params = useParams();
+  const [employeeId] = params.segments ?? [];
 
   return (
     <Crud<Employee>

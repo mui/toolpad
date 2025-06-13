@@ -6,7 +6,8 @@ import { employeesDataSource, Employee, employeesCache } from '../../../mocks/em
 import CustomDataGrid from '../../../components/CustomDataGrid';
 
 export default function EmployeesCrudPage() {
-  const { employeeId } = useParams();
+  const params = useParams();
+  const [employeeId] = params.segments ?? [];
 
   return (
     <Crud<Employee>

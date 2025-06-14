@@ -73,7 +73,7 @@ Disabled property shows the state of the component so that end user is aware tha
 
 ### isRequired
 
-isRequired is useful when the action can't be perfomed without a user provided date.
+isRequired is useful when the action can't be performed without a user provided date.
 
 <video controls width="100%" height="auto" alt="button-onclick-js-expression">
   <source src="/static/toolpad/docs/studio/components/datepicker/datepicker-validation.mp4" type="video/mp4">

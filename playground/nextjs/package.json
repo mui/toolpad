@@ -14,7 +14,7 @@
     "@mui/material-nextjs": "^7.1.1",
     "@toolpad/core": "workspace:*",
     "@types/node": "^20.19.0",
-    "@types/react": "^19.1.6",
+    "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "eslint-config-next": "15.3.3",
     "next": "^15.3.3",

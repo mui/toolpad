@@ -103,7 +103,7 @@
     "rimraf": "6.0.1",
     "typescript": "5.8.3",
     "unist-util-visit": "5.0.0",
-    "vitest-browser-react": "^0.2.0",
+    "vitest-browser-react": "^0.3.0",
     "vitest-dom": "0.1.1",
     "vitest-fail-on-console": "0.7.1"
   },

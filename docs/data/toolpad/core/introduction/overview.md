@@ -6,13 +6,13 @@ title: Toolpad Overview
 
 <p class="description">A set of components to build dashboards with React.</p>
 
+:::warning
+At the moment the maintainers are primarily focused on other projects and are not actively adding new features to Toolpad Core. They may not be able to respond in a timely manner to issues or pull requests.
+:::
+
 Toolpad Core is a set of full-stack react components that leverages existing MUI components, and ties them with the commonly-used backend integrations to help you create responsive dashboards and internal tools. It comes with the guarantee of MUI's enterprise-tested components, and the Toolpad team's focus on using the latest stable libraries, and prioritising razor-sharp performance.
 
 {{"demo": "./Introduction.js", "height": 600, "iframe": true, "hideToolbar": true}}
-
-:::warning
-Keep in mind that the maintainers are primarily focused on other projects and may not be able to respond in a timely manner to issues or pull requests related to Toolpad Core.
-:::
 
 ## Overview
 
@@ -35,9 +35,3 @@ It follows the open-core model, with some features being available under the MIT
 - [Dialogs](/toolpad/core/react-use-dialogs/)
 - [Notifications](/toolpad/core/react-use-notifications/)
 - [Persistent State](/toolpad/core/react-persistent-state/)
-
-## Upcoming Features 🚧
-
-:::info
-Visit the [roadmap](/toolpad/core/introduction/roadmap/) to see more details about upcoming releases.
-:::

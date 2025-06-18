@@ -17,7 +17,7 @@ importers:
         version: 4.17.17
       '@vitest/browser':
         specifier: 2.1.9
-        version: 2.1.9(@types/node@20.19.0)(playwright@1.52.0)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))(vitest@2.1.9)
+        version: 2.1.9(@types/node@20.19.0)(playwright@1.53.1)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))(vitest@2.1.9)
       archiver:
         specifier: 7.0.1
         version: 7.0.1
@@ -110,8 +110,8 @@ importers:
         specifier: 14.2.30
         version: 14.2.30
       '@playwright/test':
-        specifier: 1.52.0
-        version: 1.52.0
+        specifier: 1.53.1
+        version: 1.53.1
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.6.3
@@ -306,7 +306,7 @@ importers:
         version: 5.0.0-beta.70(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@mui/docs':
         specifier: ^7.1.1
-        version: 7.1.1(79b49b78c4b560fd0f674605df2964ee)
+        version: 7.1.1(9eb47e3ea5aa5a36ed0677560d96fed0)
       '@mui/icons-material':
         specifier: ^7.1.1
         version: 7.1.1(@mui/material@7.1.1(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@types/react@19.1.8)(react@19.1.0)
@@ -324,7 +324,7 @@ importers:
         version: 7.1.1(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@mui/material-nextjs':
         specifier: ^7.1.1
-        version: 7.1.1(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@emotion/server@11.11.0)(@types/react@19.1.8)(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+        version: 7.1.1(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@emotion/server@11.11.0)(@types/react@19.1.8)(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
       '@mui/stylis-plugin-rtl':
         specifier: ^7.1.0
         version: 7.1.0(stylis@4.3.6)
@@ -438,7 +438,7 @@ importers:
         version: 7.7.6(react@19.1.0)
       next:
         specifier: ^15.3.3
-        version: 15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       nprogress:
         specifier: 0.2.0
         version: 0.2.0
@@ -691,16 +691,16 @@ importers:
         version: 4.5.2(vite@5.4.19(@types/node@20.19.0)(terser@5.39.0))
       '@vitest/browser':
         specifier: 2.1.9
-        version: 2.1.9(@types/node@20.19.0)(playwright@1.52.0)(typescript@5.8.3)(vite@5.4.19(@types/node@20.19.0)(terser@5.39.0))(vitest@2.1.9)
+        version: 2.1.9(@types/node@20.19.0)(playwright@1.53.1)(typescript@5.8.3)(vite@5.4.19(@types/node@20.19.0)(terser@5.39.0))(vitest@2.1.9)
       next:
         specifier: ^15.3.3
-        version: 15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+        version: 0.9.13(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
       playwright:
-        specifier: 1.52.0
-        version: 1.52.0
+        specifier: 1.53.1
+        version: 1.53.1
       react-router:
         specifier: 7.6.2
         version: 7.6.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -772,7 +772,7 @@ importers:
         version: 7.1.1(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@mui/material-nextjs':
         specifier: ^7.1.1
-        version: 7.1.1(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@emotion/server@11.11.0)(@types/react@19.1.8)(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+        version: 7.1.1(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@emotion/server@11.11.0)(@types/react@19.1.8)(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
       '@toolpad/core':
         specifier: workspace:*
         version: link:../../packages/toolpad-core/build
@@ -790,10 +790,10 @@ importers:
         version: 15.3.3(eslint-import-resolver-webpack@0.13.10)(eslint@9.26.0)(typescript@5.8.3)
       next:
         specifier: ^15.3.3
-        version: 15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       next-auth:
         specifier: 5.0.0-beta.28
-        version: 5.0.0-beta.28(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+        version: 5.0.0-beta.28(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
       react:
         specifier: ^19.1.0
         version: 19.1.0
@@ -820,7 +820,7 @@ importers:
         version: 7.1.1(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@mui/material-nextjs':
         specifier: ^7.1.1
-        version: 7.1.1(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@emotion/server@11.11.0)(@types/react@19.1.8)(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+        version: 7.1.1(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@emotion/server@11.11.0)(@types/react@19.1.8)(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
       '@toolpad/core':
         specifier: workspace:*
         version: link:../../packages/toolpad-core/build
@@ -835,10 +835,10 @@ importers:
         version: 15.3.3(eslint-import-resolver-webpack@0.13.10)(eslint@9.26.0)(typescript@5.8.3)
       next:
         specifier: ^15.3.3
-        version: 15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       next-auth:
         specifier: 5.0.0-beta.28
-        version: 5.0.0-beta.28(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+        version: 5.0.0-beta.28(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
       react:
         specifier: ^19.1.0
         version: 19.1.0
@@ -3643,8 +3643,8 @@ packages:
     resolution: {integrity: sha512-YLT9Zo3oNPJoBjBc4q8G2mjU4tqIbf5CEOORbUUr48dCD9q3umJ3IPlVqOqDakPfd2HuwccBaqlGhN4Gmr5OWg==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  '@playwright/test@1.52.0':
-    resolution: {integrity: sha512-uh6W7sb55hl7D6vsAeA+V2p5JnlAqzhqFyF0VcJkKZXkgnFcVG9PziERRHQfPLfNGx1C292a4JqbWzhR8L4R1g==}
+  '@playwright/test@1.53.1':
+    resolution: {integrity: sha512-Z4c23LHV0muZ8hfv4jw6HngPJkbbtZxTkxPNIg7cJcTc9C28N/p2q7g3JZS2SiKBBHJ3uM1dgDye66bB7LEk5w==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -8705,13 +8705,13 @@ packages:
     resolution: {integrity: sha512-nDywThFk1i4BQK4twPQ6TA4RT8bDY96yeuCVBWL3ePARCiEKDRSrNGbFIgUJpLp+XeIR65v8ra7WuJOFUBtkMA==}
     engines: {node: '>=8'}
 
-  playwright-core@1.52.0:
-    resolution: {integrity: sha512-l2osTgLXSMeuLZOML9qYODUQoPPnUsKsb5/P6LJ2e6uPKXUdPK5WYhN4z03G+YNbWmGDY4YENauNu4ZKczreHg==}
+  playwright-core@1.53.1:
+    resolution: {integrity: sha512-Z46Oq7tLAyT0lGoFx4DOuB1IA9D1TPj0QkYxpPVUnGDqHHvDpCftu1J2hM2PiWsNMoZh8+LQaarAWcDfPBc6zg==}
     engines: {node: '>=18'}
     hasBin: true
 
-  playwright@1.52.0:
-    resolution: {integrity: sha512-JAwMNMBlxJ2oD1kce4KPtMkDeKGHQstdpFPcPH3maElAXon/QZeTvtsfXmTMRyO9TslfoYOXkSsvao2nE1ilTw==}
+  playwright@1.53.1:
+    resolution: {integrity: sha512-LJ13YLr/ocweuwxyGf1XNFWIU4M2zUSo149Qbp+A4cpwDjsxRPj7k6H25LBrEHiEwxvRbD8HdwvQmRMSvquhYw==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -12548,7 +12548,7 @@ snapshots:
 
   '@mui/core-downloads-tracker@7.1.1': {}
 
-  '@mui/docs@7.1.1(79b49b78c4b560fd0f674605df2964ee)':
+  '@mui/docs@7.1.1(9eb47e3ea5aa5a36ed0677560d96fed0)':
     dependencies:
       '@babel/runtime': 7.27.6
       '@mui/base': 5.0.0-beta.70(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -12560,7 +12560,7 @@ snapshots:
       clipboard-copy: 4.0.1
       clsx: 2.1.1
       csstype: 3.1.3
-      next: 15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next: 15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       nprogress: 0.2.0
       prop-types: 15.8.1
       react: 19.1.0
@@ -12666,11 +12666,11 @@ snapshots:
       '@emotion/styled': 11.14.0(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react@19.1.0)
       '@types/react': 19.1.8
 
-  '@mui/material-nextjs@7.1.1(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@emotion/server@11.11.0)(@types/react@19.1.8)(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)':
+  '@mui/material-nextjs@7.1.1(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@emotion/server@11.11.0)(@types/react@19.1.8)(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@babel/runtime': 7.27.6
       '@emotion/react': 11.14.0(@types/react@19.1.8)(react@19.1.0)
-      next: 15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next: 15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
     optionalDependencies:
       '@emotion/cache': 11.14.0
@@ -13708,9 +13708,9 @@ snapshots:
 
   '@pkgr/core@0.2.7': {}
 
-  '@playwright/test@1.52.0':
+  '@playwright/test@1.53.1':
     dependencies:
-      playwright: 1.52.0
+      playwright: 1.53.1
 
   '@polka/url@1.0.0-next.28': {}
 
@@ -14698,7 +14698,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/browser@2.1.9(@types/node@20.19.0)(playwright@1.52.0)(typescript@5.8.3)(vite@5.4.19(@types/node@20.19.0)(terser@5.39.0))(vitest@2.1.9)':
+  '@vitest/browser@2.1.9(@types/node@20.19.0)(playwright@1.53.1)(typescript@5.8.3)(vite@5.4.19(@types/node@20.19.0)(terser@5.39.0))(vitest@2.1.9)':
     dependencies:
       '@testing-library/dom': 10.4.0
       '@testing-library/user-event': 14.6.1(@testing-library/dom@10.4.0)
@@ -14711,7 +14711,7 @@ snapshots:
       vitest: 2.1.9(@types/node@20.19.0)(@vitest/browser@2.1.9)(jsdom@25.0.1)(msw@2.6.5(@types/node@20.19.0)(typescript@5.8.3))(terser@5.39.0)
       ws: 8.18.2
     optionalDependencies:
-      playwright: 1.52.0
+      playwright: 1.53.1
     transitivePeerDependencies:
       - '@types/node'
       - bufferutil
@@ -14719,7 +14719,7 @@ snapshots:
       - utf-8-validate
       - vite
 
-  '@vitest/browser@2.1.9(@types/node@20.19.0)(playwright@1.52.0)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))(vitest@2.1.9)':
+  '@vitest/browser@2.1.9(@types/node@20.19.0)(playwright@1.53.1)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))(vitest@2.1.9)':
     dependencies:
       '@testing-library/dom': 10.4.0
       '@testing-library/user-event': 14.6.1(@testing-library/dom@10.4.0)
@@ -14732,7 +14732,7 @@ snapshots:
       vitest: 2.1.9(@types/node@20.19.0)(@vitest/browser@2.1.9)(jsdom@25.0.1)(msw@2.6.5(@types/node@20.19.0)(typescript@5.8.3))(terser@5.39.0)
       ws: 8.18.2
     optionalDependencies:
-      playwright: 1.52.0
+      playwright: 1.53.1
     transitivePeerDependencies:
       - '@types/node'
       - bufferutil
@@ -14756,7 +14756,7 @@ snapshots:
       tinyrainbow: 1.2.0
       vitest: 2.1.9(@types/node@20.19.0)(@vitest/browser@2.1.9)(jsdom@25.0.1)(msw@2.6.5(@types/node@20.19.0)(typescript@5.8.3))(terser@5.39.0)
     optionalDependencies:
-      '@vitest/browser': 2.1.9(@types/node@20.19.0)(playwright@1.52.0)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))(vitest@2.1.9)
+      '@vitest/browser': 2.1.9(@types/node@20.19.0)(playwright@1.53.1)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))(vitest@2.1.9)
     transitivePeerDependencies:
       - supports-color
 
@@ -19261,18 +19261,18 @@ snapshots:
       p-wait-for: 5.0.2
       qs: 6.13.0
 
-  next-auth@5.0.0-beta.28(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0):
+  next-auth@5.0.0-beta.28(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0):
     dependencies:
       '@auth/core': 0.39.1
-      next: 15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next: 15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
 
-  next-router-mock@0.9.13(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0):
+  next-router-mock@0.9.13(next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0):
     dependencies:
-      next: 15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next: 15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
 
-  next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.52.0)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  next@15.3.3(@babel/core@7.27.4)(@playwright/test@1.53.1)(babel-plugin-macros@3.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
       '@next/env': 15.3.3
       '@swc/counter': 0.1.3
@@ -19292,7 +19292,7 @@ snapshots:
       '@next/swc-linux-x64-musl': 15.3.3
       '@next/swc-win32-arm64-msvc': 15.3.3
       '@next/swc-win32-x64-msvc': 15.3.3
-      '@playwright/test': 1.52.0
+      '@playwright/test': 1.53.1
       sharp: 0.34.1
     transitivePeerDependencies:
       - '@babel/core'
@@ -19933,11 +19933,11 @@ snapshots:
     dependencies:
       find-up: 3.0.0
 
-  playwright-core@1.52.0: {}
+  playwright-core@1.53.1: {}
 
-  playwright@1.52.0:
+  playwright@1.53.1:
     dependencies:
-      playwright-core: 1.52.0
+      playwright-core: 1.53.1
     optionalDependencies:
       fsevents: 2.3.2
 
@@ -21646,7 +21646,7 @@ snapshots:
 
   vitest-browser-react@0.3.0(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(@vitest/browser@2.1.9)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vitest@2.1.9):
     dependencies:
-      '@vitest/browser': 2.1.9(@types/node@20.19.0)(playwright@1.52.0)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))(vitest@2.1.9)
+      '@vitest/browser': 2.1.9(@types/node@20.19.0)(playwright@1.53.1)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))(vitest@2.1.9)
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
       vitest: 2.1.9(@types/node@20.19.0)(@vitest/browser@2.1.9)(jsdom@25.0.1)(msw@2.6.5(@types/node@20.19.0)(typescript@5.8.3))(terser@5.39.0)
@@ -21694,7 +21694,7 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 20.19.0
-      '@vitest/browser': 2.1.9(@types/node@20.19.0)(playwright@1.52.0)(typescript@5.8.3)(vite@5.4.19(@types/node@20.19.0)(terser@5.39.0))(vitest@2.1.9)
+      '@vitest/browser': 2.1.9(@types/node@20.19.0)(playwright@1.53.1)(typescript@5.8.3)(vite@5.4.19(@types/node@20.19.0)(terser@5.39.0))(vitest@2.1.9)
       jsdom: 25.0.1
     transitivePeerDependencies:
       - less

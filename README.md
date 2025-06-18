@@ -29,7 +29,7 @@
 
 https://github.com/user-attachments/assets/d2a7ff8e-2dd6-4313-98d2-5f136513f9a9/
 
-Keep in mind that the maintainers are primarily focused on other projects and may not be able to respond in a timely manner to issues or pull requests related to Toolpad Core.
+At the moment the maintainers are primarily focused on other projects and are not actively adding new features to Toolpad Core. They may not be able to respond in a timely manner to issues or pull requests.
 
 ## Notice
 

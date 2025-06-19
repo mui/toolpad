@@ -55,8 +55,8 @@
   "devDependencies": {
     "@emotion/cache": "11.14.0",
     "@emotion/react": "11.14.0",
-    "@mui/icons-material": "^7.1.1",
-    "@mui/material": "^7.1.1",
+    "@mui/icons-material": "^7.1.2",
+    "@mui/material": "^7.1.2",
     "@mui/x-data-grid-premium": "^8.5.2",
     "@mui/x-data-grid-pro": "^8.5.2",
     "@standard-schema/spec": "^1.0.0",

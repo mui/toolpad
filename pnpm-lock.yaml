@@ -17,7 +17,7 @@ importers:
         version: 4.17.17
       '@vitest/browser':
         specifier: 2.1.9
-        version: 2.1.9(@types/node@20.19.0)(playwright@1.53.1)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))(vitest@2.1.9)
+        version: 2.1.9(@types/node@20.19.0)(playwright@1.53.1)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0))(vitest@2.1.9)
       archiver:
         specifier: 7.0.1
         version: 7.0.1
@@ -44,10 +44,10 @@ importers:
         version: 7.7.2
       tsup:
         specifier: 8.5.0
-        version: 8.5.0(postcss@8.5.5)(tsx@4.19.4)(typescript@5.8.3)(yaml@2.8.0)
+        version: 8.5.0(postcss@8.5.5)(tsx@4.20.3)(typescript@5.8.3)(yaml@2.8.0)
       tsx:
-        specifier: 4.19.4
-        version: 4.19.4
+        specifier: 4.20.3
+        version: 4.20.3
       vitest:
         specifier: 2.1.9
         version: 2.1.9(@types/node@20.19.0)(@vitest/browser@2.1.9)(jsdom@25.0.1)(msw@2.6.5(@types/node@20.19.0)(typescript@5.8.3))(terser@5.39.0)
@@ -273,7 +273,7 @@ importers:
         version: 0.1.1(vitest@2.1.9)
       vitest-fail-on-console:
         specifier: 0.7.1
-        version: 0.7.1(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))(vitest@2.1.9)
+        version: 0.7.1(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0))(vitest@2.1.9)
 
   docs:
     dependencies:
@@ -913,7 +913,7 @@ importers:
         version: 1.121.16(@tanstack/react-router@1.121.16(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@tanstack/router-core@1.121.16)(csstype@3.1.3)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(solid-js@1.9.7)(tiny-invariant@1.3.3)
       '@tanstack/router-plugin':
         specifier: ^1.121.16
-        version: 1.121.16(@tanstack/react-router@1.121.16(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))(webpack@5.99.7(esbuild@0.25.5))
+        version: 1.121.16(@tanstack/react-router@1.121.16(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0))(webpack@5.99.7(esbuild@0.25.5))
       '@toolpad/core':
         specifier: workspace:*
         version: link:../../packages/toolpad-core/build
@@ -925,7 +925,7 @@ importers:
         version: 19.1.6(@types/react@19.1.8)
       '@vitejs/plugin-react':
         specifier: ^4.5.2
-        version: 4.5.2(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))
+        version: 4.5.2(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0))
       react:
         specifier: ^19.1.0
         version: 19.1.0
@@ -934,7 +934,7 @@ importers:
         version: 19.1.0(react@19.1.0)
       vite:
         specifier: ^6.3.5
-        version: 6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0)
+        version: 6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0)
       zod:
         specifier: 3.25.64
         version: 3.25.64
@@ -9957,8 +9957,8 @@ packages:
     peerDependencies:
       typescript: '>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta'
 
-  tsx@4.19.4:
-    resolution: {integrity: sha512-gK5GVzDkJK1SI1zwHf32Mqxf2tSJkNx+eYcNly5+nHvWqXUJYUkWBQtKauoESz3ymezAI++ZwT855x5p5eop+Q==}
+  tsx@4.20.3:
+    resolution: {integrity: sha512-qjbnuR9Tr+FJOMBqJCW5ehvIo/buZq7vH7qD7JziU98h6l3qGy0a/yPFjwO+y0/T7GFpNgNAvEcPPVfyT8rrPQ==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -14015,12 +14015,12 @@ snapshots:
       prettier: 3.5.3
       recast: 0.23.11
       source-map: 0.7.4
-      tsx: 4.19.4
+      tsx: 4.20.3
       zod: 3.25.64
     transitivePeerDependencies:
       - supports-color
 
-  '@tanstack/router-plugin@1.121.16(@tanstack/react-router@1.121.16(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))(webpack@5.99.7(esbuild@0.25.5))':
+  '@tanstack/router-plugin@1.121.16(@tanstack/react-router@1.121.16(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0))(webpack@5.99.7(esbuild@0.25.5))':
     dependencies:
       '@babel/core': 7.27.4
       '@babel/plugin-syntax-jsx': 7.27.1(@babel/core@7.27.4)
@@ -14038,7 +14038,7 @@ snapshots:
       zod: 3.25.64
     optionalDependencies:
       '@tanstack/react-router': 1.121.16(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      vite: 6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0)
+      vite: 6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0)
       webpack: 5.99.7(esbuild@0.25.5)
     transitivePeerDependencies:
       - supports-color
@@ -14686,7 +14686,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-react@4.5.2(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))':
+  '@vitejs/plugin-react@4.5.2(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0))':
     dependencies:
       '@babel/core': 7.27.4
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.27.4)
@@ -14694,7 +14694,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.11
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0)
+      vite: 6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -14719,11 +14719,11 @@ snapshots:
       - utf-8-validate
       - vite
 
-  '@vitest/browser@2.1.9(@types/node@20.19.0)(playwright@1.53.1)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))(vitest@2.1.9)':
+  '@vitest/browser@2.1.9(@types/node@20.19.0)(playwright@1.53.1)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0))(vitest@2.1.9)':
     dependencies:
       '@testing-library/dom': 10.4.0
       '@testing-library/user-event': 14.6.1(@testing-library/dom@10.4.0)
-      '@vitest/mocker': 2.1.9(msw@2.6.5(@types/node@20.19.0)(typescript@5.8.3))(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))
+      '@vitest/mocker': 2.1.9(msw@2.6.5(@types/node@20.19.0)(typescript@5.8.3))(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0))
       '@vitest/utils': 2.1.9
       magic-string: 0.30.17
       msw: 2.6.5(@types/node@20.19.0)(typescript@5.8.3)
@@ -14756,7 +14756,7 @@ snapshots:
       tinyrainbow: 1.2.0
       vitest: 2.1.9(@types/node@20.19.0)(@vitest/browser@2.1.9)(jsdom@25.0.1)(msw@2.6.5(@types/node@20.19.0)(typescript@5.8.3))(terser@5.39.0)
     optionalDependencies:
-      '@vitest/browser': 2.1.9(@types/node@20.19.0)(playwright@1.53.1)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))(vitest@2.1.9)
+      '@vitest/browser': 2.1.9(@types/node@20.19.0)(playwright@1.53.1)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0))(vitest@2.1.9)
     transitivePeerDependencies:
       - supports-color
 
@@ -14776,14 +14776,14 @@ snapshots:
       msw: 2.6.5(@types/node@20.19.0)(typescript@5.8.3)
       vite: 5.4.19(@types/node@20.19.0)(terser@5.39.0)
 
-  '@vitest/mocker@2.1.9(msw@2.6.5(@types/node@20.19.0)(typescript@5.8.3))(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))':
+  '@vitest/mocker@2.1.9(msw@2.6.5(@types/node@20.19.0)(typescript@5.8.3))(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0))':
     dependencies:
       '@vitest/spy': 2.1.9
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
       msw: 2.6.5(@types/node@20.19.0)(typescript@5.8.3)
-      vite: 6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0)
+      vite: 6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0)
 
   '@vitest/pretty-format@2.1.9':
     dependencies:
@@ -19943,12 +19943,12 @@ snapshots:
 
   possible-typed-array-names@1.0.0: {}
 
-  postcss-load-config@6.0.1(postcss@8.5.5)(tsx@4.19.4)(yaml@2.8.0):
+  postcss-load-config@6.0.1(postcss@8.5.5)(tsx@4.20.3)(yaml@2.8.0):
     dependencies:
       lilconfig: 3.1.2
     optionalDependencies:
       postcss: 8.5.5
-      tsx: 4.19.4
+      tsx: 4.20.3
       yaml: 2.8.0
 
   postcss-selector-parser@6.1.2:
@@ -21298,7 +21298,7 @@ snapshots:
 
   tsscmp@1.0.6: {}
 
-  tsup@8.5.0(postcss@8.5.5)(tsx@4.19.4)(typescript@5.8.3)(yaml@2.8.0):
+  tsup@8.5.0(postcss@8.5.5)(tsx@4.20.3)(typescript@5.8.3)(yaml@2.8.0):
     dependencies:
       bundle-require: 5.1.0(esbuild@0.25.5)
       cac: 6.7.14
@@ -21309,7 +21309,7 @@ snapshots:
       fix-dts-default-cjs-exports: 1.0.1
       joycon: 3.1.1
       picocolors: 1.1.1
-      postcss-load-config: 6.0.1(postcss@8.5.5)(tsx@4.19.4)(yaml@2.8.0)
+      postcss-load-config: 6.0.1(postcss@8.5.5)(tsx@4.20.3)(yaml@2.8.0)
       resolve-from: 5.0.0
       rollup: 4.41.1
       source-map: 0.8.0-beta.0
@@ -21331,7 +21331,7 @@ snapshots:
       tslib: 1.14.1
       typescript: 5.8.3
 
-  tsx@4.19.4:
+  tsx@4.20.3:
     dependencies:
       esbuild: 0.25.5
       get-tsconfig: 4.8.1
@@ -21629,7 +21629,7 @@ snapshots:
       fsevents: 2.3.3
       terser: 5.39.0
 
-  vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0):
+  vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0):
     dependencies:
       esbuild: 0.25.5
       fdir: 6.4.5(picomatch@4.0.2)
@@ -21641,12 +21641,12 @@ snapshots:
       '@types/node': 20.19.0
       fsevents: 2.3.3
       terser: 5.39.0
-      tsx: 4.19.4
+      tsx: 4.20.3
       yaml: 2.8.0
 
   vitest-browser-react@0.3.0(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(@vitest/browser@2.1.9)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vitest@2.1.9):
     dependencies:
-      '@vitest/browser': 2.1.9(@types/node@20.19.0)(playwright@1.53.1)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))(vitest@2.1.9)
+      '@vitest/browser': 2.1.9(@types/node@20.19.0)(playwright@1.53.1)(typescript@5.8.3)(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0))(vitest@2.1.9)
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
       vitest: 2.1.9(@types/node@20.19.0)(@vitest/browser@2.1.9)(jsdom@25.0.1)(msw@2.6.5(@types/node@20.19.0)(typescript@5.8.3))(terser@5.39.0)
@@ -21664,10 +21664,10 @@ snapshots:
       redent: 4.0.0
       vitest: 2.1.9(@types/node@20.19.0)(@vitest/browser@2.1.9)(jsdom@25.0.1)(msw@2.6.5(@types/node@20.19.0)(typescript@5.8.3))(terser@5.39.0)
 
-  vitest-fail-on-console@0.7.1(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0))(vitest@2.1.9):
+  vitest-fail-on-console@0.7.1(vite@6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0))(vitest@2.1.9):
     dependencies:
       chalk: 5.3.0
-      vite: 6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.19.4)(yaml@2.8.0)
+      vite: 6.3.5(@types/node@20.19.0)(terser@5.39.0)(tsx@4.20.3)(yaml@2.8.0)
       vitest: 2.1.9(@types/node@20.19.0)(@vitest/browser@2.1.9)(jsdom@25.0.1)(msw@2.6.5(@types/node@20.19.0)(typescript@5.8.3))(terser@5.39.0)
 
   vitest@2.1.9(@types/node@20.19.0)(@vitest/browser@2.1.9)(jsdom@25.0.1)(msw@2.6.5(@types/node@20.19.0)(typescript@5.8.3))(terser@5.39.0):

@@ -89,8 +89,8 @@ importers:
         specifier: 7.27.1
         version: 7.27.1(@babel/core@7.27.4)
       '@mui/internal-babel-plugin-resolve-imports':
-        specifier: 2.0.4
-        version: 2.0.4(@babel/core@7.27.4)
+        specifier: 2.0.5
+        version: 2.0.5(@babel/core@7.27.4)
       '@mui/internal-docs-utils':
         specifier: 2.0.1
         version: 2.0.1
@@ -2705,8 +2705,8 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/internal-babel-plugin-resolve-imports@2.0.4':
-    resolution: {integrity: sha512-ncd6T7Z3Nck0QtauTQkIKFHAZD9ZcRk4fo8dnWGTC9fXgaa8lWEFUQeqGI/D/7ObEQf+4lw3ozYL36m6XdrpQA==}
+  '@mui/internal-babel-plugin-resolve-imports@2.0.5':
+    resolution: {integrity: sha512-FGnxs2ZD+1xDvbnvwqTZvlKgVmCmoApbuw9HjUtloh7H0TV1w8uCIaTZpxQg+HkUJ+aeVkUsHeys0208rXoG5w==}
     peerDependencies:
       '@babel/core': '7'
 
@@ -12583,7 +12583,7 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.1.8
 
-  '@mui/internal-babel-plugin-resolve-imports@2.0.4(@babel/core@7.27.4)':
+  '@mui/internal-babel-plugin-resolve-imports@2.0.5(@babel/core@7.27.4)':
     dependencies:
       '@babel/core': 7.27.4
       resolve: 1.22.10

@@ -749,8 +749,8 @@ importers:
         specifier: ^19.0.0
         version: 19.0.0
       '@types/title':
-        specifier: 3.4.3
-        version: 3.4.3
+        specifier: 4.0.0
+        version: 4.0.0
       vitest:
         specifier: 2.1.9
         version: 2.1.9(@types/node@20.19.0)(@vitest/browser@2.1.9)(jsdom@25.0.1)(msw@2.6.5(@types/node@20.19.0)(typescript@5.8.3))(terser@5.39.0)
@@ -4235,8 +4235,9 @@ packages:
   '@types/through@0.0.33':
     resolution: {integrity: sha512-HsJ+z3QuETzP3cswwtzt2vEIiHBk/dCcHGhbmG5X3ecnwFD/lPrMpliGXxSCg03L9AhrdwA4Oz/qfspkDW+xGQ==}
 
-  '@types/title@3.4.3':
-    resolution: {integrity: sha512-mjupLOb4kwUuoUFokkacy/VMRVBH2qtqZ5AX7K7iha6+iKIkX80n/Y4EoNVEVRmer8dYJU/ry+fppUaDFVQh7Q==}
+  '@types/title@4.0.0':
+    resolution: {integrity: sha512-+/DoT3en4uDoeAq55IHtwLVWq51kCJVIjQFswW7kfw36p/mTa7gyf7vqAuoGdYmDcY7Mg7tgv6rfrnU7jNQ7BA==}
+    deprecated: This is a stub types definition. title provides its own type definitions, so you do not need this installed.
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
@@ -14396,7 +14397,9 @@ snapshots:
     dependencies:
       '@types/node': 20.19.0
 
-  '@types/title@3.4.3': {}
+  '@types/title@4.0.0':
+    dependencies:
+      title: 4.0.1
 
   '@types/tough-cookie@4.0.5': {}
 

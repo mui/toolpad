@@ -60,7 +60,7 @@
     "@mui/x-data-grid-premium": "^8.5.3",
     "@mui/x-data-grid-pro": "^8.5.3",
     "@standard-schema/spec": "^1.0.0",
-    "@tanstack/react-router": "^1.121.16",
+    "@tanstack/react-router": "^1.121.34",
     "@types/invariant": "2.2.37",
     "@types/prop-types": "15.7.15",
     "@types/react": "^19.1.8",

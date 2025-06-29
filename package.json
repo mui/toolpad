@@ -129,9 +129,9 @@
     "google-auth-library": "*",
     "@types/node": "^20.19.1"
   },
-  "packageManager": "pnpm@10.12.1",
+  "packageManager": "pnpm@10.12.4",
   "engines": {
     "node": ">=20",
-    "pnpm": "10.12.1"
+    "pnpm": "10.12.4"
   }
 }

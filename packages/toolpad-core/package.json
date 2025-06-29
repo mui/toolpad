@@ -71,7 +71,7 @@
     "next": "^15.3.4",
     "next-router-mock": "^1.0.2",
     "playwright": "1.53.1",
-    "react-router": "7.6.2",
+    "react-router": "7.6.3",
     "sinon": "^21.0.0",
     "vitest": "2.1.9"
   },

@@ -123,7 +123,7 @@
     "vitest": "2.1.9",
     "yargs": "17.7.2",
     "zod": "3.25.67",
-    "zod-to-json-schema": "3.24.5"
+    "zod-to-json-schema": "3.24.6"
   },
   "resolutions": {
     "google-auth-library": "*",

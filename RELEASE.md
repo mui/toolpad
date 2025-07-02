@@ -25,7 +25,6 @@
 1. Copy the generated changelog from the console, clean it up, add a short summary of the release highlights and use the new version number as the title.
 
    Writing good highlights:
-
    - Focus on new user facing features or changes
    - Be concise, link to relevant documentation for extra clarity
 
@@ -74,7 +73,6 @@
 1. Merge the PR changes, then check out the `master` branch and pull the last commit.
 
 1. Publish the package to `npm`
-
    1. If you are not logged in to `npm` in your CLI, first log in with:
 
       ```bash
@@ -102,7 +100,6 @@
    You can follow the deployment process on the [Netlify Dashboard](https://app.netlify.com/sites/mui-toolpad-docs/deploys?filter=docs-latest). Once deployed, it will be accessible at https://mui-toolpad-docs.netlify.app/.
 
 1. [Create a new GitHub release](https://github.com/mui/toolpad/releases/new).
-
    1. Use `<version number>` to **Choose a tag** (when you enter new version GH UI will pop a suggestion `Create new tag: *** on publish`)
    2. Use `<commit of merged PR>` as the **target**
    3. Use the cleaned changelog as the content of **Describe this release**

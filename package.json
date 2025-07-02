@@ -59,7 +59,7 @@
     "@types/fs-extra": "11.0.4",
     "@types/gtag.js": "0.0.20",
     "@types/invariant": "2.2.37",
-    "@types/node": "^20.19.1",
+    "@types/node": "^20.19.4",
     "@types/yargs": "17.0.33",
     "@typescript-eslint/eslint-plugin": "^8.34.1",
     "@typescript-eslint/parser": "^8.34.1",
@@ -127,7 +127,7 @@
   },
   "resolutions": {
     "google-auth-library": "*",
-    "@types/node": "^20.19.1"
+    "@types/node": "^20.19.4"
   },
   "packageManager": "pnpm@10.12.1",
   "engines": {

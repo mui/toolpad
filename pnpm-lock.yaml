@@ -718,8 +718,8 @@ importers:
         specifier: 2.2.4
         version: 2.2.4
       prettier:
-        specifier: 3.5.3
-        version: 3.5.3
+        specifier: 3.6.2
+        version: 3.6.2
       react:
         specifier: ^18.0.0 || ^19.0.0
         version: 19.1.0
@@ -8745,6 +8745,11 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
 
+  prettier@3.6.2:
+    resolution: {integrity: sha512-I7AIg5boAr5R0FFtJ6rCfD+LFsWHp81dolrFD8S79U9tb8Az2nGrJncnMSnys+bpQJfRUzqs9hnA81OAA3hCuQ==}
+    engines: {node: '>=14'}
+    hasBin: true
+
   pretty-format@27.5.1:
     resolution: {integrity: sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
@@ -13936,7 +13941,7 @@ snapshots:
       '@tanstack/router-core': 1.121.34
       '@tanstack/router-utils': 1.121.21
       '@tanstack/virtual-file-routes': 1.121.21
-      prettier: 3.5.3
+      prettier: 3.6.2
       recast: 0.23.11
       source-map: 0.7.4
       tsx: 4.20.3
@@ -19892,6 +19897,8 @@ snapshots:
   prettier@3.4.2: {}
 
   prettier@3.5.3: {}
+
+  prettier@3.6.2: {}
 
   pretty-format@27.5.1:
     dependencies:

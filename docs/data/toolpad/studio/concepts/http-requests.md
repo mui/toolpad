@@ -22,7 +22,6 @@ The following options are configurable here:
 - ### Body
 
   You can configure the request body in this tab. This may be of the following types:
-
   - `x-www-form-urlencoded`: The body consists of key value pairs that are encoded in tuples separated by `&`, with a `=` between the key and the value. The UI allows you to define the key value pairs. The request `content-type` will be set to `application/x-www-form-urlencoded`.
 
   - `raw`: The body can be freely defined as text. The `content-type` is selectable from the dropdown.
@@ -42,7 +41,6 @@ The following options are configurable here:
   You can define how the response should be parsed in this tab.
 
   There are two options available:
-
   - `JSON`: This is the default behavior. Parse the response content as JSON and return the result.
 
   - `raw`: Do not parse the response and return the response as text.

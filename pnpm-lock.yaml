@@ -101,8 +101,8 @@ importers:
         specifier: 2.0.10
         version: 2.0.10
       '@mui/monorepo':
-        specifier: github:mui/material-ui#3641a0b7b5c4506b7d44f3241580087b56482c74
-        version: https://codeload.github.com/mui/material-ui/tar.gz/3641a0b7b5c4506b7d44f3241580087b56482c74(@babel/core@7.28.0)(@types/express@5.0.3)(encoding@0.1.13)(rollup@4.41.1)
+        specifier: github:mui/material-ui#04b87f3c13a6568ce01c3a0339fc7e2ee69370d1
+        version: https://codeload.github.com/mui/material-ui/tar.gz/04b87f3c13a6568ce01c3a0339fc7e2ee69370d1(@babel/core@7.28.0)(@types/express@5.0.3)(encoding@0.1.13)(rollup@4.41.1)
       '@mui/x-charts':
         specifier: ^8.6.0
         version: 8.6.0(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react@19.1.0))(@mui/material@7.2.0(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@mui/system@7.2.0(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -2873,9 +2873,9 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/3641a0b7b5c4506b7d44f3241580087b56482c74':
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/3641a0b7b5c4506b7d44f3241580087b56482c74}
-    version: 7.1.1
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/04b87f3c13a6568ce01c3a0339fc7e2ee69370d1':
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/04b87f3c13a6568ce01c3a0339fc7e2ee69370d1}
+    version: 7.2.0
     engines: {pnpm: 10.12.1}
 
   '@mui/private-theming@5.17.1':
@@ -12730,7 +12730,7 @@ snapshots:
       '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react@19.1.0)
       '@types/react': 19.1.8
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/3641a0b7b5c4506b7d44f3241580087b56482c74(@babel/core@7.28.0)(@types/express@5.0.3)(encoding@0.1.13)(rollup@4.41.1)':
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/04b87f3c13a6568ce01c3a0339fc7e2ee69370d1(@babel/core@7.28.0)(@types/express@5.0.3)(encoding@0.1.13)(rollup@4.41.1)':
     dependencies:
       '@googleapis/sheets': 9.8.0(encoding@0.1.13)
       '@netlify/functions': 3.1.10(encoding@0.1.13)(rollup@4.41.1)

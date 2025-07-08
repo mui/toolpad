@@ -1,7 +1,7 @@
 import type { LocaleText } from '../AppProvider';
 import { getLocalization } from './getLocalization';
 
-const enLabels: LocaleText = {
+const faIRLabels: LocaleText = {
   // Account
   accountSignInLabel: 'ورود',
   accountSignOutLabel: 'خروج',
@@ -55,4 +55,4 @@ const enLabels: LocaleText = {
   deletedItemMessage: 'این مورد حذف شده است.',
 };
 
-export default getLocalization(enLabels);
+export default getLocalization(faIRLabels);

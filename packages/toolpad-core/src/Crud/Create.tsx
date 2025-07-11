@@ -168,12 +168,20 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
 
   const handleFormSubmit = React.useCallback(async () => {
     // Check if all required fields are present
-    const requiredFields = fields.filter(({ field, editable }) => field !== 'id' && editable !== false);
-    const missingFields = requiredFields.filter(({ field }) => formValues[field] === undefined || formValues[field] === null || formValues[field] === '');
-    
+    const requiredFields = fields.filter(
+      ({ field, editable }) => field !== 'id' && editable !== false,
+    );
+    const missingFields = requiredFields.filter(
+      ({ field }) =>
+        formValues[field] === undefined || formValues[field] === null || formValues[field] === '',
+    );
+
     if (missingFields.length > 0) {
       const missingFieldErrors = Object.fromEntries(
-        missingFields.map(({ field, headerName }) => [field as keyof D, `${headerName || field} is required`])
+        missingFields.map(({ field, headerName }) => [
+          field as keyof D,
+          `${headerName || field} is required`,
+        ]),
       ) as Partial<Record<keyof D, string>>;
       setFormErrors(missingFieldErrors);
       throw new Error('Required fields are missing');

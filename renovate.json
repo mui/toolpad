@@ -145,13 +145,6 @@
       "allowedVersions": "!/.*/"
     },
     {
-      "groupName": "Update @toolpad/studio in examples",
-      "matchPackageNames": ["@toolpad/studio"],
-      "matchFiles": ["examples/**/package.json"],
-      "schedule": ["at any time"],
-      "automerge": true
-    },
-    {
       "groupName": "@types/node",
       "matchPackageNames": ["@types/node"],
       "allowedVersions": "< 21.0.0"

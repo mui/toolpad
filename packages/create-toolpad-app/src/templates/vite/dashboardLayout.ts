@@ -9,9 +9,8 @@ const dashboardTemplate: Template = (options) => {
 `
       : ``
   }
-import { Outlet, useLocation, useParams, matchPath } from 'react-router';
+import { Outlet${auth ? `, Navigate, useLocation` : ''} } from 'react-router';
 import { DashboardLayout${auth ? ', ThemeSwitcher' : ''} } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
 ${
   auth
     ? `import { Account } from '@toolpad/core/Account';
@@ -34,22 +33,6 @@ function CustomActions() {
 }
 
 export default function Layout() {
-  const location = useLocation();
-  const { employeeId } = useParams();
-
-  const title = React.useMemo(() => {
-    if (location.pathname === '/employees/new') {
-      return 'New Employee';
-    }
-    if (matchPath('/employees/:employeeId/edit', location.pathname)) {
-      return \`Employee \${employeeId} - Edit\`;
-    }
-    if (employeeId) {
-      return \`Employee \${employeeId}\`;
-    }
-    return undefined;
-  }, [location.pathname, employeeId]);
-
   ${
     auth
       ? `const { session, loading } = useSession();
@@ -71,10 +54,8 @@ export default function Layout() {
   }
 
   return (
-    <DashboardLayout title={title} ${auth ? ` slots={{ toolbarActions: CustomActions }}` : ''}>
-      <PageContainer>
-        <Outlet />
-      </PageContainer>
+    <DashboardLayout ${auth ? ` slots={{ toolbarActions: CustomActions }}` : ''}>
+      <Outlet />
     </DashboardLayout>
   );
 }`;

@@ -10,7 +10,7 @@ yarn && yarn docs:dev
 
 If you do not have yarn installed, select your OS and follow the instructions on the pnpm. DO NOT USE npm, use pnpm to install the dependencies.
 
-Visit the [Toolpad documentation](https://mui.com/toolpad/studio/getting-started/).
+Visit the [Toolpad documentation](https://mui.com/toolpad/core/introduction/).
 
 ## How can I add a new demo to the documentation?
 

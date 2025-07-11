@@ -34,7 +34,7 @@ GCP offers an ecosystem of products to help you build, manage, and scale any web
 
 5. This opens a drawer menu. From the drop-down, choose the repository that contains your Toolpad Studio app and click Next.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/deploy-gcp/choose-repository.png", "alt": "Choose repository", "caption": "Choose respository", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/deploy-gcp/choose-repository.png", "alt": "Choose repository", "caption": "Choose repository", "indent": 1 }}
 
 6. The branch input shows `main` by default and it can remain unchanged. From the radio buttons, choose the second option as it is a Node.js app. The other configurations can be kept unchanged. Click **Save**.
 
@@ -46,7 +46,7 @@ GCP offers an ecosystem of products to help you build, manage, and scale any web
 
 8. The last step is to expand the 'Container(s), Volumes, Networking, Security' caret. The first input **Container port** needs to be updated to 3000. Click the **Create** button to start the service.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/deploy-gcp/set-container-port.png", "alt": "Set contianer port", "caption": "Set contianer port", "indent": 1}}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/deploy-gcp/set-container-port.png", "alt": "Set container port", "caption": "Set container port", "indent": 1}}
 
 9. The next screen shows that the deployment is in progress and the build is being prepared, which can take 3-5 minutes. You can click on the **logs** link (pending state) to see the live build logs in Cloud Build UI.
 

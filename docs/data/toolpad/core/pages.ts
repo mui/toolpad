@@ -27,7 +27,6 @@ const pages: MuiPage[] = [
       {
         pathname: '/toolpad/core/introduction/examples',
         title: 'Examples',
-        newFeature: true,
       },
       {
         pathname: '/toolpad/core/introduction/roadmap',
@@ -115,7 +114,6 @@ const pages: MuiPage[] = [
           {
             pathname: '/toolpad/core/react-crud',
             title: 'CRUD',
-            newFeature: true,
           },
         ],
       },

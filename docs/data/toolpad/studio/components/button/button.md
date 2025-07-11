@@ -57,7 +57,7 @@ The size property supports three options: small (default), medium and large.
 
 ### State
 
-Button supports states like loading and disabled to share the state of the component so that user can wait/act accoridngly.
+Button supports states like loading and disabled to share the state of the component so that user can wait/act accordingly.
 {{"demo": "ButtonState.js", "hideToolbar": true}}
 
 ## API

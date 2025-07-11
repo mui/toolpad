@@ -8,7 +8,6 @@ import { NextAppProvider } from '@toolpad/core/nextjs';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PersonIcon from '@mui/icons-material/Person';
@@ -92,26 +91,9 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
 }
 
 function DefaultLayout({ page }: { page: React.ReactElement<any> }) {
-  const router = useRouter();
-  const { segments = [] } = router.query;
-  const [employeeId] = segments;
-
-  const title = React.useMemo(() => {
-    if (router.asPath.split('?')[0] === '/employees/new') {
-      return 'New Employee';
-    }
-    if (employeeId && router.asPath.includes('/edit')) {
-      return \`Employee \${employeeId} - Edit\`;
-    }
-    if (employeeId) {
-      return \`Employee \${employeeId}\`;
-    }
-    return undefined;
-  }, [employeeId, router.asPath]);
-
   return (
     <DashboardLayout>
-      <PageContainer title={title}>{page}</PageContainer>
+      {page}
     </DashboardLayout>
   );
 }

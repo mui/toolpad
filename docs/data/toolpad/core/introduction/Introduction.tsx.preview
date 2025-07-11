@@ -5,8 +5,6 @@
   window={demoWindow}
 >
   <DashboardLayout defaultSidebarCollapsed>
-    <PageContainer title={title}>
-      <DemoPageContent pathname={router.pathname} />
-    </PageContainer>
+    <DemoPageContent pathname={router.pathname} />
   </DashboardLayout>
 </AppProvider>

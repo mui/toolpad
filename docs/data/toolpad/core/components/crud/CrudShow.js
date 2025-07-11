@@ -4,7 +4,6 @@ import { createTheme } from '@mui/material/styles';
 import PersonIcon from '@mui/icons-material/Person';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
 import { DataSourceCache, Show } from '@toolpad/core/Crud';
 import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
@@ -113,17 +112,16 @@ function CrudShow(props) {
         window={demoWindow}
       >
         <DashboardLayout defaultSidebarCollapsed>
-          <PageContainer title="Person">
-            {/* preview-start */}
-            <Show
-              id={1}
-              dataSource={peopleDataSource}
-              dataSourceCache={peopleCache}
-              onEditClick={handleEditClick}
-              onDelete={handleDelete}
-            />
-            {/* preview-end */}
-          </PageContainer>
+          {/* preview-start */}
+          <Show
+            id={1}
+            dataSource={peopleDataSource}
+            dataSourceCache={peopleCache}
+            onEditClick={handleEditClick}
+            onDelete={handleDelete}
+            pageTitle="Person 1"
+          />
+          {/* preview-end */}
         </DashboardLayout>
       </AppProvider>
     </DemoProvider>

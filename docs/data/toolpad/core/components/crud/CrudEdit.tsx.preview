@@ -3,4 +3,5 @@
   dataSource={peopleDataSource}
   dataSourceCache={peopleCache}
   onSubmitSuccess={handleSubmitSuccess}
+  pageTitle="Person 1 - Edit"
 />

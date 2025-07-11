@@ -9,7 +9,7 @@ type Require<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 type Ensure<U, K extends PropertyKey> = K extends keyof U ? Require<U, K> : U & Record<K, unknown>;
 
 /**
- * Type aware version of Object.protoype.hasOwnProperty.
+ * Type aware version of Object.prototype.hasOwnProperty.
  * See https://fettblog.eu/typescript-hasownproperty/
  */
 export function hasOwnProperty<X extends {}, Y extends PropertyKey>(

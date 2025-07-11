@@ -181,7 +181,7 @@ export default function generateProject(
               ['app/auth/signin/actions.ts', { content: signInAction(options) }],
             ]);
             if (options.hasNodemailerProvider || options.hasPasskeyProvider) {
-              // Prisma adapater support requires removal of middleware
+              // Prisma adapter support requires removal of middleware
               authFiles.delete('middleware.ts');
               const prismaFiles = new Map([
                 ['prisma.ts', { content: prisma }],

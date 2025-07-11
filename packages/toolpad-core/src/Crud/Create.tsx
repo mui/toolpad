@@ -10,6 +10,8 @@ import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
 import type { DataFieldFormValue, DataModel, DataSource, OmitId } from './types';
+import { PageContainer, type PageContainerProps } from '../PageContainer';
+import { useActivePage } from '../useActivePage';
 
 export interface CreateProps<D extends DataModel> {
   /**
@@ -35,6 +37,10 @@ export interface CreateProps<D extends DataModel> {
    */
   dataSourceCache?: DataSourceCache | null;
   /**
+   * The title of the page.
+   */
+  pageTitle?: string;
+  /**
    * Locale text for the component.
    */
   localeText?: CRUDLocaleText;
@@ -44,6 +50,7 @@ export interface CreateProps<D extends DataModel> {
    */
   slots?: {
     form?: CrudFormSlots;
+    pageContainer?: React.JSXElementConstructor<PageContainerProps>;
   };
   /**
    * The props used for each slot inside.
@@ -51,6 +58,7 @@ export interface CreateProps<D extends DataModel> {
    */
   slotProps?: {
     form?: CrudFormSlotProps;
+    pageContainer?: PageContainerProps;
   };
 }
 
@@ -70,6 +78,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
     onSubmitSuccess,
     resetOnSubmit = false,
     dataSourceCache,
+    pageTitle,
     localeText: propsLocaleText,
     slots,
     slotProps,
@@ -96,6 +105,8 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
   >;
 
   const { fields, createOne, validate } = cachedDataSource;
+
+  const activePage = useActivePage();
 
   const [formState, setFormState] = React.useState<{
     values: Partial<OmitId<D>>;
@@ -199,17 +210,34 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
     validate,
   ]);
 
+  const PageContainerSlot = slots?.pageContainer ?? PageContainer;
+
   return (
-    <CrudForm
-      dataSource={dataSource}
-      formState={formState}
-      onFieldChange={handleFormFieldChange}
-      onSubmit={handleFormSubmit}
-      onReset={handleFormReset}
-      submitButtonLabel={localeText.createLabel}
-      slots={slots?.form}
-      slotProps={slotProps?.form}
-    />
+    <PageContainerSlot
+      title={pageTitle}
+      breadcrumbs={
+        activePage && pageTitle
+          ? [
+              ...activePage.breadcrumbs,
+              {
+                title: pageTitle,
+              },
+            ]
+          : undefined
+      }
+      {...slotProps?.pageContainer}
+    >
+      <CrudForm
+        dataSource={dataSource}
+        formState={formState}
+        onFieldChange={handleFormFieldChange}
+        onSubmit={handleFormSubmit}
+        onReset={handleFormReset}
+        submitButtonLabel={localeText.createLabel}
+        slots={slots?.form}
+        slotProps={slotProps?.form}
+      />
+    </PageContainerSlot>
   );
 }
 
@@ -246,6 +274,10 @@ Create.propTypes /* remove-proptypes */ = {
    */
   onSubmitSuccess: PropTypes.func,
   /**
+   * The title of the page.
+   */
+  pageTitle: PropTypes.string,
+  /**
    * Whether the form fields should reset after the form is submitted.
    * @default false
    */
@@ -262,6 +294,7 @@ Create.propTypes /* remove-proptypes */ = {
       select: PropTypes.object,
       textField: PropTypes.object,
     }),
+    pageContainer: PropTypes.object,
   }),
   /**
    * The components used for each slot inside.
@@ -275,6 +308,7 @@ Create.propTypes /* remove-proptypes */ = {
       select: PropTypes.elementType,
       textField: PropTypes.elementType,
     }),
+    pageContainer: PropTypes.elementType,
   }),
 } as any;
 

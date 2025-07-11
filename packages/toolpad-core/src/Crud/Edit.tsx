@@ -13,6 +13,8 @@ import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
 import type { DataFieldFormValue, DataModel, DataModelId, DataSource, OmitId } from './types';
+import { PageContainer, type PageContainerProps } from '../PageContainer';
+import { useActivePage } from '../useActivePage';
 
 interface EditFormProps<D extends DataModel> {
   dataSource: DataSource<D> & Required<Pick<DataSource<D>, 'getOne' | 'updateOne'>>;
@@ -190,6 +192,10 @@ export interface EditProps<D extends DataModel> {
    */
   dataSourceCache?: DataSourceCache | null;
   /**
+   * The title of the page.
+   */
+  pageTitle?: string;
+  /**
    * Locale text for the component.
    */
   localeText?: CRUDLocaleText;
@@ -199,6 +205,7 @@ export interface EditProps<D extends DataModel> {
    */
   slots?: {
     form?: CrudFormSlots;
+    pageContainer?: React.JSXElementConstructor<PageContainerProps>;
   };
   /**
    * The props used for each slot inside.
@@ -206,6 +213,7 @@ export interface EditProps<D extends DataModel> {
    */
   slotProps?: {
     form?: CrudFormSlotProps;
+    pageContainer?: PageContainerProps;
   };
 }
 
@@ -224,6 +232,7 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
     id,
     onSubmitSuccess,
     dataSourceCache,
+    pageTitle,
     localeText: propsLocaleText,
     slots,
     slotProps,
@@ -249,21 +258,36 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
   const { fields, validate, ...methods } = cachedDataSource;
   const { getOne, updateOne } = methods;
 
-  const [data, setData] = React.useState<D | null>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const activePage = useActivePage();
+
+  const cachedData = React.useMemo(
+    () => cache && (cache.get(JSON.stringify(['getOne', id])) as D),
+    [cache, id],
+  );
+
+  const [data, setData] = React.useState<D | null>(cachedData);
+  const [isLoading, setIsLoading] = React.useState(!cachedData);
   const [error, setError] = React.useState<Error | null>(null);
 
   const loadData = React.useCallback(async () => {
     setError(null);
-    setIsLoading(true);
-    try {
-      const showData = await getOne(id);
+
+    let showData = cachedData;
+    if (!showData) {
+      setIsLoading(true);
+
+      try {
+        showData = await getOne(id);
+      } catch (showDataError) {
+        setError(showDataError as Error);
+      }
+    }
+
+    if (showData) {
       setData(showData);
-    } catch (showDataError) {
-      setError(showDataError as Error);
     }
     setIsLoading(false);
-  }, [getOne, id]);
+  }, [cachedData, getOne, id]);
 
   React.useEffect(() => {
     loadData();
@@ -329,7 +353,26 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
     slots,
   ]);
 
-  return <Box sx={{ display: 'flex', flex: 1 }}>{renderEdit}</Box>;
+  const PageContainerSlot = slots?.pageContainer ?? PageContainer;
+
+  return (
+    <PageContainerSlot
+      title={pageTitle}
+      breadcrumbs={
+        activePage && pageTitle
+          ? [
+              ...activePage.breadcrumbs,
+              {
+                title: pageTitle,
+              },
+            ]
+          : undefined
+      }
+      {...slotProps?.pageContainer}
+    >
+      <Box sx={{ display: 'flex', flex: 1 }}>{renderEdit}</Box>
+    </PageContainerSlot>
+  );
 }
 
 Edit.propTypes /* remove-proptypes */ = {
@@ -364,6 +407,10 @@ Edit.propTypes /* remove-proptypes */ = {
    */
   onSubmitSuccess: PropTypes.func,
   /**
+   * The title of the page.
+   */
+  pageTitle: PropTypes.string,
+  /**
    * The props used for each slot inside.
    * @default {}
    */
@@ -375,6 +422,7 @@ Edit.propTypes /* remove-proptypes */ = {
       select: PropTypes.object,
       textField: PropTypes.object,
     }),
+    pageContainer: PropTypes.object,
   }),
   /**
    * The components used for each slot inside.
@@ -388,6 +436,7 @@ Edit.propTypes /* remove-proptypes */ = {
       select: PropTypes.elementType,
       textField: PropTypes.elementType,
     }),
+    pageContainer: PropTypes.elementType,
   }),
 } as any;
 

@@ -1,5 +1,0 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/toolpad/v0.3.1/docs/schemas/v1/definitions.json#properties/Application
-
-apiVersion: v1
-kind: application
-spec: { authentication: {}, authorization: {} }

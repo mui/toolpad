@@ -51,8 +51,9 @@ export interface DataSource<D extends DataModel> {
   deleteOne?: (id: DataModelId) => void | Promise<void>;
   /**
    * Function to validate form values. Follows the Standard Schema `validate` function format (https://standardschema.dev/).
+   * Can validate either complete records (for create) or partial records (for update).
    */
   validate?: (
-    value: Partial<OmitId<D>>,
-  ) => ReturnType<StandardSchemaV1<Partial<OmitId<D>>>['~standard']['validate']>;
+    value: OmitId<D> | Partial<OmitId<D>>,
+  ) => ReturnType<StandardSchemaV1<OmitId<D> | Partial<OmitId<D>>>['~standard']['validate']>;
 }

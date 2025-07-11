@@ -24,7 +24,7 @@ import { CrudContext } from '../shared/context';
 import type { DataField, DataFieldFormValue, DataModel, DataSource, OmitId } from './types';
 
 interface CrudFormState<D extends DataModel> {
-  values: Partial<OmitId<D>>;
+  values: OmitId<D> | Partial<OmitId<D>>;
   errors: Partial<Record<keyof D, string>>;
 }
 
@@ -80,11 +80,11 @@ export interface CrudFormProps<D extends DataModel> {
   /**
    * Callback fired when the form is submitted.
    */
-  onSubmit: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
+  onSubmit: (formValues: OmitId<D> | Partial<OmitId<D>>) => void | Promise<void>;
   /**
    * Callback fired when the form is reset.
    */
-  onReset?: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
+  onReset?: (formValues: OmitId<D> | Partial<OmitId<D>>) => void | Promise<void>;
   /**
    * The components used for each slot inside.
    * @default {}

@@ -26,7 +26,7 @@ export interface CreateProps<D extends DataModel> {
   /**
    * Callback fired when the form is successfully submitted.
    */
-  onSubmitSuccess?: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
+  onSubmitSuccess?: (formValues: OmitId<D>) => void | Promise<void>;
   /**
    * Whether the form fields should reset after the form is submitted.
    * @default false
@@ -109,7 +109,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
   const activePage = useActivePage();
 
   const [formState, setFormState] = React.useState<{
-    values: Partial<OmitId<D>>;
+    values: OmitId<D>;
     errors: Partial<Record<keyof D, string>>;
   }>(() => ({
     values: {
@@ -118,17 +118,17 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
           .filter(({ field, editable }) => field !== 'id' && editable !== false)
           .map(({ field, type }) => [
             field,
-            type === 'boolean' ? (initialValues[field] ?? false) : initialValues[field],
+            type === 'boolean' ? (initialValues?.[field] ?? false) : initialValues?.[field],
           ]),
       ),
       ...initialValues,
-    },
+    } as OmitId<D>,
     errors: {},
   }));
   const formValues = formState.values;
   const formErrors = formState.errors;
 
-  const setFormValues = React.useCallback((newFormValues: Partial<OmitId<D>>) => {
+  const setFormValues = React.useCallback((newFormValues: OmitId<D>) => {
     setFormState((previousState) => ({
       ...previousState,
       values: newFormValues,
@@ -144,7 +144,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
 
   const handleFormFieldChange = React.useCallback(
     (name: keyof D, value: DataFieldFormValue) => {
-      const validateField = async (values: Partial<OmitId<D>>) => {
+      const validateField = async (values: OmitId<D>) => {
         if (validate) {
           const { issues } = await validate(values);
           setFormErrors({

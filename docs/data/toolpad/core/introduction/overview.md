@@ -8,6 +8,9 @@ title: Toolpad Overview
 
 :::warning
 At the moment the maintainers are primarily focused on other projects and are not actively adding new features to Toolpad Core. They may not be able to respond in a timely manner to issues or pull requests.
+
+You can use the **CRUD dashboard template** from the [Material UI React templates page](https://mui.com/material-ui/getting-started/templates/#free-templates) as an easy-to-customize, copy-pastable alternative to the main Toolpad Core components — including dashboard layout and CRUD features.
+
 :::
 
 Toolpad Core is a set of full-stack react components that leverages existing MUI components, and ties them with the commonly-used backend integrations to help you create responsive dashboards and internal tools. It comes with the guarantee of MUI's enterprise-tested components, and the Toolpad team's focus on using the latest stable libraries, and prioritising razor-sharp performance.

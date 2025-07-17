@@ -302,7 +302,11 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
               const { field, headerName, renderShowField } = showField;
 
               if (renderShowField) {
-                return renderShowField({ value: (data?.[field] ?? null) as DataFieldFormValue, headerName, data });
+                return renderShowField({
+                  value: (data?.[field] ?? null) as DataFieldFormValue,
+                  headerName,
+                  data,
+                });
               }
 
               const renderedField = renderField(showField);

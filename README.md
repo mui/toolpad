@@ -23,7 +23,7 @@
   <a href="https://trendshift.io/repositories/12027" target="_blank"><img src="https://trendshift.io/api/badge/repositories/12027" alt="mui%2Ftoolpad | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 </div>
 
-> [!IMPORTANT] 
+> [!IMPORTANT]
 > At the moment the maintainers are primarily focused on other projects and are not actively adding new features to Toolpad Core. They may not be able to respond in a timely manner to issues or pull requests.
 
 ## Product walkthrough

@@ -84,7 +84,7 @@ jobs:
       - checkout
       - install_js
       - run:
-          name: Eslint
+          name: ESlint
           command: pnpm eslint
       - run:
           name: Lint JSON

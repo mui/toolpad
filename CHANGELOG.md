@@ -483,7 +483,7 @@ A big thanks to the 8 contributors who made this release possible. Here are some
 - Lock file maintenance (#4176) @renovate[bot]
 - Remove custom playwright installation steps (#4154) @Janpot
 - remove e identifier (#4152) @Janpot
-- Enable React compiler eslint plugin (#4121) @Janpot
+- Enable React compiler ESLint plugin (#4121) @Janpot
 - Remove <-- from changelog (#4232) @oliviertassinari
 - Make git repo easier to go to from IDE @oliviertassinari
 - Increase the minimum Node.js version support to 14.0.0 (#4171) @oliviertassinari
@@ -815,7 +815,7 @@ This release adds Dialogs and Notifications hooks to Toolpad Core! Supporting th
 - Add dashboard tutorial to introduction (#3637) @Janpot
 - Lock file maintenance Docs (#3623) @renovate[bot]
 - [AppProvider] Create basic router adapters (#3638) @Janpot
-- [code-infra] Add eslint plugin for testing-library (#3648) @Janpot
+- [code-infra] Add ESLint plugin for testing-library (#3648) @Janpot
 - [core] Remove update-monorepo.yml (#3712) @oliviertassinari
 - [core] Add browserslistrc (#3711) @Janpot
 - [core] dedupe emotion and react-query (#3695) @Janpot
@@ -850,7 +850,7 @@ First components in @toolpad/core: [DashboardLayout](https://github.com/mui/tool
 - Group vite dependency updates @Janpot
 - Generate API docs for Toolpad Core (#3536) @apedroferreira
 - Add DashboardLayout component to @toolpad/core (#3554) @apedroferreira
-- Some fixes from new react compiler eslint plugin (#3562) @Janpot
+- Some fixes from new react compiler ESLint plugin (#3562) @Janpot
 - Update renovate.json @Janpot
 - Updates to project setup (#3561) @Janpot
 - Add keywords and other info in package.json (#3556) @prakhargupta1
@@ -904,7 +904,7 @@ Add max width option to page container, auto-scroll to selected elements, suppor
 - Remove renovate grouping (#3325) @Janpot
 - Remove unsupported engines section from renovate (#3376) @Janpot
 - fix: Duplicate entry in `CHANGELOG.md` (#3388) @bharatkashyap
-- [code-infra] Closer sync with eslint config of codebase (#3441) @oliviertassinari
+- [code-infra] Closer sync with ESLint config of codebase (#3441) @oliviertassinari
 - [core] Support toggling initial visibility of columns (#3490) @Janpot
 - [core] ESLint unification (#3488) @oliviertassinari
 - [core] Remove react pages experiment (#3483) @Janpot
@@ -1865,7 +1865,7 @@ New Chart and Metric components, a page structure explorer to view components hi
 - Chart component (#2081) @apedroferreira
 - Remove Next.js (#2288) @Janpot
 - Remove packages/toolpad (#2287) @Janpot
-- Codify lodash usage in eslint (#1270) @Janpot
+- Codify lodash usage in ESLint (#1270) @Janpot
 - Add some visual regression tests (#1959) @Janpot
 - Add Metric component (#2202) @Janpot
 - Switch to stackblitz links for examples (#2307) @Janpot
@@ -1900,7 +1900,7 @@ Use vite for the Toolpad application instead of Next.js, Windows support, docume
 - Disallow access to DOM globals in bindings (#1991) @Janpot
 - Clarify the rules around documentation screenshots (#2296) @Janpot
 - Isolate prettier in renovatebot (#2295) @Janpot
-- Add eslint rule restricting React import style (#2286) @Janpot
+- Add ESLint rule restricting React import style (#2286) @Janpot
 - Provide all exports of @mui/toolpad on @mui/toolpad-app (#2284) @Janpot
 - Resolve components from source for docs:build:api (#2280) @Janpot
 - Use vite for Toolpad editor (#1999) @Janpot
@@ -2730,7 +2730,7 @@ Client-side functions, migration fixes, add sidebar to overview page, support vi
 - Move TypeScript to devDependencies (#1366) @Janpot
 - Remove sentry debug option (#1361) @Janpot
 - Fix yarn.lock @Janpot
-- Upgrade eslint (#1287) @Janpot
+- Upgrade ESLint (#1287) @Janpot
 - Fallback to visible captcha if invisible captcha fails (#1272) @apedroferreira
 - Refactor overview page (#1357) @Janpot
 - Fix migration to v3 (#1359) @Janpot
@@ -2842,7 +2842,7 @@ Added new Data Grid column types, improved dev mode performance, support for pag
 - Support duplicating pages, connection, components (#1210) @Janpot
 - Part 5: Update building ui docs (#1215) @bytasv
 - Part 6: Update data binding docs (#1216) @bytasv
-- [core] Fixes for upcoming eslint upgrade (#1249) @Janpot
+- [core] Fixes for upcoming ESLint upgrade (#1249) @Janpot
 - [core] Remove unused GitHub Action permission @oliviertassinari
 - [core] Pin GitHub Action to digests (#1250) @oliviertassinari
 - [core] Fix permissions in workflow @oliviertassinari
@@ -2865,7 +2865,7 @@ Add element duplication, improved Paper component, improved node naming UX, supp
 - renovatebot, tweak playwright @Janpot
 - Add API and datasource logging (#1066) @apedroferreira
 - fix name @Janpot
-- Codify the icons exception in eslint (#1211) @Janpot
+- Codify the icons exception in ESLint (#1211) @Janpot
 - Improve Paper component (#1031) @apedroferreira
 - Deploy with keyboard enter (#1188) @bytasv
 - Part 3: Update connections docs (#1203) @bytasv
@@ -2974,7 +2974,7 @@ Improve update notification, fold mutations into queries, support duplicating ap
 - Support public applications (#1009) @Janpot
 - [app] Select options editor enhancements (#1055) @bharatkashyap
 - [core] disable react-router-dom update (#1123) @Janpot
-- [core] Remove jsdoc eslint (#1109) @Janpot
+- [core] Remove jsdoc ESLint (#1109) @Janpot
 - [core] Remove dead dependency @oliviertassinari
 - [core] Rename query and params to parameters in fetch and function editors (#1096) @bytasv
 - [core] x10 speedup of yarn install in the CI (#1098) @oliviertassinari

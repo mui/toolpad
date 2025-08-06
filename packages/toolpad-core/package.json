@@ -67,13 +67,13 @@
     "@types/react-dom": "^19.1.6",
     "@types/sinon": "^17.0.4",
     "@vitejs/plugin-react": "4.6.0",
-    "@vitest/browser": "2.1.9",
+    "@vitest/browser": "3.2.4",
     "next": "^15.3.4",
     "next-router-mock": "^1.0.2",
     "playwright": "1.54.1",
     "react-router": "7.6.3",
     "sinon": "^21.0.0",
-    "vitest": "2.1.9"
+    "vitest": "3.2.4"
   },
   "peerDependencies": {
     "@emotion/cache": "^11",

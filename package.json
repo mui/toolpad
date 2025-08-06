@@ -36,22 +36,22 @@
   },
   "devDependencies": {
     "@argos-ci/core": "3.2.0",
-    "@babel/cli": "7.27.2",
-    "@babel/core": "7.27.4",
-    "@babel/node": "7.27.1",
+    "@babel/cli": "7.28.0",
+    "@babel/core": "7.28.0",
+    "@babel/node": "7.28.0",
     "@babel/plugin-transform-react-constant-elements": "7.27.1",
-    "@babel/plugin-transform-runtime": "7.27.4",
-    "@babel/preset-env": "7.27.2",
+    "@babel/plugin-transform-runtime": "7.28.0",
+    "@babel/preset-env": "7.28.0",
     "@babel/preset-react": "7.27.1",
     "@babel/preset-typescript": "7.27.1",
     "@mui/internal-babel-plugin-resolve-imports": "2.0.5",
     "@mui/internal-docs-utils": "2.0.1",
-    "@mui/internal-markdown": "2.0.6",
-    "@mui/internal-scripts": "2.0.9",
+    "@mui/internal-markdown": "2.0.7",
+    "@mui/internal-scripts": "2.0.10",
     "@mui/monorepo": "github:mui/material-ui#3641a0b7b5c4506b7d44f3241580087b56482c74",
-    "@mui/x-charts": "^8.5.3",
+    "@mui/x-charts": "^8.8.0",
     "@next/eslint-plugin-next": "15.3.4",
-    "@playwright/test": "1.53.1",
+    "@playwright/test": "1.54.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "16.3.0",
     "@testing-library/user-event": "14.6.1",
@@ -59,15 +59,15 @@
     "@types/fs-extra": "11.0.4",
     "@types/gtag.js": "0.0.20",
     "@types/invariant": "2.2.37",
-    "@types/node": "^20.19.1",
+    "@types/node": "^20.19.4",
     "@types/yargs": "17.0.33",
-    "@typescript-eslint/eslint-plugin": "^8.34.1",
-    "@typescript-eslint/parser": "^8.34.1",
+    "@typescript-eslint/eslint-plugin": "^8.35.1",
+    "@typescript-eslint/parser": "^8.35.1",
     "@vitest/coverage-v8": "2.1.9",
     "babel-plugin-react-remove-properties": "0.3.0",
     "babel-plugin-transform-react-remove-prop-types": "0.4.24",
     "chalk": "5.4.1",
-    "concurrently": "9.1.2",
+    "concurrently": "9.2.0",
     "css-mediaquery": "^0.1.2",
     "danger": "^13.0.4",
     "eslint": "8.57.1",
@@ -92,9 +92,9 @@
     "fs-extra": "11.3.0",
     "globby": "14.1.0",
     "jsdom": "26.1.0",
-    "lerna": "8.2.2",
+    "lerna": "8.2.3",
     "markdownlint-cli2": "0.18.1",
-    "prettier": "3.5.3",
+    "prettier": "3.6.2",
     "pretty-quick": "4.2.2",
     "react-docgen": "5.4.3",
     "react-inspector": "6.0.2",
@@ -108,7 +108,7 @@
     "vitest-fail-on-console": "0.7.1"
   },
   "dependencies": {
-    "@types/lodash": "4.17.18",
+    "@types/lodash": "4.17.20",
     "@vitest/browser": "2.1.9",
     "archiver": "7.0.1",
     "cross-env": "7.0.3",
@@ -123,15 +123,15 @@
     "vitest": "2.1.9",
     "yargs": "17.7.2",
     "zod": "3.25.67",
-    "zod-to-json-schema": "3.24.5"
+    "zod-to-json-schema": "3.24.6"
   },
   "resolutions": {
     "google-auth-library": "*",
-    "@types/node": "^20.19.1"
+    "@types/node": "^20.19.4"
   },
-  "packageManager": "pnpm@10.12.1",
+  "packageManager": "pnpm@10.12.4",
   "engines": {
     "node": ">=20",
-    "pnpm": "10.12.1"
+    "pnpm": "10.12.4"
   }
 }

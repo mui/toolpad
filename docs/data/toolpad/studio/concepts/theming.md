@@ -15,7 +15,6 @@ Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead
 
 1. To change the application theme, go to the **Theme** tab in the inspector panel.
 2. In the theme options you can:
-
    - change your UI to light or dark mode.
    - set primary and secondary colors for your UI, from a predefined list of colors.
 

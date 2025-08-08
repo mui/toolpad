@@ -546,8 +546,8 @@ importers:
   packages/create-toolpad-app:
     dependencies:
       '@inquirer/prompts':
-        specifier: ^7.7.0
-        version: 7.7.0(@types/node@20.19.4)
+        specifier: ^7.8.1
+        version: 7.8.1(@types/node@20.19.4)
       '@toolpad/core':
         specifier: workspace:*
         version: link:../toolpad-core/build
@@ -2503,8 +2503,8 @@ packages:
       '@types/node':
         optional: true
 
-  '@inquirer/editor@4.2.15':
-    resolution: {integrity: sha512-wst31XT8DnGOSS4nNJDIklGKnf+8shuauVrWzgKegWUe28zfCftcWZ2vktGdzJgcylWSS2SrDnYUb6alZcwnCQ==}
+  '@inquirer/editor@4.2.16':
+    resolution: {integrity: sha512-iSzLjT4C6YKp2DU0fr8T7a97FnRRxMO6CushJnW5ktxLNM2iNeuyUuUA5255eOLPORoGYCrVnuDOEBdGkHGkpw==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/node': ^20.19.4
@@ -2520,6 +2520,12 @@ packages:
     peerDependenciesMeta:
       '@types/node':
         optional: true
+
+  '@inquirer/external-editor@1.0.0':
+    resolution: {integrity: sha512-5v3YXc5ZMfL6OJqXPrX9csb4l7NlQA2doO1yynUjpUChT9hg4JcuBVP0RbsEJ/3SL/sxWEyFjT2W69ZhtoBWqg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@types/node': ^20.19.4
 
   '@inquirer/figures@1.0.13':
     resolution: {integrity: sha512-lGPVU3yO9ZNqA7vTYz26jny41lE7yoQansmqdMLBEfqaGsmdg7V3W9mK9Pvb5IL4EVZ9GnSDGMO/cJXud5dMaw==}
@@ -2552,8 +2558,8 @@ packages:
       '@types/node':
         optional: true
 
-  '@inquirer/prompts@7.7.0':
-    resolution: {integrity: sha512-8/7fOJA/Q5qqxznIvYjEvUCeRE6pncc1OHEmeA5JdNIKfOBC3a0EE5lFBofTWK/WXKfsjMkIz28y/uL6A3frYA==}
+  '@inquirer/prompts@7.8.1':
+    resolution: {integrity: sha512-LpBPeIpyCF1H3C7SK/QxJQG4iV1/SRmJdymfcul8PuwtVhD0JI1CSwqmd83VgRgt1QEsDojQYFSXJSgo81PVMw==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/node': ^20.19.4
@@ -2570,8 +2576,8 @@ packages:
       '@types/node':
         optional: true
 
-  '@inquirer/search@3.0.17':
-    resolution: {integrity: sha512-CuBU4BAGFqRYors4TNCYzy9X3DpKtgIW4Boi0WNkm4Ei1hvY9acxKdBdyqzqBCEe4YxSdaQQsasJlFlUJNgojw==}
+  '@inquirer/search@3.1.0':
+    resolution: {integrity: sha512-PMk1+O/WBcYJDq2H7foV0aAZSmDdkzZB9Mw2v/DmONRJopwA/128cS9M/TXWLKKdEQKZnKwBzqu2G4x/2Nqx8Q==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/node': ^20.19.4
@@ -2579,8 +2585,8 @@ packages:
       '@types/node':
         optional: true
 
-  '@inquirer/select@4.3.0':
-    resolution: {integrity: sha512-dY4sPBAfGH6Cv435gOSbNbMsLd6v1ItNmhjsLY+LTY4h8L+SAOERL2L/VtvjZFSVpVcY4dcu8fo6Uq8H8vNvzQ==}
+  '@inquirer/select@4.3.1':
+    resolution: {integrity: sha512-Gfl/5sqOF5vS/LIrSndFgOh7jgoe0UXEizDqahFRkq5aJBLegZ6WjuMh/hVEJwlFQjyLq1z9fRtvUMkb7jM1LA==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/node': ^20.19.4
@@ -5079,6 +5085,9 @@ packages:
 
   chardet@0.7.0:
     resolution: {integrity: sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==}
+
+  chardet@2.1.0:
+    resolution: {integrity: sha512-bNFETTG/pM5ryzQ9Ad0lJOTa6HWD/YsScAR3EnCPZRPlQh77JocYktSHOUHelyhm8IARL+o4c4F1bP5KVOjiRA==}
 
   check-error@2.1.1:
     resolution: {integrity: sha512-OAlb+T7V4Op9OwdkjmguYRqncdlx5JiofwOAUkmTF+jNdHwzTaTs4sRAGpzLF3oOz5xAyDGrPgeIDFQmDOTiJw==}
@@ -9462,6 +9471,7 @@ packages:
   source-map@0.8.0-beta.0:
     resolution: {integrity: sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==}
     engines: {node: '>= 8'}
+    deprecated: The work that was done in this beta branch won't be included in future versions
 
   spdx-correct@3.2.0:
     resolution: {integrity: sha512-kN9dJbvnySHULIluDHy32WHRUu3Og7B9sbY7tsFLctQkIqnMh3hErYgdMjTYuqmcXX+lK5T1lnUt3G7zNswmZA==}
@@ -12262,11 +12272,11 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.19.4
 
-  '@inquirer/editor@4.2.15(@types/node@20.19.4)':
+  '@inquirer/editor@4.2.16(@types/node@20.19.4)':
     dependencies:
       '@inquirer/core': 10.1.15(@types/node@20.19.4)
+      '@inquirer/external-editor': 1.0.0(@types/node@20.19.4)
       '@inquirer/type': 3.0.8(@types/node@20.19.4)
-      external-editor: 3.1.0
     optionalDependencies:
       '@types/node': 20.19.4
 
@@ -12277,6 +12287,12 @@ snapshots:
       yoctocolors-cjs: 2.1.2
     optionalDependencies:
       '@types/node': 20.19.4
+
+  '@inquirer/external-editor@1.0.0(@types/node@20.19.4)':
+    dependencies:
+      '@types/node': 20.19.4
+      chardet: 2.1.0
+      iconv-lite: 0.6.3
 
   '@inquirer/figures@1.0.13': {}
 
@@ -12302,18 +12318,18 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.19.4
 
-  '@inquirer/prompts@7.7.0(@types/node@20.19.4)':
+  '@inquirer/prompts@7.8.1(@types/node@20.19.4)':
     dependencies:
       '@inquirer/checkbox': 4.2.0(@types/node@20.19.4)
       '@inquirer/confirm': 5.1.14(@types/node@20.19.4)
-      '@inquirer/editor': 4.2.15(@types/node@20.19.4)
+      '@inquirer/editor': 4.2.16(@types/node@20.19.4)
       '@inquirer/expand': 4.0.17(@types/node@20.19.4)
       '@inquirer/input': 4.2.1(@types/node@20.19.4)
       '@inquirer/number': 3.0.17(@types/node@20.19.4)
       '@inquirer/password': 4.0.17(@types/node@20.19.4)
       '@inquirer/rawlist': 4.1.5(@types/node@20.19.4)
-      '@inquirer/search': 3.0.17(@types/node@20.19.4)
-      '@inquirer/select': 4.3.0(@types/node@20.19.4)
+      '@inquirer/search': 3.1.0(@types/node@20.19.4)
+      '@inquirer/select': 4.3.1(@types/node@20.19.4)
     optionalDependencies:
       '@types/node': 20.19.4
 
@@ -12325,7 +12341,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.19.4
 
-  '@inquirer/search@3.0.17(@types/node@20.19.4)':
+  '@inquirer/search@3.1.0(@types/node@20.19.4)':
     dependencies:
       '@inquirer/core': 10.1.15(@types/node@20.19.4)
       '@inquirer/figures': 1.0.13
@@ -12334,7 +12350,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.19.4
 
-  '@inquirer/select@4.3.0(@types/node@20.19.4)':
+  '@inquirer/select@4.3.1(@types/node@20.19.4)':
     dependencies:
       '@inquirer/core': 10.1.15(@types/node@20.19.4)
       '@inquirer/figures': 1.0.13
@@ -15553,6 +15569,8 @@ snapshots:
   character-reference-invalid@2.0.1: {}
 
   chardet@0.7.0: {}
+
+  chardet@2.1.0: {}
 
   check-error@2.1.1: {}
 

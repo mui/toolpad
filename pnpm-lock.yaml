@@ -635,8 +635,8 @@ importers:
         specifier: 2.2.4
         version: 2.2.4
       path-to-regexp:
-        specifier: 6.3.0
-        version: 6.3.0
+        specifier: 8.2.0
+        version: 8.2.0
       prop-types:
         specifier: 15.8.1
         version: 15.8.1
@@ -9462,6 +9462,7 @@ packages:
   source-map@0.8.0-beta.0:
     resolution: {integrity: sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==}
     engines: {node: '>= 8'}
+    deprecated: The work that was done in this beta branch won't be included in future versions
 
   spdx-correct@3.2.0:
     resolution: {integrity: sha512-kN9dJbvnySHULIluDHy32WHRUu3Og7B9sbY7tsFLctQkIqnMh3hErYgdMjTYuqmcXX+lK5T1lnUt3G7zNswmZA==}

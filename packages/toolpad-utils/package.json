@@ -51,7 +51,7 @@
     "@types/react": "^19.1.8",
     "@types/react-is": "^19.0.0",
     "@types/title": "4.0.0",
-    "vitest": "2.1.9"
+    "vitest": "3.2.4"
   },
   "publishConfig": {
     "access": "public",

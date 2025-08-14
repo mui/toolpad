@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import Link from '@mui/material/Link';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/AuthPage';
 import { providerMap } from '../../../auth';
 import signIn from './actions';
 

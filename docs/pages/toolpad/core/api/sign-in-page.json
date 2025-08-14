@@ -37,10 +37,7 @@
     }
   },
   "name": "SignInPage",
-  "imports": [
-    "import { SignInPage } from '@toolpad/core/SignInPage';",
-    "import { SignInPage } from '@toolpad/core';"
-  ],
+  "imports": ["import { SignInPage } from '@toolpad/core/AuthPage';"],
   "slots": [
     {
       "name": "emailField",
@@ -95,7 +92,7 @@
   "spread": true,
   "themeDefaultProps": false,
   "muiName": "SignInPage",
-  "filename": "/packages/toolpad-core/src/SignInPage/SignInPage.tsx",
+  "filename": "/packages/toolpad-core/src/AuthPage/SignInPage/SignInPage.tsx",
   "inheritance": null,
   "demos": "<ul><li><a href=\"/toolpad/core/react-sign-in-page/\">Sign-in Page</a></li></ul>",
   "cssComponent": false

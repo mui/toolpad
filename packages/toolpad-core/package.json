@@ -66,7 +66,7 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@types/sinon": "^17.0.4",
-    "@vitejs/plugin-react": "4.6.0",
+    "@vitejs/plugin-react": "5.0.0",
     "@vitest/browser": "2.1.9",
     "next": "^15.3.4",
     "next-router-mock": "^1.0.2",

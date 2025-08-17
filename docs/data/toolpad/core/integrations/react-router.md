@@ -461,7 +461,7 @@ You can protect any page or groups of pages through this mechanism.
 ```tsx title="src/pages/signIn.tsx"
 'use client';
 import * as React from 'react';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/AuthPage';
 import LinearProgress from '@mui/material/LinearProgress';
 import { Navigate, useNavigate } from 'react-router';
 import { useSession, type Session } from '../SessionContext';

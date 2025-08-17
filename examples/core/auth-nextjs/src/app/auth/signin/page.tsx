@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
+import { SignInPage, type AuthProvider } from '@toolpad/core/AuthPage';
 import { AuthError } from 'next-auth';
 import { providerMap, signIn } from '../../../auth';
 

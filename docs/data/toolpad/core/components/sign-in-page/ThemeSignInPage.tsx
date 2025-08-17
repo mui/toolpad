@@ -4,7 +4,7 @@ import {
   SignInPage,
   type AuthProvider,
   type AuthResponse,
-} from '@toolpad/core/SignInPage';
+} from '@toolpad/core/AuthPage';
 import { createTheme } from '@mui/material/styles';
 import { useColorSchemeShim } from 'docs/src/modules/components/ThemeContext';
 import { getDesignTokens, inputsCustomizations } from './customTheme';

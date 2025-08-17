@@ -6,7 +6,7 @@ import { input, confirm, select, checkbox } from '@inquirer/prompts';
 import chalk from 'chalk';
 import { satisfies } from 'semver';
 import invariant from 'invariant';
-import type { SupportedAuthProvider } from '@toolpad/core/SignInPage';
+import type { SupportedAuthProvider } from '@toolpad/core/AuthPage';
 import { bashResolvePath } from '@toolpad/utils/cli';
 import { downloadAndExtractExample } from './examples';
 import type { SupportedFramework, SupportedRouter, GenerateProjectOptions } from './types';

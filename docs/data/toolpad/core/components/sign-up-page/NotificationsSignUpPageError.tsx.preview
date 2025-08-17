@@ -1,0 +1,13 @@
+resolve({
+  error: 'Invalid credentials.',
+});
+
+// ...
+
+<AppProvider theme={theme}>
+  <SignUpPage
+    signUp={signUp}
+    providers={providers}
+    slotProps={{ emailField: { autoFocus: false }, form: { noValidate: true } }}
+  />
+</AppProvider>

@@ -81,7 +81,7 @@ Toolpad Core uses slots for component customization. Slots allow you to override
 Here's an example using the `SignInPage` component:
 
 ```tsx
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/AuthPage';
 function MyComponent() {
   return (
     <SignInPage

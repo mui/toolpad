@@ -2,7 +2,7 @@ export * from './AppProvider';
 
 export * from './DashboardLayout';
 
-export * from './SignInPage';
+export * from './AuthPage';
 
 export * from './Account';
 

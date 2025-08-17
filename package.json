@@ -10,7 +10,7 @@
     "proptypes": "tsx ./scripts/generateProptypes.ts",
     "install:codesandbox": "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 pnpm install",
     "markdownlint": "markdownlint-cli2 \"**/*.md\"",
-    "prettier": "pretty-quick --ignore-path .eslintignore",
+    "prettier": "pretty-quick --ignore-path .eslintignore --branch master",
     "prettier:all": "prettier --write . --ignore-path .eslintignore",
     "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --ignore docs --ignore playground-*",
     "docs:dev": "pnpm --filter docs dev",

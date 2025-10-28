@@ -1,3 +1,10 @@
+> [!WARNING]
+> At the moment, the maintainers are primarily focused on other projects and are not actively working on Toolpad Core. We may not be able to respond promptly to issues or pull requests.
+>
+> You can use the **CRUD dashboard template** from the [Material UI React templates page](https://mui.com/material-ui/getting-started/templates/#free-templates) as an easy-to-customize, copy-pastable alternative to the main Toolpad Core components — including dashboard layout and CRUD features.
+
+---
+
 <!-- markdownlint-disable-next-line -->
 <p align="center">
   <a href="https://mui.com/toolpad/" rel="noopener" target="_blank"><img width="150" src="https://mui.com/static/branding/product-toolpad-light.svg" alt="Toolpad logo"></a>
@@ -22,11 +29,6 @@
 <div align="center">
   <a href="https://trendshift.io/repositories/12027" target="_blank"><img src="https://trendshift.io/api/badge/repositories/12027" alt="mui%2Ftoolpad | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 </div>
-
-> [!IMPORTANT]
-> At the moment the maintainers are primarily focused on other projects and are not actively adding new features to Toolpad Core. They may not be able to respond in a timely manner to issues or pull requests.
->
-> You can use the **CRUD dashboard template** from the [Material UI React templates page](https://mui.com/material-ui/getting-started/templates/#free-templates) as an easy-to-customize, copy-pastable alternative to the main Toolpad Core components — including dashboard layout and CRUD features.
 
 ## Product walkthrough
 

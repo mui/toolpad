@@ -1,19 +1,42 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
-import SvgToolpadLogo from 'docs/src/icons/SvgToolpadCoreLogo';
 import Box from '@mui/material/Box';
-import GradientText from 'docs/src/components/typography/GradientText';
 import Container from '@mui/material/Container';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 import { Typewriter } from 'react-simple-typewriter';
+import SvgToolpadLogo from 'docs/src/icons/SvgToolpadCoreLogo';
+import GradientText from 'docs/src/components/typography/GradientText';
 import GetStartedButtons from './GetStartedButtons';
 
 export default function Hero() {
   return (
     <Container
       sx={{
-        py: { xs: 4, sm: 8 },
+        py: { xs: 4, sm: 2 },
       }}
     >
+      <Alert
+        severity="warning"
+        sx={{
+          mb: 4,
+          '& .MuiAlert-message': {
+            width: '100%',
+          },
+        }}
+      >
+        <AlertTitle>Warning</AlertTitle>
+        At the moment, the maintainers are primarily focused on other projects and are not actively
+        working on Toolpad Core and Studio. You can use the CRUD dashboard template from the{' '}
+        <a
+          href="https://mui.com/material-ui/getting-started/templates/#free-templates"
+          style={{ color: 'inherit', textDecoration: 'underline' }}
+        >
+          Material UI React templates page
+        </a>{' '}
+        as an easy-to-customize, copy-pastable alternative to the main Toolpad Core components —
+        including dashboard layout and CRUD features.
+      </Alert>
       <Box
         sx={{
           display: 'flex',

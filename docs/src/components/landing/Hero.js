@@ -1,12 +1,12 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
+import SvgToolpadLogo from 'docs/src/icons/SvgToolpadCoreLogo';
 import Box from '@mui/material/Box';
+import GradientText from 'docs/src/components/typography/GradientText';
 import Container from '@mui/material/Container';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import { Typewriter } from 'react-simple-typewriter';
-import SvgToolpadLogo from 'docs/src/icons/SvgToolpadCoreLogo';
-import GradientText from 'docs/src/components/typography/GradientText';
 import GetStartedButtons from './GetStartedButtons';
 
 export default function Hero() {

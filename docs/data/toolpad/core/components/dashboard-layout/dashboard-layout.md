@@ -8,8 +8,8 @@ components: AppProvider, DashboardLayout, DashboardHeader, ToolbarActions, Theme
 
 <p class="description">The dashboard layout component provides a customizable out-of-the-box layout for a typical dashboard page.</p>
 
-:::info
-If this is your first time using Toolpad Core, it's recommended to read about the [basic concepts](/toolpad/core/introduction/base-concepts/) first.
+:::warning
+As mentioned in the [introduction](https://mui.com/toolpad/core/introduction/), Toolpad Core is not in active development. If you are interested in this feature then please check and upvote [this issue](https://github.com/mui/material-ui/issues/14519).
 :::
 
 The `DashboardLayout` component is a quick, easy way to provide a standard full-screen layout with a header and sidebar to any dashboard page, as well as ready-to-use and easy to customize navigation and branding.

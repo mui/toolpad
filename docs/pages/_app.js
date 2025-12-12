@@ -286,9 +286,8 @@ function AppWrapper(props) {
                     {isDocs && !isToolpadHome ? (
                       <Box
                         sx={{
-                          position: 'sticky',
                           top: 'var(--MuiDocs-header-height)',
-                          zIndex: 10,
+
                           mt: 'var(--MuiDocs-header-height)',
                           ml: { md: 'var(--MuiDocs-navDrawer-width)' },
                         }}

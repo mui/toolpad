@@ -9,7 +9,7 @@ components: Crud, CrudProvider, List, Show, Create, Edit, CrudForm
 <p class="description">The CRUD component provides UIs to interact with data from any data source.</p>
 
 :::warning
-As mentioned in the [introduction](https://mui.com/toolpad/core/introduction/), Toolpad Core is not in active development. If you are interested in this feature then please check and upvote [this issue](https://github.com/mui/mui-x/issues/20285).
+If you are interested in this feature then please check and upvote [this issue](https://github.com/mui/mui-x/issues/20285).
 :::
 
 With the `Crud` component and its subcomponents you can easily generate pages where items from your data source can be listed in a table, shown individually in detail, or created and edited with forms. All with minimal configuration from a single data source definition.

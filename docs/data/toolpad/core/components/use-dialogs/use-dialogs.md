@@ -9,7 +9,7 @@ components: DialogsProvider
 <p class="description">Imperative APIs to open and interact with dialogs.</p>
 
 :::warning
-As mentioned in the [introduction](https://mui.com/toolpad/core/introduction/), Toolpad Core is not in active development. If you are interested in this feature then please check and upvote [this issue](https://github.com/mui/material-ui/issues/24759).
+If you are interested in this feature then please check and upvote [this issue](https://github.com/mui/material-ui/issues/24759).
 :::
 
 Toolpad Core offers a set of abstractions that makes interacting with dialogs simpler. It has an imperative API to open and close dialogs, and allows dialogs to be stacked on top of each other.

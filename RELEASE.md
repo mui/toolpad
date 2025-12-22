@@ -25,7 +25,6 @@
 1. Copy the generated changelog from the console, clean it up, add a short summary of the release highlights and use the new version number as the title.
 
    Writing good highlights:
-
    - Focus on new user facing features or changes
    - Be concise, link to relevant documentation for extra clarity
 
@@ -74,7 +73,6 @@
 1. Merge the PR changes, then check out the `master` branch and pull the last commit.
 
 1. Publish the package to `npm`
-
    1. If you are not logged in to `npm` in your CLI, first log in with:
 
       ```bash

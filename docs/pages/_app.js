@@ -289,7 +289,7 @@ function AppWrapper(props) {
                           top: 'var(--MuiDocs-header-height)',
 
                           mt: 'var(--MuiDocs-header-height)',
-                          ml: { md: 'var(--MuiDocs-navDrawer-width)' },
+                          ml: { lg: 'var(--MuiDocs-navDrawer-width)' },
                         }}
                       >
                         <Banner />

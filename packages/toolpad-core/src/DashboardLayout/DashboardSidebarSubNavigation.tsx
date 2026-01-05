@@ -78,6 +78,7 @@ function DashboardSidebarSubNavigationPageItem({
           onLinkClick={onLinkClick}
           isPopover={isMini}
           sidebarExpandedWidth={sidebarExpandedWidth}
+          renderPageItem={renderPageItem}
         />
       ),
     }),

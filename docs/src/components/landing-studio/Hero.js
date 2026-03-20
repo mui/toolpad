@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import SvgMuiLogo from 'docs/src/icons/SvgMuiLogomark';
 import BrushIcon from '@mui/icons-material/Brush';
+import Alert from '@mui/material/Alert';
 import { Typewriter } from 'react-simple-typewriter';
 import GradientText from 'docs/src/components/typography/GradientText';
 import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
@@ -100,165 +101,194 @@ export default function Hero() {
   const fileIndex = React.useMemo(() => Math.floor(frameIndex / 2), [frameIndex]);
 
   return (
-    <ToolpadHeroContainer>
-      <Box
+    <div>
+      <Alert
+        severity="warning"
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          maxWidth: { md: 500, lg: 600, xl: 'unset' },
+          mb: 4,
+          borderRadius: 0,
+          '& .MuiAlert-message': {
+            width: '100%',
+          },
         }}
       >
-        <Typography
-          fontWeight="bold"
-          variant="body2"
-          sx={[
-            (theme) => ({
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              color: (theme.vars || theme).palette.primary[600],
-              ...theme.applyDarkStyles({
-                color: (theme.vars || theme).palette.primary[400],
-              }),
-            }),
-          ]}
+        At the moment, the maintainers are primarily focused on other projects and are not actively
+        working on Toolpad Core and Studio. You can use the CRUD dashboard template from the{' '}
+        <a
+          href="https://mui.com/material-ui/getting-started/templates/#free-templates"
+          style={{ color: 'inherit', textDecoration: 'underline' }}
         >
-          <BrushIcon sx={{ fontSize: '0.875rem' }} />
-          <Box component="span" sx={{ ml: 0.5, mr: 1 }}>
-            Toolpad Studio
-          </Box>
-        </Typography>
-        <Typography variant="h1" sx={{ my: 2, minWidth: { xs: 'auto', sm: 600 } }}>
-          Turn your{' '}
-          <Typewriter
-            loop
-            cursor
-            typeSpeed={100}
-            deleteSpeed={80}
-            delaySpeed={5200}
-            words={words}
-          />
-          <br />
-          <GradientText>into UIs</GradientText>
-        </Typography>
-        <Typography color="text.secondary" sx={{ maxWidth: 520, mb: 3, textWrap: 'balance' }}>
-          Build scalable and secure internal tools locally. Drag and drop to build UI, then connect
-          to data sources with your own code.
-        </Typography>
+          Material UI React templates page
+        </a>{' '}
+        as an easy-to-customize, copy-pastable alternative to the main Toolpad Core components —
+        including dashboard layout and CRUD features. To share any feedback, please check{' '}
+        <a
+          href="https://github.com/mui/toolpad/discussions/5011"
+          style={{ color: 'inherit', textDecoration: 'underline' }}
+        >
+          this GitHub discussion.
+        </a>{' '}
+      </Alert>
+      <ToolpadHeroContainer>
         <Box
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            alignItems: { xs: 'center', md: 'flex-start' },
+            justifyContent: 'center',
+            maxWidth: { md: 500, lg: 600, xl: 'unset' },
           }}
         >
-          <GetStartedButtons
-            primaryLabel={'Get started'}
-            primaryUrl={ROUTES.toolpadQuickstart}
-            secondaryLabel={'Book a demo'}
-            secondaryUrl={ROUTES.toolpadDemoBooking}
-            secondaryUrlTarget="_blank"
-            altInstallation={'npx create-toolpad-app@latest --studio'}
-            sx={{ width: '100%' }}
-          />
-        </Box>
-        <Box
-          sx={{
-            mt: 4,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: { xs: 'space-around', sm: 'start' },
-            gap: 2,
-          }}
-        >
-          <GithubStars />
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-            <SvgMuiLogo width={20} />
-            <Typography color="text.secondary" fontWeight="medium" variant="body2">
-              Powered by Material&nbsp;UI
-            </Typography>
-          </Box>
-        </Box>
-      </Box>
-      <Box
-        sx={{
-          position: 'relative',
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-          rowGap: 1,
-        }}
-        onMouseEnter={() => setPauseHeroAnimation(true)}
-        onMouseLeave={() => setPauseHeroAnimation(false)}
-      >
-        <Box
-          className="MuiToolpadHero-image"
-          sx={[
-            (theme) => ({
-              position: { xs: 'absolute', sm: 'relative', md: 'absolute' },
-              gridRowStart: 1,
-              gridRowEnd: 2,
-              gridColumnStart: { xs: 'unset', sm: 1, md: 'unset' },
-              width: '100%',
-              justifySelf: { xs: 'center', sm: 'unset' },
-              '& > img': {
-                objectFit: { xs: 'cover', sm: 'unset' },
-                objectPosition: { xs: 'top', sm: 'unset' },
-              },
-              height: '100%',
-              borderRadius: '16px',
-              padding: '8px',
-              background: `linear-gradient(120deg, ${
-                (theme.vars || theme).palette.grey[50]
-              } 0%, ${alpha(theme.palette.primary[50], 0.5)} 150%)`,
-              border: '1px solid',
-              borderColor: (theme.vars || theme).palette.grey[100],
-              backfaceVisibility: 'hidden',
-              transition: 'all 0.3s ease',
-              transform: {
-                xs: `rotateY(${heroAppMode ? '0' : '180'}deg)`,
-                sm: 'unset',
-                md: `rotateY(${heroAppMode ? '0' : '180'}deg)`,
-              },
-              boxShadow: `0 4px 8px ${alpha(theme.palette.grey[100], 0.9)}`,
-            }),
-            (theme) =>
-              theme.applyDarkStyles({
-                background: `linear-gradient(120deg, ${
-                  (theme.vars || theme).palette.primaryDark[500]
-                } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
-                borderColor: `${alpha(theme.palette.primaryDark[300], 0.3)}`,
-                boxShadow: `0 4px 8px ${alpha(theme.palette.common.black, 0.8)}`,
+          <Typography
+            fontWeight="bold"
+            variant="body2"
+            sx={[
+              (theme) => ({
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                color: (theme.vars || theme).palette.primary[600],
+                ...theme.applyDarkStyles({
+                  color: (theme.vars || theme).palette.primary[400],
+                }),
               }),
-          ]}
-        >
-          <Img
-            src={`/static/toolpad/marketing/hero-${fileIndex + 1}.png`}
-            width="2880"
-            height="1592"
-          />
-        </Box>
-        <CodeBlock appMode={heroAppMode} fileIndex={fileIndex} setFrameIndex={setFrameIndex} />
-        <Box
-          sx={{
-            display: { xs: 'grid', sm: 'none', md: 'grid' },
-            gridRowStart: 2,
-            gridColumnStart: 1,
-            gridColumnEnd: 3,
-            transform: { xs: 'scale(0.95)', sm: 'unset' },
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
-            <Typography variant="caption" color="text.secondary">
-              Code
-            </Typography>
-            <HeroModeSwitch checked={heroAppMode} onChange={handleModeChange} />
-            <Typography variant="caption" color="text.secondary">
-              UI
-            </Typography>
+            ]}
+          >
+            <BrushIcon sx={{ fontSize: '0.875rem' }} />
+            <Box component="span" sx={{ ml: 0.5, mr: 1 }}>
+              Toolpad Studio
+            </Box>
+          </Typography>
+          <Typography variant="h1" sx={{ my: 2, minWidth: { xs: 'auto', sm: 600 } }}>
+            Turn your{' '}
+            <Typewriter
+              loop
+              cursor
+              typeSpeed={100}
+              deleteSpeed={80}
+              delaySpeed={5200}
+              words={words}
+            />
+            <br />
+            <GradientText>into UIs</GradientText>
+          </Typography>
+          <Typography color="text.secondary" sx={{ maxWidth: 520, mb: 3, textWrap: 'balance' }}>
+            Build scalable and secure internal tools locally. Drag and drop to build UI, then
+            connect to data sources with your own code.
+          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: { xs: 'center', md: 'flex-start' },
+            }}
+          >
+            <GetStartedButtons
+              primaryLabel={'Get started'}
+              primaryUrl={ROUTES.toolpadQuickstart}
+              secondaryLabel={'Book a demo'}
+              secondaryUrl={ROUTES.toolpadDemoBooking}
+              secondaryUrlTarget="_blank"
+              altInstallation={'npx create-toolpad-app@latest --studio'}
+              sx={{ width: '100%' }}
+            />
+          </Box>
+          <Box
+            sx={{
+              mt: 4,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: { xs: 'space-around', sm: 'start' },
+              gap: 2,
+            }}
+          >
+            <GithubStars />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+              <SvgMuiLogo width={20} />
+              <Typography color="text.secondary" fontWeight="medium" variant="body2">
+                Powered by Material&nbsp;UI
+              </Typography>
+            </Box>
           </Box>
         </Box>
-      </Box>
-    </ToolpadHeroContainer>
+        <Box
+          sx={{
+            position: 'relative',
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+            rowGap: 1,
+          }}
+          onMouseEnter={() => setPauseHeroAnimation(true)}
+          onMouseLeave={() => setPauseHeroAnimation(false)}
+        >
+          <Box
+            className="MuiToolpadHero-image"
+            sx={[
+              (theme) => ({
+                position: { xs: 'absolute', sm: 'relative', md: 'absolute' },
+                gridRowStart: 1,
+                gridRowEnd: 2,
+                gridColumnStart: { xs: 'unset', sm: 1, md: 'unset' },
+                width: '100%',
+                justifySelf: { xs: 'center', sm: 'unset' },
+                '& > img': {
+                  objectFit: { xs: 'cover', sm: 'unset' },
+                  objectPosition: { xs: 'top', sm: 'unset' },
+                },
+                height: '100%',
+                borderRadius: '16px',
+                padding: '8px',
+                background: `linear-gradient(120deg, ${
+                  (theme.vars || theme).palette.grey[50]
+                } 0%, ${alpha(theme.palette.primary[50], 0.5)} 150%)`,
+                border: '1px solid',
+                borderColor: (theme.vars || theme).palette.grey[100],
+                backfaceVisibility: 'hidden',
+                transition: 'all 0.3s ease',
+                transform: {
+                  xs: `rotateY(${heroAppMode ? '0' : '180'}deg)`,
+                  sm: 'unset',
+                  md: `rotateY(${heroAppMode ? '0' : '180'}deg)`,
+                },
+                boxShadow: `0 4px 8px ${alpha(theme.palette.grey[100], 0.9)}`,
+              }),
+              (theme) =>
+                theme.applyDarkStyles({
+                  background: `linear-gradient(120deg, ${
+                    (theme.vars || theme).palette.primaryDark[500]
+                  } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
+                  borderColor: `${alpha(theme.palette.primaryDark[300], 0.3)}`,
+                  boxShadow: `0 4px 8px ${alpha(theme.palette.common.black, 0.8)}`,
+                }),
+            ]}
+          >
+            <Img
+              src={`/static/toolpad/marketing/hero-${fileIndex + 1}.png`}
+              width="2880"
+              height="1592"
+            />
+          </Box>
+          <CodeBlock appMode={heroAppMode} fileIndex={fileIndex} setFrameIndex={setFrameIndex} />
+          <Box
+            sx={{
+              display: { xs: 'grid', sm: 'none', md: 'grid' },
+              gridRowStart: 2,
+              gridColumnStart: 1,
+              gridColumnEnd: 3,
+              transform: { xs: 'scale(0.95)', sm: 'unset' },
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
+              <Typography variant="caption" color="text.secondary">
+                Code
+              </Typography>
+              <HeroModeSwitch checked={heroAppMode} onChange={handleModeChange} />
+              <Typography variant="caption" color="text.secondary">
+                UI
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+      </ToolpadHeroContainer>
+    </div>
   );
 }

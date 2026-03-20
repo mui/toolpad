@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/AuthPage';
 import type { Session } from '@toolpad/core/AppProvider';
 import { useNavigate } from 'react-router';
 import { useSession } from '../SessionContext';

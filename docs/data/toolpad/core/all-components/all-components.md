@@ -8,3 +8,4 @@
 - [Dashboard Layout](/toolpad/core/react-dashboard-layout/)
 - [Page Container](/toolpad/core/react-page-container/)
 - [Sign-in Page](/toolpad/core/react-sign-in-page/)
+- [Sign-up Page](/toolpad/core/react-sign-up-page/)

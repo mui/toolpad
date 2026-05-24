@@ -18,7 +18,7 @@ The `SignInPage` component is a quick way to generate a ready-to-use authenticat
 
 ```tsx
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/AuthPage';
 
 export default function App() {
   return (
@@ -35,6 +35,12 @@ export default function App() {
 ```
 
 ## OAuth
+
+:::warning
+
+This function works similarly to the sign-up flow　to authenticate users, but is focused on signing in existing accounts rather than creating new ones. For details on the sign-up flow, see the [Sign-up Page documentation](/toolpad/core/components/sign-up-page/).
+
+:::
 
 The `SignInPage` component can be set up with an OAuth provider by passing in a list of providers in the `providers` prop, along with a `signIn` function that accepts the `provider` as a parameter.
 
@@ -177,7 +183,7 @@ To have a fully built "Sign in with GitHub" page appear at the `/auth/signin` ro
 ```tsx title="./app/auth/signin/page.tsx"
 // ...
 import * as React from 'react';
-import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
+import { SignInPage, type AuthProvider } from '@toolpad/core/AuthPage';
 import { AuthError } from 'next-auth';
 import { providerMap, signIn } from '../../../auth';
 
@@ -294,6 +300,12 @@ Beyond the [global localization options](/toolpad/core/introduction/base-concept
 
 The `SignInPage` component has versions with different layouts for authentication - one column, two column and others such. The APIs of these components are identical. This is in progress.
 
+### 🚧 SignUp
+
+A dedicated `SignUpPage` component is planned to provide a seamless registration experience for new users. This will support multiple authentication providers and allow for custom fields, validation, and branding, similar to the `SignInPage`. Stay tuned for updates and check the [Sign-up Page documentation](/toolpad/core/components/sign-up-page/) for the latest information.
+
 ## 🚧 Other authentication flows
 
-Besides the `SignInPage` , the team is planning work on several other components that enable new workflows such as [sign up](https://github.com/mui/toolpad/issues/4068) and [password reset](https://github.com/mui/toolpad/issues/4265).
+Additional authentication flows such as password reset, multi-factor authentication (MFA), and account recovery are on the roadmap. These features aim to enhance security and user experience. Follow the [Toolpad GitHub issues](https://github.com/mui/toolpad/issues) for progress and upcoming releases.
+
+Besides the `SignInPage` , the team is planning work on several other components that enable new workflows such as [password reset](https://github.com/mui/toolpad/issues/4265).

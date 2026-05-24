@@ -19,6 +19,16 @@ export interface LocaleText {
   providerSignInTitle: (provider: string) => string;
   signInRememberMe: string;
 
+  // SignUpPage
+  signUpTitle: string | ((brandingTitle?: string) => string);
+  signUpSubtitle: string;
+  providerSignUpTitle: (provider: string) => string;
+  passwordsDoNotMatch: string;
+  confirmPassword: string;
+  terms: string;
+  privacy: string;
+  agree: string;
+
   // Common authentication labels
   email: string;
   passkey: string;
@@ -37,6 +47,7 @@ export interface LocaleText {
   alert: string;
   confirm: string;
   loading: string;
+  and: string;
 
   // CRUD
   createNewButtonLabel: string;

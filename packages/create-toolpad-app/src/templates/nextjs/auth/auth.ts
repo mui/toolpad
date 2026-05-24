@@ -1,4 +1,4 @@
-import type { SupportedAuthProvider } from '@toolpad/core/SignInPage';
+import type { SupportedAuthProvider } from '@toolpad/core/AuthPage';
 import { kebabToConstant, kebabToPascal } from '@toolpad/utils/strings';
 import { requiresIssuer, requiresTenantId } from './utils';
 import { Template } from '../../../types';

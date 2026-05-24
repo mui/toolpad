@@ -4,7 +4,7 @@ import {
   SignInPage,
   type AuthProvider,
   type AuthResponse,
-} from '@toolpad/core/SignInPage';
+} from '@toolpad/core/AuthPage';
 import { hiIN } from '@toolpad/core/locales';
 
 const providers = [

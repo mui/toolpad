@@ -5,7 +5,7 @@ const signIn: Template = (options) => {
 
   return `import * as React from 'react';
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/AuthPage';
 ${hasPasskeyProvider ? "import { signIn as webauthnSignIn } from 'next-auth/webauthn';" : ''}
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';

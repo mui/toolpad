@@ -4,7 +4,7 @@ import {
   SignInPage,
   SupportedAuthProvider,
   AuthResponse,
-} from '@toolpad/core/SignInPage';
+} from '@toolpad/core/AuthPage';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { useTheme } from '@mui/material/styles';
 

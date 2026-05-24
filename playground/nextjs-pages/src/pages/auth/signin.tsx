@@ -1,7 +1,7 @@
 import * as React from 'react';
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import Link from '@mui/material/Link';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/AuthPage';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { auth, providerMap } from '../../auth';

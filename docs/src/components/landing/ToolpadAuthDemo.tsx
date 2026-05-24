@@ -3,7 +3,7 @@ import Paper from '@mui/material/Paper';
 import { HighlightedCode } from '@mui/docs/HighlightedCode';
 import DemoSandbox from 'docs/src/modules/components/DemoSandbox';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
+import { SignInPage, type AuthProvider } from '@toolpad/core/AuthPage';
 import Frame from '../../modules/components/Frame';
 
 const NOOP = () => {};

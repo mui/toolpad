@@ -98,6 +98,10 @@ const pages: MuiPage[] = [
             title: 'Sign-in Page',
           },
           {
+            pathname: '/toolpad/core/react-sign-up-page',
+            title: 'Sign-up Page',
+          },
+          {
             pathname: '/toolpad/core/react-account',
             title: 'Account',
           },

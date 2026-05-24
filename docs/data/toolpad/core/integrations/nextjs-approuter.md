@@ -181,7 +181,7 @@ Use the `SignInPage` component to add a sign-in page to your app. For example, `
 
 ```tsx title="app/auth/signin/page.tsx"
 import * as React from 'react';
-import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
+import { SignInPage, type AuthProvider } from '@toolpad/core/AuthPage';
 import { AuthError } from 'next-auth';
 import { providerMap, signIn } from '../../../auth';
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/AuthPage';
 import { providerMap } from '../../../auth';
 import signIn from './actions';
 

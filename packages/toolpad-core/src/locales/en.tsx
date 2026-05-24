@@ -34,7 +34,7 @@ const enLabels: LocaleText = {
   delete: 'Delete',
   alert: 'Alert',
   confirm: 'Confirm',
-  loading: 'Loading...',
+  loading: 'Loading…',
 
   // CRUD
   createNewButtonLabel: 'Create new',

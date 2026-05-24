@@ -7,7 +7,7 @@ until nc -z db 5432; do
 done
 
 # Run migrations
-npx prisma migrate deploy 
+npx prisma migrate deploy
 npx prisma generate
 
 # Start the application

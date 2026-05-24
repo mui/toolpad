@@ -13,7 +13,7 @@ export default function LocalStorageStateString() {
       <TextField
         value={value ?? ''}
         onChange={(event) => setValue(event.target.value)}
-        placeholder="Type something..."
+        placeholder="Type something…"
       />
       <Button onClick={() => setValue(null)}>Clear</Button>
     </Stack>

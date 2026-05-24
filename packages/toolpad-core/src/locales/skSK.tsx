@@ -34,7 +34,7 @@ const enLabels: LocaleText = {
   delete: 'Vymazať',
   alert: 'Upozornenie',
   confirm: 'Potvrdiť',
-  loading: 'Načítavanie...',
+  loading: 'Načítavanie…',
 
   // CRUD
   createNewButtonLabel: 'Vytvoriť nový',

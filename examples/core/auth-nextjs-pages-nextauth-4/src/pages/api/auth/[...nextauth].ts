@@ -9,7 +9,7 @@ export const authOptions = {
       clientSecret: process.env.GITHUB_CLIENT_SECRET ?? '',
     }),
     CredentialsProvider({
-      // The name to display on the sign in form (e.g. 'Sign in with...')
+      // The name to display on the sign in form (e.g. 'Sign in with…')
       credentials: {
         email: { label: 'Email Address', type: 'email' },
         password: { label: 'Password', type: 'password' },

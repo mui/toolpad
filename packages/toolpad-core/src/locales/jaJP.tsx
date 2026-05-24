@@ -34,7 +34,7 @@ const jaLabels: LocaleText = {
   delete: '削除',
   alert: 'アラート',
   confirm: '確認',
-  loading: '読み込み中...',
+  loading: '読み込み中…',
 
   // CRUD
   createNewButtonLabel: '新規作成',

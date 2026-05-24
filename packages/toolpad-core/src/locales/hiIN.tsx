@@ -34,7 +34,7 @@ const hiINLabels: Partial<LocaleText> = {
   delete: 'हटाएं',
   alert: 'सूचना',
   confirm: 'पुष्टि करें',
-  loading: 'लोड हो रहा है...',
+  loading: 'लोड हो रहा है…',
 };
 
 export default getLocalization(hiINLabels);

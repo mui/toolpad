@@ -8,8 +8,8 @@ components: NotificationsProvider
 
 <p class="description">Imperative APIs to show and interact with application notifications.</p>
 
-:::info
-If this is your first time using Toolpad Core, it's recommended to read about the [basic concepts](/toolpad/core/introduction/base-concepts/) first.
+:::warning
+If you are interested in this feature then please check and upvote [this issue](https://github.com/mui/material-ui/issues/18098).
 :::
 
 Toolpad Core offers a set of abstractions that make it easier to interact with notifications. Notifications are used to give short updates to the user about things that are happening during the application lifetime. They appear at the bottom of the screen. The Toolpad API allows for opening multiple notifications concurrenlty.

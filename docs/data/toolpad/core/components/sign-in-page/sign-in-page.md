@@ -8,8 +8,8 @@ components: SignInPage, Account, NotificationsProvider, LocalizationProvider
 
 <p class="description">A customizable sign-in UI component that abstracts away the pain needed to wire together a secure authentication page for your application.</p>
 
-:::info
-If this is your first time using Toolpad Core, it's recommended to read about the [basic concepts](/toolpad/core/introduction/base-concepts/) first.
+:::warning
+If you are interested in this feature then please check and upvote [this issue](https://github.com/mui/material-ui/issues/47238).
 :::
 
 The `SignInPage` component is a quick way to generate a ready-to-use authentication page with multiple OAuth providers, or a credentials form.

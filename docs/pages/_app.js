@@ -20,6 +20,8 @@ import { pathnameToLanguage } from 'docs/src/modules/utils/helpers';
 import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl';
 import { DocsProvider } from '@mui/docs/DocsProvider';
 import { mapTranslations } from '@mui/docs/i18n';
+import Box from '@mui/material/Box';
+import Banner from '../src/modules/components/Banner';
 import toolpadStudioPages from '../data/toolpad/studio/pages';
 import toolpadCorePages from '../data/toolpad/core/pages';
 import * as config from '../config';
@@ -169,6 +171,8 @@ function AppWrapper(props) {
   const { children, emotionCache, pageProps } = props;
 
   const router = useRouter();
+  const isDocs = router.asPath.startsWith('/toolpad/');
+  const isToolpadHome = router.asPath === '/toolpad/studio/' || router.asPath === '/toolpad/';
   // TODO move productId & productCategoryId resolution to page layout.
   // We should use the productId field from the markdown and fallback to getProductInfoFromUrl()
   // if not present
@@ -279,6 +283,18 @@ function AppWrapper(props) {
               <PageContext.Provider value={pageContextValue}>
                 <ThemeProvider>
                   <DocsStyledEngineProvider cacheLtr={emotionCache}>
+                    {isDocs && !isToolpadHome ? (
+                      <Box
+                        sx={{
+                          top: 'var(--MuiDocs-header-height)',
+
+                          mt: 'var(--MuiDocs-header-height)',
+                          ml: { lg: 'var(--MuiDocs-navDrawer-width)' },
+                        }}
+                      >
+                        <Banner />
+                      </Box>
+                    ) : null}
                     {children}
                     <GoogleAnalytics />
                   </DocsStyledEngineProvider>

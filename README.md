@@ -1,7 +1,7 @@
 > [!WARNING]
-> At the moment, the maintainers are primarily focused on other projects and are not actively working on Toolpad Core. We may not be able to respond promptly to issues or pull requests.
+> Toolpad is no longer actively maintained. Issues and pull requests may not receive a response.
 >
-> You can use the **CRUD dashboard template** from the [Material UI React templates page](https://mui.com/material-ui/getting-started/templates/#free-templates) as an easy-to-customize, copy-pastable alternative to the main Toolpad Core components — including dashboard layout and CRUD features.
+> As an alternative to the main Toolpad Core components, use the **CRUD dashboard template** from the [Material UI React templates page](https://mui.com/material-ui/getting-started/templates/#free-templates). It's easy to customize and copy into your project. You can also ask an AI coding assistant to scaffold a CRUD dashboard for you.
 
 ---
 
